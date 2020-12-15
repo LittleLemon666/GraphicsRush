@@ -483,7 +483,7 @@ void TrainView::draw()
 		}
 
 		this->plane = new VAO;
-		this->plane->element_amount = sizeof(path->element);
+		this->plane->element_amount = (int)path->element.size() * sizeof(GLuint);
 		glGenVertexArrays(1, &this->plane->vao);
 		glGenBuffers(3, this->plane->vbo);
 		glGenBuffers(1, &this->plane->ebo);
