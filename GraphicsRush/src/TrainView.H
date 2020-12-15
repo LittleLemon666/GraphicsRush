@@ -34,6 +34,8 @@
 class TrainWindow;
 class CTrack;
 
+/*********************NEW ADDITIONS*********************/
+#include "ShaderInfo.h"
 
 //#######################################################################
 // TODO
@@ -106,5 +108,6 @@ class TrainView : public Fl_Gl_Window
 		ALuint source;
 		ALuint buffer;
 
-
+		/*********************NEW ADDITIONS*********************/
+		ShaderInfo* path = nullptr;
 };
