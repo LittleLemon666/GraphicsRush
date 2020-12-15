@@ -39,7 +39,8 @@
 #include "TrainWindow.H"
 #include "Utilities/3DUtils.H"
 
-
+/*********************NEW ADDITIONS*********************/
+using namespace glm;
 
 #ifdef EXAMPLE_SOLUTION
 #	include "TrainExample/TrainExample.H"
@@ -210,24 +211,93 @@ void TrainView::draw()
 			/*********************NEW ADDITIONS*********************/
 			if (!this->path) {
 				this->path = new ShaderInfo;
-				path->vertices = {
-					-0.5f ,0.0f , -0.5f,
-					-0.5f ,0.0f , 0.5f ,
-					0.5f ,0.0f ,0.5f ,
-					0.5f ,0.0f ,-0.5f };
-				path->normal = {
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f,
-					0.0f, 1.0f, 0.0f };
-				path->texture_coordinate = {
-					0.0f, 0.0f,
-					1.0f, 0.0f,
-					1.0f, 1.0f,
-					0.0f, 1.0f };
-				path->element = {
-					0, 1, 2,
-					0, 2, 3, };
+				//add info for each track between control points
+				const int NUM_of_CPs = (int)m_pTrack->points.size();
+				for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
+
+					//create forward vector
+					vec3 this_cp = vec3(m_pTrack->points[cp_id].pos.x,
+						m_pTrack->points[cp_id].pos.y, 
+						m_pTrack->points[cp_id].pos.z);
+					int next_cp_id = (cp_id + 1) % NUM_of_CPs;
+					vec3 next_cp = vec3(m_pTrack->points[next_cp_id].pos.x,
+						m_pTrack->points[next_cp_id].pos.y,
+						m_pTrack->points[next_cp_id].pos.z);
+					vec3 forward = next_cp - this_cp;
+					forward = normalize(forward);
+					//std::cout << forward.x << " " << forward.y << " " << forward.z << std::endl;
+
+					//create orient vector
+					vec3 this_cp_orient = vec3(m_pTrack->points[cp_id].orient.x,
+						m_pTrack->points[cp_id].orient.y,
+						m_pTrack->points[cp_id].orient.z);
+					this_cp_orient = normalize(this_cp_orient);
+					//std::cout << this_cp_orient.x << " " << this_cp_orient.y << " " << this_cp_orient.z << std::endl;
+					vec3 next_cp_orient = vec3(m_pTrack->points[next_cp_id].orient.x,
+						m_pTrack->points[next_cp_id].orient.y,
+						m_pTrack->points[next_cp_id].orient.z);
+					next_cp_orient = normalize(next_cp_orient);
+					//std::cout << next_cp_orient.x << " " << next_cp_orient.y << " " << next_cp_orient.z << std::endl;
+
+					//create cross vector
+					vec3 this_cross = vec3(forward.y * this_cp_orient.z - this_cp_orient.y * forward.z,
+						forward.z * this_cp_orient.x - this_cp_orient.z * forward.x,
+						forward.x * this_cp_orient.y - this_cp_orient.x * forward.y);
+					this_cross = normalize(this_cross);
+					//std::cout << this_cross.x << " " << this_cross.y << " " << this_cross.z << std::endl;
+					vec3 next_cross = vec3(forward.y * next_cp_orient.z - next_cp_orient.y * forward.z,
+						forward.z * next_cp_orient.x - next_cp_orient.z * forward.x,
+						forward.x * next_cp_orient.y - next_cp_orient.x * forward.y);
+					next_cross = normalize(next_cross);
+					//std::cout << next_cross.x << " " << next_cross.y << " " << next_cross.z << std::endl;
+
+					//initialize path->vertices
+					GLfloat roadSize = 1.0f;
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f - roadSize * this_cross.x);
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f - roadSize * this_cross.y);
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f - roadSize * this_cross.z);
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f + roadSize * this_cross.x);
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f + roadSize * this_cross.y);
+					path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f + roadSize * this_cross.z);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f + roadSize * next_cross.x);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f + roadSize * next_cross.y);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f + roadSize * next_cross.z);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f - roadSize * next_cross.x);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f - roadSize * next_cross.y);
+					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f - roadSize * next_cross.z);
+
+					//initialize path->normal
+					path->normal.push_back(m_pTrack->points[cp_id].orient.x);
+					path->normal.push_back(m_pTrack->points[cp_id].orient.y);
+					path->normal.push_back(m_pTrack->points[cp_id].orient.z);
+					path->normal.push_back(m_pTrack->points[cp_id].orient.x);
+					path->normal.push_back(m_pTrack->points[cp_id].orient.y);
+					path->normal.push_back(m_pTrack->points[cp_id].orient.z);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.x);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.y);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.z);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.x);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.y);
+					path->normal.push_back(m_pTrack->points[next_cp_id].orient.z);
+
+					//initialize path->texture_coordinate
+					path->texture_coordinate.push_back((GLfloat)0.0);
+					path->texture_coordinate.push_back((GLfloat)0.0);
+					path->texture_coordinate.push_back((GLfloat)1.0);
+					path->texture_coordinate.push_back((GLfloat)0.0);
+					path->texture_coordinate.push_back((GLfloat)1.0);
+					path->texture_coordinate.push_back((GLfloat)1.0);
+					path->texture_coordinate.push_back((GLfloat)0.0);
+					path->texture_coordinate.push_back((GLfloat)1.0);
+
+					//initialize path->element
+					path->element.push_back(cp_id * 4);
+					path->element.push_back(cp_id * 4 + 1);
+					path->element.push_back(cp_id * 4 + 2);
+					path->element.push_back(cp_id * 4);
+					path->element.push_back(cp_id * 4 + 2);
+					path->element.push_back(cp_id * 4 + 3);
+				}
 			}
 
 			this->plane = new VAO;
@@ -265,7 +335,7 @@ void TrainView::draw()
 		}
 
 		if (!this->texture)
-			this->texture = new Texture2D("../GraphicsRush/Images/church.png");
+			this->texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
 
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
