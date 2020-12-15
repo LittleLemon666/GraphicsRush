@@ -191,8 +191,8 @@ void TrainView::draw()
 	{
 		//initiailize VAO, VBO, Shader...
 
-		if (!this->shader)
-			this->shader = new
+		if (!this->path_shader)
+			this->path_shader = new
 			Shader(
 				"../GraphicsRush/src/shaders/simple.vert",
 				nullptr, nullptr, nullptr,
@@ -206,130 +206,128 @@ void TrainView::draw()
 		glBufferData(GL_UNIFORM_BUFFER, this->commom_matrices->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-		if (!this->plane) {
-			/*********************NEW ADDITIONS*********************/
-			if (!this->path) {
-				this->path = new ShaderInfo;
-				//add info for each track between control points
-				const int NUM_of_CPs = (int)m_pTrack->points.size();
-				for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
+		/*********************NEW ADDITIONS*********************/
+		if (!this->path) {
+			this->path = new ShaderInfo;
+			//add info for each track between control points
+			const int NUM_of_CPs = (int)m_pTrack->points.size();
+			for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
-					//create forward vector
-					vec3 this_cp = vec3(m_pTrack->points[cp_id].pos.x,
-						m_pTrack->points[cp_id].pos.y, 
-						m_pTrack->points[cp_id].pos.z);
-					int next_cp_id = (cp_id + 1) % NUM_of_CPs;
-					vec3 next_cp = vec3(m_pTrack->points[next_cp_id].pos.x,
-						m_pTrack->points[next_cp_id].pos.y,
-						m_pTrack->points[next_cp_id].pos.z);
-					vec3 forward = next_cp - this_cp;
-					forward = normalize(forward);
+				//create forward vector
+				vec3 this_cp = vec3(m_pTrack->points[cp_id].pos.x,
+					m_pTrack->points[cp_id].pos.y,
+					m_pTrack->points[cp_id].pos.z);
+				int next_cp_id = (cp_id + 1) % NUM_of_CPs;
+				vec3 next_cp = vec3(m_pTrack->points[next_cp_id].pos.x,
+					m_pTrack->points[next_cp_id].pos.y,
+					m_pTrack->points[next_cp_id].pos.z);
+				vec3 forward = next_cp - this_cp;
+				forward = normalize(forward);
 
-					//create orient vector
-					vec3 this_cp_orient = vec3(m_pTrack->points[cp_id].orient.x,
-						m_pTrack->points[cp_id].orient.y,
-						m_pTrack->points[cp_id].orient.z);
-					this_cp_orient = normalize(this_cp_orient);
-					vec3 next_cp_orient = vec3(m_pTrack->points[next_cp_id].orient.x,
-						m_pTrack->points[next_cp_id].orient.y,
-						m_pTrack->points[next_cp_id].orient.z);
-					next_cp_orient = normalize(next_cp_orient);
-					
-					//create cross vector
-					vec3 this_cross = vec3(forward.y * this_cp_orient.z - this_cp_orient.y * forward.z,
-						forward.z * this_cp_orient.x - this_cp_orient.z * forward.x,
-						forward.x * this_cp_orient.y - this_cp_orient.x * forward.y);
-					this_cross = normalize(this_cross);
-					vec3 next_cross = vec3(forward.y * next_cp_orient.z - next_cp_orient.y * forward.z,
-						forward.z * next_cp_orient.x - next_cp_orient.z * forward.x,
-						forward.x * next_cp_orient.y - next_cp_orient.x * forward.y);
-					next_cross = normalize(next_cross);
-					
-					//initialize path->vertices
-					GLfloat roadSize = 1.0f;
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f - roadSize * this_cross.x);
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f - roadSize * this_cross.y);
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f - roadSize * this_cross.z);
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f + roadSize * this_cross.x);
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f + roadSize * this_cross.y);
-					path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f + roadSize * this_cross.z);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f + roadSize * next_cross.x);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f + roadSize * next_cross.y);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f + roadSize * next_cross.z);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f - roadSize * next_cross.x);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f - roadSize * next_cross.y);
-					path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f - roadSize * next_cross.z);
+				//create orient vector
+				vec3 this_cp_orient = vec3(m_pTrack->points[cp_id].orient.x,
+					m_pTrack->points[cp_id].orient.y,
+					m_pTrack->points[cp_id].orient.z);
+				this_cp_orient = normalize(this_cp_orient);
+				vec3 next_cp_orient = vec3(m_pTrack->points[next_cp_id].orient.x,
+					m_pTrack->points[next_cp_id].orient.y,
+					m_pTrack->points[next_cp_id].orient.z);
+				next_cp_orient = normalize(next_cp_orient);
 
-					//initialize path->normal
-					path->normal.push_back(this_cp_orient.x);
-					path->normal.push_back(this_cp_orient.y);
-					path->normal.push_back(this_cp_orient.z);
-					path->normal.push_back(this_cp_orient.x);
-					path->normal.push_back(this_cp_orient.y);
-					path->normal.push_back(this_cp_orient.z);
-					path->normal.push_back(next_cp_orient.x);
-					path->normal.push_back(next_cp_orient.y);
-					path->normal.push_back(next_cp_orient.z);
-					path->normal.push_back(next_cp_orient.x);
-					path->normal.push_back(next_cp_orient.y);
-					path->normal.push_back(next_cp_orient.z);
+				//create cross vector
+				vec3 this_cross = vec3(forward.y * this_cp_orient.z - this_cp_orient.y * forward.z,
+					forward.z * this_cp_orient.x - this_cp_orient.z * forward.x,
+					forward.x * this_cp_orient.y - this_cp_orient.x * forward.y);
+				this_cross = normalize(this_cross);
+				vec3 next_cross = vec3(forward.y * next_cp_orient.z - next_cp_orient.y * forward.z,
+					forward.z * next_cp_orient.x - next_cp_orient.z * forward.x,
+					forward.x * next_cp_orient.y - next_cp_orient.x * forward.y);
+				next_cross = normalize(next_cross);
 
-					//initialize path->texture_coordinate
-					path->texture_coordinate.push_back((GLfloat)0.0);
-					path->texture_coordinate.push_back((GLfloat)0.0);
-					path->texture_coordinate.push_back((GLfloat)1.0);
-					path->texture_coordinate.push_back((GLfloat)0.0);
-					path->texture_coordinate.push_back((GLfloat)1.0);
-					path->texture_coordinate.push_back((GLfloat)1.0);
-					path->texture_coordinate.push_back((GLfloat)0.0);
-					path->texture_coordinate.push_back((GLfloat)1.0);
+				//initialize path->vertices
+				GLfloat roadSize = 1.0f;
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f - roadSize * this_cross.x);
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f - roadSize * this_cross.y);
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f - roadSize * this_cross.z);
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.x / 10.0f + roadSize * this_cross.x);
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.y / 10.0f + roadSize * this_cross.y);
+				path->vertices.push_back(m_pTrack->points[cp_id].pos.z / 10.0f + roadSize * this_cross.z);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f + roadSize * next_cross.x);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f + roadSize * next_cross.y);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f + roadSize * next_cross.z);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.x / 10.0f - roadSize * next_cross.x);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.y / 10.0f - roadSize * next_cross.y);
+				path->vertices.push_back(m_pTrack->points[next_cp_id].pos.z / 10.0f - roadSize * next_cross.z);
 
-					//initialize path->element
-					path->element.push_back(cp_id * 4);
-					path->element.push_back(cp_id * 4 + 1);
-					path->element.push_back(cp_id * 4 + 2);
-					path->element.push_back(cp_id * 4);
-					path->element.push_back(cp_id * 4 + 2);
-					path->element.push_back(cp_id * 4 + 3);
-				}
+				//initialize path->normal
+				path->normal.push_back(this_cp_orient.x);
+				path->normal.push_back(this_cp_orient.y);
+				path->normal.push_back(this_cp_orient.z);
+				path->normal.push_back(this_cp_orient.x);
+				path->normal.push_back(this_cp_orient.y);
+				path->normal.push_back(this_cp_orient.z);
+				path->normal.push_back(next_cp_orient.x);
+				path->normal.push_back(next_cp_orient.y);
+				path->normal.push_back(next_cp_orient.z);
+				path->normal.push_back(next_cp_orient.x);
+				path->normal.push_back(next_cp_orient.y);
+				path->normal.push_back(next_cp_orient.z);
+
+				//initialize path->texture_coordinate
+				path->texture_coordinate.push_back((GLfloat)0.0);
+				path->texture_coordinate.push_back((GLfloat)0.0);
+				path->texture_coordinate.push_back((GLfloat)1.0);
+				path->texture_coordinate.push_back((GLfloat)0.0);
+				path->texture_coordinate.push_back((GLfloat)1.0);
+				path->texture_coordinate.push_back((GLfloat)1.0);
+				path->texture_coordinate.push_back((GLfloat)0.0);
+				path->texture_coordinate.push_back((GLfloat)1.0);
+
+				//initialize path->element
+				path->element.push_back(cp_id * 4);
+				path->element.push_back(cp_id * 4 + 1);
+				path->element.push_back(cp_id * 4 + 2);
+				path->element.push_back(cp_id * 4);
+				path->element.push_back(cp_id * 4 + 2);
+				path->element.push_back(cp_id * 4 + 3);
 			}
-
-			this->plane = new VAO;
-			this->plane->element_amount = sizeof(path->element);
-			glGenVertexArrays(1, &this->plane->vao);
-			glGenBuffers(3, this->plane->vbo);
-			glGenBuffers(1, &this->plane->ebo);
-
-			glBindVertexArray(this->plane->vao);
-
-			// Position attribute
-			glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[0]);
-			glBufferData(GL_ARRAY_BUFFER, (int)path->vertices.size() * sizeof(GLfloat), &path->vertices[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-			glEnableVertexAttribArray(0);
-
-			// Normal attribute
-			glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[1]);
-			glBufferData(GL_ARRAY_BUFFER, (int)path->normal.size() * sizeof(GLfloat), &path->normal[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-			glEnableVertexAttribArray(1);
-
-			// Texture Coordinate attribute
-			glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[2]);
-			glBufferData(GL_ARRAY_BUFFER, (int)path->texture_coordinate.size() * sizeof(GLfloat), &path->texture_coordinate[0], GL_STATIC_DRAW);
-			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-			glEnableVertexAttribArray(2);
-
-			//Element attribute
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->plane->ebo);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)path->element.size() * sizeof(GLuint), &path->element[0], GL_STATIC_DRAW);
-
-			// Unbind VAO
-			glBindVertexArray(0);
 		}
 
-		if (!this->texture)
-			this->texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
+		this->path->vertex_data = new VAO;
+		this->path->vertex_data->element_amount = sizeof(path->element);
+		glGenVertexArrays(1, &this->path->vertex_data->vao);
+		glGenBuffers(3, this->path->vertex_data->vbo);
+		glGenBuffers(1, &this->path->vertex_data->ebo);
+
+		glBindVertexArray(this->path->vertex_data->vao);
+
+		// Position attribute
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, (int)path->vertices.size() * sizeof(GLfloat), &path->vertices[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		// Normal attribute
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, (int)path->normal.size() * sizeof(GLfloat), &path->normal[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+
+		// Texture Coordinate attribute
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[2]);
+		glBufferData(GL_ARRAY_BUFFER, (int)path->texture_coordinate.size() * sizeof(GLfloat), &path->texture_coordinate[0], GL_STATIC_DRAW);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(2);
+
+		//Element attribute
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->path->vertex_data->ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)path->element.size() * sizeof(GLuint), &path->element[0], GL_STATIC_DRAW);
+
+		// Unbind VAO
+		glBindVertexArray(0);
+
+		if (!this->path_texture)
+			this->path_texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
 
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
@@ -482,34 +480,34 @@ void TrainView::draw()
 			path->element.push_back(cp_id * 4 + 3);
 		}
 
-		this->plane = new VAO;
-		this->plane->element_amount = (int)path->element.size() * sizeof(GLuint);
-		glGenVertexArrays(1, &this->plane->vao);
-		glGenBuffers(3, this->plane->vbo);
-		glGenBuffers(1, &this->plane->ebo);
+		this->path->vertex_data = new VAO;
+		this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);
+		glGenVertexArrays(1, &this->path->vertex_data->vao);
+		glGenBuffers(3, this->path->vertex_data->vbo);
+		glGenBuffers(1, &this->path->vertex_data->ebo);
 
-		glBindVertexArray(this->plane->vao);
+		glBindVertexArray(this->path->vertex_data->vao);
 
 		// Position attribute
-		glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[0]);
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[0]);
 		glBufferData(GL_ARRAY_BUFFER, (int)path->vertices.size() * sizeof(GLfloat), &path->vertices[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(0);
 
 		// Normal attribute
-		glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[1]);
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[1]);
 		glBufferData(GL_ARRAY_BUFFER, (int)path->normal.size() * sizeof(GLfloat), &path->normal[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(1);
 
 		// Texture Coordinate attribute
-		glBindBuffer(GL_ARRAY_BUFFER, this->plane->vbo[2]);
+		glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[2]);
 		glBufferData(GL_ARRAY_BUFFER, (int)path->texture_coordinate.size() * sizeof(GLfloat), &path->texture_coordinate[0], GL_STATIC_DRAW);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 		glEnableVertexAttribArray(2);
 
 		//Element attribute
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->plane->ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->path->vertex_data->ebo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (int)path->element.size() * sizeof(GLuint), &path->element[0], GL_STATIC_DRAW);
 
 		// Unbind VAO
@@ -545,39 +543,6 @@ void TrainView::draw()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-
-	// top view only needs one light
-	if (tw->topCam->value()) {
-		glDisable(GL_LIGHT1);
-		glDisable(GL_LIGHT2);
-	}
-	else {
-		glEnable(GL_LIGHT1);
-		glEnable(GL_LIGHT2);
-	}
-
-	//*********************************************************************
-	//
-	// * set the light parameters
-	//
-	//**********************************************************************
-	GLfloat lightPosition1[] = { 0,1,1,0 }; // {50, 200.0, 50, 1.0};
-	GLfloat lightPosition2[] = { 1, 0, 0, 0 };
-	GLfloat lightPosition3[] = { 0, -1, 0, 0 };
-	GLfloat yellowLight[] = { 0.5f, 0.5f, .1f, 1.0 };
-	GLfloat whiteLight[] = { 1.0f, 1.0f, 1.0f, 1.0 };
-	GLfloat blueLight[] = { .1f,.1f,.3f,1.0 };
-	GLfloat grayLight[] = { .3f, .3f, .3f, 1.0 };
-
-	glLightfv(GL_LIGHT0, GL_POSITION, lightPosition1);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteLight);
-	glLightfv(GL_LIGHT0, GL_AMBIENT, grayLight);
-
-	glLightfv(GL_LIGHT1, GL_POSITION, lightPosition2);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, yellowLight);
-
-	glLightfv(GL_LIGHT2, GL_POSITION, lightPosition3);
-	glLightfv(GL_LIGHT2, GL_DIFFUSE, blueLight);
 
 	// set linstener position 
 	if (selectedCube >= 0)
@@ -624,20 +589,20 @@ void TrainView::draw()
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 
 	//bind shader
-	this->shader->Use();
+	this->path_shader->Use();
 
 	glm::mat4 model_matrix = glm::mat4();
 	model_matrix = glm::translate(model_matrix, this->source_pos);
 	model_matrix = glm::scale(model_matrix, glm::vec3(10.0f, 10.0f, 10.0f));
-	glUniformMatrix4fv(glGetUniformLocation(this->shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->texture->bind(0);
-	glUniform1i(glGetUniformLocation(this->shader->Program, "u_texture"), 0);
+	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+	this->path_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
 
 	//bind VAO
-	glBindVertexArray(this->plane->vao);
+	glBindVertexArray(this->path->vertex_data->vao);
 
-	glDrawElements(GL_TRIANGLES, this->plane->element_amount, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, this->path->vertex_data->element_amount, GL_UNSIGNED_INT, 0);
 
 	//unbind VAO
 	glBindVertexArray(0);

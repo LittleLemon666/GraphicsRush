@@ -96,9 +96,8 @@ class TrainView : public Fl_Gl_Window
 		TrainWindow*	tw;				// The parent of this display window
 		CTrack*			m_pTrack;		// The track of the entire scene
 
-		Shader* shader		= nullptr;
-		Texture2D* texture	= nullptr;
-		VAO* plane			= nullptr;
+		Shader* path_shader		= nullptr;
+		Texture2D* path_texture	= nullptr;
 		UBO* commom_matrices= nullptr;
 
 		//OpenAL
