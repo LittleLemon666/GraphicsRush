@@ -180,10 +180,10 @@ void TrainView::initPath() {
 	path->normal = {};
 	path->texture_coordinate = {};
 	path->element = {};
-	vec3* first_segment_r = nullptr;
-	vec3* first_segment_l = nullptr;
-	vec3* last_segment_r = nullptr;
-	vec3* last_segment_l = nullptr;
+	vec3 first_segment_r(-1.0f, -1.0f, -1.0f);
+	vec3 first_segment_l(-1.0f, -1.0f, -1.0f);
+	vec3 last_segment_r(-1.0f, -1.0f, -1.0f);
+	vec3 last_segment_l(-1.0f, -1.0f, -1.0f);
 	const int NUM_of_CPs = (int)m_pTrack->points.size();
 	for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
@@ -203,7 +203,7 @@ void TrainView::initPath() {
 			vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
 
 			//overide linear track with BSpline track
-			gmt.setG(cp_id);
+			gmt.setG_pos(cp_id);
 			this_segment = gmt.calculate((float)segment / (float)PATH_DIVIDE);
 			next_segment = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
 
@@ -211,15 +211,18 @@ void TrainView::initPath() {
 			segment_forward = normalize(segment_forward);
 
 			//create orient vector
+			gmt.setG_orient(cp_id);
 			vec3 this_cp_orient = vec3(
 				m_pTrack->points[cp_id].orient.x * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)segment / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.y * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)segment / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.z * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)segment / (float)PATH_DIVIDE));
+			this_cp_orient = gmt.calculate((float)segment / (float)PATH_DIVIDE);
 			this_cp_orient = normalize(this_cp_orient);
 			vec3 next_cp_orient = vec3(
 				m_pTrack->points[cp_id].orient.x * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)(segment + 1) / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.y * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)(segment + 1) / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.z * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)(segment + 1) / (float)PATH_DIVIDE));
+			next_cp_orient = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
 			next_cp_orient = normalize(next_cp_orient);
 
 			//create cross vector
@@ -232,16 +235,12 @@ void TrainView::initPath() {
 			this_cross = roadSize * this_cross;
 			next_cross = roadSize * next_cross;
 			//record next segment and the first segment so later it can be used to perfectly connect segments
-			if (!last_segment_r) {
-				last_segment_r = new vec3;
-				last_segment_l = new vec3;
-				first_segment_r = new vec3;
-				*first_segment_r = vec3(
+			if (cp_id == 0 && segment == 0) {
+				first_segment_r = vec3(
 					this_segment.x + this_cross.x,
 					this_segment.y + this_cross.y,
 					this_segment.z + this_cross.z);
-				first_segment_l = new vec3;
-				*first_segment_l = vec3(
+				first_segment_l = vec3(
 					this_segment.x - this_cross.x,
 					this_segment.y - this_cross.y,
 					this_segment.z - this_cross.z);
@@ -253,24 +252,34 @@ void TrainView::initPath() {
 				path->vertices.push_back(this_segment.z + this_cross.z);
 			}
 			else {
-				path->vertices.push_back(last_segment_l->x);
-				path->vertices.push_back(last_segment_l->y);
-				path->vertices.push_back(last_segment_l->z);
-				path->vertices.push_back(last_segment_r->x);
-				path->vertices.push_back(last_segment_r->y);
-				path->vertices.push_back(last_segment_r->z);
+				path->vertices.push_back(last_segment_l.x);
+				path->vertices.push_back(last_segment_l.y);
+				path->vertices.push_back(last_segment_l.z);
+				path->vertices.push_back(last_segment_r.x);
+				path->vertices.push_back(last_segment_r.y);
+				path->vertices.push_back(last_segment_r.z);
 			}
-			path->vertices.push_back(next_segment.x + next_cross.x);
-			path->vertices.push_back(next_segment.y + next_cross.y);
-			path->vertices.push_back(next_segment.z + next_cross.z);
-			path->vertices.push_back(next_segment.x - next_cross.x);
-			path->vertices.push_back(next_segment.y - next_cross.y);
-			path->vertices.push_back(next_segment.z - next_cross.z);
-			*last_segment_r = vec3(
+			if (cp_id + 1 == NUM_of_CPs && segment + 1 == PATH_DIVIDE) {
+				path->vertices.push_back(first_segment_r.x);
+				path->vertices.push_back(first_segment_r.y);
+				path->vertices.push_back(first_segment_r.z);
+				path->vertices.push_back(first_segment_l.x);
+				path->vertices.push_back(first_segment_l.y);
+				path->vertices.push_back(first_segment_l.z);
+			}
+			else {
+				path->vertices.push_back(next_segment.x + next_cross.x);
+				path->vertices.push_back(next_segment.y + next_cross.y);
+				path->vertices.push_back(next_segment.z + next_cross.z);
+				path->vertices.push_back(next_segment.x - next_cross.x);
+				path->vertices.push_back(next_segment.y - next_cross.y);
+				path->vertices.push_back(next_segment.z - next_cross.z);
+			}
+			last_segment_r = vec3(
 				next_segment.x + next_cross.x,
 				next_segment.y + next_cross.y,
 				next_segment.z + next_cross.z);
-			*last_segment_l = vec3(
+			last_segment_l = vec3(
 				next_segment.x - next_cross.x,
 				next_segment.y - next_cross.y,
 				next_segment.z - next_cross.z);
@@ -308,45 +317,6 @@ void TrainView::initPath() {
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4 + 3);
 		}
 	}
-	//initialize the last part to connect the end of track with the front
-	path->vertices.push_back(last_segment_l->x);
-	path->vertices.push_back(last_segment_l->y);
-	path->vertices.push_back(last_segment_l->z);
-	path->vertices.push_back(last_segment_r->x);
-	path->vertices.push_back(last_segment_r->y);
-	path->vertices.push_back(last_segment_r->z);
-	path->vertices.push_back(first_segment_r->x);
-	path->vertices.push_back(first_segment_r->y);
-	path->vertices.push_back(first_segment_r->z);
-	path->vertices.push_back(first_segment_l->x);
-	path->vertices.push_back(first_segment_l->y);
-	path->vertices.push_back(first_segment_l->z);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(1.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(1.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(1.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(0.0f);
-	path->normal.push_back(1.0f);
-	path->normal.push_back(0.0f);
-	path->texture_coordinate.push_back((GLfloat)0.0);
-	path->texture_coordinate.push_back((GLfloat)0.0);
-	path->texture_coordinate.push_back((GLfloat)1.0);
-	path->texture_coordinate.push_back((GLfloat)0.0);
-	path->texture_coordinate.push_back((GLfloat)1.0);
-	path->texture_coordinate.push_back((GLfloat)1.0);
-	path->texture_coordinate.push_back((GLfloat)0.0);
-	path->texture_coordinate.push_back((GLfloat)1.0);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 1);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 2);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 2);
-	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 3);
 
 	if (!this->path->vertex_data)
 	{

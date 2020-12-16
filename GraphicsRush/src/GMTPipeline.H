@@ -16,7 +16,8 @@ class GMTPipeline {
 			{3.0f / 6.0f, -6.0f / 6.0f, 0.0f / 6.0f, 4.0f / 6.0f},
 			{-3.0f / 6.0f, 3.0f / 6.0f, 3.0f / 6.0f, 1.0f / 6.0f},
 			{1.0f / 6.0f, 0.0f / 6.0f, 0.0f / 6.0f, 0.0f / 6.0f} };
-		void setG(int cp_id);
+		void setG_pos(int cp_id);
+		void setG_orient(int cp_id);
 
 		vec3 calculate(float t);
 };
