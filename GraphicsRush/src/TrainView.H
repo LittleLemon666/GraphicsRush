@@ -35,8 +35,9 @@ class TrainWindow;
 class CTrack;
 
 /*********************NEW ADDITIONS*********************/
-#include "ShaderInfo.h"
 #include <vector>
+#include "ShaderInfo.h"
+#include "GMTPipeline.h"
 
 //#######################################################################
 // TODO
@@ -113,4 +114,5 @@ class TrainView : public Fl_Gl_Window
 		void initPath();
 		void drawPath();
 		const int PATH_DIVIDE = 50;
+		GMTPipeline gmt;
 };

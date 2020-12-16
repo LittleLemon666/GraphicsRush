@@ -54,6 +54,10 @@ TrainWindow(const int x, const int y)
 		trainView = new TrainView(5,5,590,590);
 		trainView->tw = this;
 		trainView->m_pTrack = &m_Track;
+
+		/*********************NEW ADDITIONS*********************/
+		trainView->gmt.gmt_track = &m_Track;
+
 		this->resizable(trainView);
 
 		// to make resizing work better, put all the widgets in a group

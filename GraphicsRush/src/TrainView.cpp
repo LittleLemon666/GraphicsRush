@@ -59,6 +59,7 @@ TrainView(int x, int y, int w, int h, const char* l)
 	mode(FL_RGB | FL_ALPHA | FL_DOUBLE | FL_STENCIL);
 
 	resetArcball();
+	
 }
 
 //************************************************************************
@@ -197,6 +198,12 @@ void TrainView::initPath() {
 			//create forward vector for this segment
 			vec3 this_segment = this_cp + forward * ((float)segment / (float)PATH_DIVIDE);
 			vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
+
+			//overide linear track with BSpline track
+			gmt.setG(cp_id);
+			this_segment = gmt.calculate((float)segment / (float)PATH_DIVIDE);
+			next_segment = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
+
 			vec3 segment_forward = next_segment - this_segment;
 			segment_forward = normalize(segment_forward);
 
