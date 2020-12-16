@@ -5,7 +5,9 @@
 using namespace glm;
 class GMTPipeline {
 	public:
-		CTrack* gmt_track;
+		GMTPipeline() { }
+		~GMTPipeline() { }
+		CTrack* gmt_track = nullptr;
 
 		mat4 G = {};
 		//M is defaulted to BSpline
