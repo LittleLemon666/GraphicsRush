@@ -180,6 +180,10 @@ void TrainView::initPath() {
 	path->normal = {};
 	path->texture_coordinate = {};
 	path->element = {};
+	vec3* first_segment_r = nullptr;
+	vec3* first_segment_l = nullptr;
+	vec3* last_segment_r = nullptr;
+	vec3* last_segment_l = nullptr;
 	const int NUM_of_CPs = (int)m_pTrack->points.size();
 	for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
@@ -194,7 +198,6 @@ void TrainView::initPath() {
 		vec3 forward = next_cp - this_cp;
 
 		for (int segment = 0; segment < PATH_DIVIDE; segment++) {
-
 			//create forward vector for this segment
 			vec3 this_segment = this_cp + forward * ((float)segment / (float)PATH_DIVIDE);
 			vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
@@ -228,18 +231,49 @@ void TrainView::initPath() {
 			GLfloat roadSize = 10.0f;
 			this_cross = roadSize * this_cross;
 			next_cross = roadSize * next_cross;
-			path->vertices.push_back(this_segment.x - this_cross.x);
-			path->vertices.push_back(this_segment.y - this_cross.y);
-			path->vertices.push_back(this_segment.z - this_cross.z);
-			path->vertices.push_back(this_segment.x + this_cross.x);
-			path->vertices.push_back(this_segment.y + this_cross.y);
-			path->vertices.push_back(this_segment.z + this_cross.z);
+			//record next segment and the first segment so later it can be used to perfectly connect segments
+			if (!last_segment_r) {
+				last_segment_r = new vec3;
+				last_segment_l = new vec3;
+				first_segment_r = new vec3;
+				*first_segment_r = vec3(
+					this_segment.x + this_cross.x,
+					this_segment.y + this_cross.y,
+					this_segment.z + this_cross.z);
+				first_segment_l = new vec3;
+				*first_segment_l = vec3(
+					this_segment.x - this_cross.x,
+					this_segment.y - this_cross.y,
+					this_segment.z - this_cross.z);
+				path->vertices.push_back(this_segment.x - this_cross.x);
+				path->vertices.push_back(this_segment.y - this_cross.y);
+				path->vertices.push_back(this_segment.z - this_cross.z);
+				path->vertices.push_back(this_segment.x + this_cross.x);
+				path->vertices.push_back(this_segment.y + this_cross.y);
+				path->vertices.push_back(this_segment.z + this_cross.z);
+			}
+			else {
+				path->vertices.push_back(last_segment_l->x);
+				path->vertices.push_back(last_segment_l->y);
+				path->vertices.push_back(last_segment_l->z);
+				path->vertices.push_back(last_segment_r->x);
+				path->vertices.push_back(last_segment_r->y);
+				path->vertices.push_back(last_segment_r->z);
+			}
 			path->vertices.push_back(next_segment.x + next_cross.x);
 			path->vertices.push_back(next_segment.y + next_cross.y);
 			path->vertices.push_back(next_segment.z + next_cross.z);
 			path->vertices.push_back(next_segment.x - next_cross.x);
 			path->vertices.push_back(next_segment.y - next_cross.y);
 			path->vertices.push_back(next_segment.z - next_cross.z);
+			*last_segment_r = vec3(
+				next_segment.x + next_cross.x,
+				next_segment.y + next_cross.y,
+				next_segment.z + next_cross.z);
+			*last_segment_l = vec3(
+				next_segment.x - next_cross.x,
+				next_segment.y - next_cross.y,
+				next_segment.z - next_cross.z);
 
 			//initialize path->normal
 			path->normal.push_back(this_cp_orient.x);
@@ -274,6 +308,46 @@ void TrainView::initPath() {
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4 + 3);
 		}
 	}
+	//initialize the last part to connect the end of track with the front
+	path->vertices.push_back(last_segment_l->x);
+	path->vertices.push_back(last_segment_l->y);
+	path->vertices.push_back(last_segment_l->z);
+	path->vertices.push_back(last_segment_r->x);
+	path->vertices.push_back(last_segment_r->y);
+	path->vertices.push_back(last_segment_r->z);
+	path->vertices.push_back(first_segment_r->x);
+	path->vertices.push_back(first_segment_r->y);
+	path->vertices.push_back(first_segment_r->z);
+	path->vertices.push_back(first_segment_l->x);
+	path->vertices.push_back(first_segment_l->y);
+	path->vertices.push_back(first_segment_l->z);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(1.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(1.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(1.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(0.0f);
+	path->normal.push_back(1.0f);
+	path->normal.push_back(0.0f);
+	path->texture_coordinate.push_back((GLfloat)0.0);
+	path->texture_coordinate.push_back((GLfloat)0.0);
+	path->texture_coordinate.push_back((GLfloat)1.0);
+	path->texture_coordinate.push_back((GLfloat)0.0);
+	path->texture_coordinate.push_back((GLfloat)1.0);
+	path->texture_coordinate.push_back((GLfloat)1.0);
+	path->texture_coordinate.push_back((GLfloat)0.0);
+	path->texture_coordinate.push_back((GLfloat)1.0);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 1);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 2);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 2);
+	path->element.push_back(NUM_of_CPs * PATH_DIVIDE * 4 + 3);
+
 	if (!this->path->vertex_data)
 	{
 		this->path->vertex_data = new VAO;
