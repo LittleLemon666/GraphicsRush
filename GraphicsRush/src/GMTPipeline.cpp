@@ -18,15 +18,15 @@ void GMTPipeline::setG_pos(int cp_id) {
 };
 void GMTPipeline::setG_orient(int cp_id) {
 	G = {
-			{gmt_track->points[(cp_id - 1 + gmt_track->points.size()) % (int)gmt_track->points.size()].orient.x,
+			{gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].orient.x,
 			gmt_track->points[cp_id % (int)gmt_track->points.size()].orient.x,
 			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].orient.x,
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].orient.x},
-			{ gmt_track->points[(cp_id - 1 + gmt_track->points.size()) % (int)gmt_track->points.size()].orient.y,
+			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].orient.y,
 			gmt_track->points[cp_id % (int)gmt_track->points.size()].orient.y,
 			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].orient.y,
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].orient.y },
-			{ gmt_track->points[(cp_id - 1 + gmt_track->points.size()) % (int)gmt_track->points.size()].orient.z,
+			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].orient.z,
 			gmt_track->points[cp_id % (int)gmt_track->points.size()].orient.z,
 			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].orient.z,
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].orient.z },
