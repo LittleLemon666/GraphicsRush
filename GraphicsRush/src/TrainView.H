@@ -110,4 +110,6 @@ class TrainView : public Fl_Gl_Window
 
 		/*********************NEW ADDITIONS*********************/
 		ShaderInfo* path = nullptr;
+		void initPath();
+		void drawPath();
 };
