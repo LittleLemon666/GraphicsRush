@@ -162,11 +162,11 @@ int TrainView::handle(int event)
 
 			return 1;
 		};
-		if (k == FL_Left && m_pTrack->lane > -1) {
+		if (k == 'a' && m_pTrack->lane > -1) {
 			m_pTrack->lane--;
 			return 1;
 		}
-		if (k == FL_Right && m_pTrack->lane < 1) {
+		if (k == 'd' && m_pTrack->lane < 1) {
 			m_pTrack->lane++;
 			return 1;
 		}
@@ -676,7 +676,11 @@ setProjection()
 		printf("%d\n", m_pTrack->lane);
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
 		vec3 viewer_pos = trainPosition + up * 10.0f - forward * 10.0f;
-		viewer_pos = viewer_pos + (float)m_pTrack->lane * crossed * 5.0f;
+		if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
+			if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
+			else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
+		}
+		viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
 			viewer_pos.x + forward.x,
 			viewer_pos.y + forward.y,

@@ -61,4 +61,5 @@ class CTrack {
 		// it is in parameter space
 		float trainU;
 		int lane;
+		float switchLane;
 };
