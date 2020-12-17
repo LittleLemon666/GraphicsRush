@@ -170,6 +170,10 @@ int TrainView::handle(int event)
 			m_pTrack->lane++;
 			return 1;
 		}
+		if (k == 'w' && m_pTrack->jumpingState == -1) {
+			m_pTrack->jumpingState = 0;
+			return 1;
+		}
 		break;
 	}
 
@@ -680,7 +684,12 @@ setProjection()
 			if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
 			else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
 		}
+		if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
 		viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
+		if (m_pTrack->jumpingState != -1) {
+			viewer_pos = viewer_pos + m_pTrack->airbornePosition[m_pTrack->jumpingState] * up * 10.0f;
+			m_pTrack->jumpingState++;
+		}
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
 			viewer_pos.x + forward.x,
 			viewer_pos.y + forward.y,
