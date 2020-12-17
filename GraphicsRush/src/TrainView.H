@@ -114,7 +114,7 @@ class TrainView : public Fl_Gl_Window
 		ShaderInfo* path = nullptr;
 		void initPath();
 		void drawPath();
-		const int PATH_DIVIDE = 2;
+		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 
 		Object pikachu;

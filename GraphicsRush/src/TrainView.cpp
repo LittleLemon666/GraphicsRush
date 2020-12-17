@@ -162,6 +162,14 @@ int TrainView::handle(int event)
 
 			return 1;
 		};
+		if (k == FL_Left && m_pTrack->lane > -1) {
+			m_pTrack->lane--;
+			return 1;
+		}
+		if (k == FL_Right && m_pTrack->lane < 1) {
+			m_pTrack->lane++;
+			return 1;
+		}
 		break;
 	}
 
@@ -640,7 +648,7 @@ setProjection()
 		//prepare variables
 		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
 		int cp_id = (int)tw->m_Track.trainU;
-		vec3 trainPosition, forward, orient, up, thisPosition, nextPosition;
+		vec3 trainPosition, forward, orient, crossed, up, thisPosition, nextPosition;
 		//find trainPosition, forward and orient
 		gmt.setG_pos(cp_id);
 		trainPosition = gmt.calculate(ratio);
@@ -654,15 +662,18 @@ setProjection()
 		orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
 		
 		//find up (the orient perpendicular to the rail)
-		up = cross(forward, cross(orient, forward));
+		crossed = cross(forward, orient);
+		up = cross(crossed, forward);
 
 		//normalize all vec3s for use
 		forward = normalize(forward);
 		orient = normalize(orient);
 		up = normalize(up);
-
+		crossed = normalize(crossed);
+		printf("%d\n", m_pTrack->lane);
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
 		vec3 viewer_pos = trainPosition + up * 10.0f;
+		viewer_pos = viewer_pos + (float)m_pTrack->lane * crossed * 5.0f;
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
 			viewer_pos.x + forward.x,
 			viewer_pos.y + forward.y,

@@ -60,4 +60,5 @@ class CTrack {
 		// the state of the train - basically, all I need to remember is where
 		// it is in parameter space
 		float trainU;
+		int lane;
 };
