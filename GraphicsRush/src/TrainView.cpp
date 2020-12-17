@@ -627,7 +627,7 @@ setProjection()
 		//prepare variables
 		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
 		int cp_id = (int)tw->m_Track.trainU;
-		vec3 trainPosition, forward, orient, up, nextPosition;
+		vec3 trainPosition, forward, orient, up, thisPosition, nextPosition;
 		//find trainPosition, forward and orient
 		gmt.setG_pos(cp_id);
 		trainPosition = gmt.calculate(ratio);
@@ -636,17 +636,17 @@ setProjection()
 		forward = vec3(nextPosition - trainPosition);
 
 		gmt.setG_orient(cp_id);
-		orient = gmt.calculate(ratio);
+		thisPosition = gmt.calculate(ratio);
 		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		orient = (1.0f - ratio) * orient + ratio * nextPosition;
+		orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
 		
 		//find up (the orient perpendicular to the rail)
 		up = cross(forward, cross(orient, forward));
 
 		//normalize all vec3s for use
-		normalize(forward);
-		normalize(orient);
-		normalize(up);
+		forward = normalize(forward);
+		orient = normalize(orient);
+		up = normalize(up);
 
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
 		vec3 viewer_pos = trainPosition + up * 10.0f;
