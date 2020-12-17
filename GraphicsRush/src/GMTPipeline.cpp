@@ -1,17 +1,17 @@
 #include "GMTPipeline.h"
 void GMTPipeline::setG_pos(int cp_id) {
 	G = {
-			{gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.x,
-			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.x,
-			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.x,
+			{gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.x, 
+			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.x, 
+			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.x, 
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].pos.x},
-			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.y,
-			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.y,
-			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.y,
+			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.y, 
+			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.y, 
+			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.y, 
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].pos.y },
-			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.z,
-			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.z,
-			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.z,
+			{ gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.z, 
+			gmt_track->points[cp_id % (int)gmt_track->points.size()].pos.z, 
+			gmt_track->points[(cp_id + 1) % (int)gmt_track->points.size()].pos.z, 
 			gmt_track->points[(cp_id + 2) % (int)gmt_track->points.size()].pos.z },
 			{ 1.0f, 1.0f, 1.0f, 1.0f }
 	};

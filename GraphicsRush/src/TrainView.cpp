@@ -319,7 +319,7 @@ void TrainView::initPath() {
 		glGenBuffers(3, this->path->vertex_data->vbo);
 		glGenBuffers(1, &this->path->vertex_data->ebo);
 	}
-	else
+	else 
 	{
 		glad_glDeleteVertexArrays(1, &this->path->vertex_data->vao);
 		glad_glDeleteBuffers(3, this->path->vertex_data->vbo);
@@ -328,7 +328,7 @@ void TrainView::initPath() {
 		glGenBuffers(3, this->path->vertex_data->vbo);
 		glGenBuffers(1, &this->path->vertex_data->ebo);
 	}
-	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);
+	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);	
 
 	glBindVertexArray(this->path->vertex_data->vao);
 
@@ -621,53 +621,7 @@ setProjection()
 	// TODO: 
 	// put code for train view projection here!	
 	//####################################################################
-	else if (tw->trainCam->value()) {
-
-		//some OpenGL stuff
-		glClear(GL_DEPTH_BUFFER_BIT);
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-
-		//set perspective
-		float aspect = (float)w() / h();
-		gluPerspective(100, aspect, 1, 200);
-
-		//more OpenGL stuff
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-
-		//prepare variables
-		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
-		int cp_id = (int)tw->m_Track.trainU;
-		vec3 trainPosition, forward, orient, up, nextPosition;
-		//find trainPosition, forward and orient
-		gmt.setG_pos(cp_id);
-		trainPosition = gmt.calculate(ratio);
-
-		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		forward = vec3(nextPosition - trainPosition);
-
-		gmt.setG_orient(cp_id);
-		orient = gmt.calculate(ratio);
-		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		orient = (1.0f - ratio) * orient + ratio * nextPosition;
-
-		//find up (the orient perpendicular to the rail)
-		up = cross(forward, cross(orient, forward));
-
-		//normalize all vec3s for use
-		normalize(forward);
-		normalize(orient);
-		normalize(up);
-
-		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-		vec3 viewer_pos = trainPosition + up * 10.0f;
-		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
-			viewer_pos.x + forward.x,
-			viewer_pos.y + forward.y,
-			viewer_pos.z + forward.z,
-			up.x, up.y, up.z);
-
+	else {
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
 #endif
