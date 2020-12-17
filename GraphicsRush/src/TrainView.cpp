@@ -162,11 +162,11 @@ int TrainView::handle(int event)
 
 			return 1;
 		};
-		if (k == FL_Left && m_pTrack->lane > -1) {
+		if (k == 'a' && m_pTrack->lane > -1) {
 			m_pTrack->lane--;
 			return 1;
 		}
-		if (k == FL_Right && m_pTrack->lane < 1) {
+		if (k == 'd' && m_pTrack->lane < 1) {
 			m_pTrack->lane++;
 			return 1;
 		}
@@ -389,6 +389,23 @@ void TrainView::drawPath() {
 	glUseProgram(0);
 };
 
+void TrainView::drawPlayer() {
+	//bind shader
+	this->path_shader->Use();
+
+	mat4 model_matrix = inverse(lookAt(playerPos, playerForward, playerUp));
+	model_matrix = scale(model_matrix, vec3(10, 10, 10));
+	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	this->pikachu_texture->bind(1);
+	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 1);
+
+	pikachu->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+};
+
 //************************************************************************
 //
 // * this is the code that actually draws the window
@@ -574,22 +591,7 @@ void TrainView::draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	drawPath();
-
-	//bind shader
-	this->path_shader->Use();
-
-	glm::mat4 model_matrix = glm::mat4();
-	model_matrix = glm::translate(model_matrix, glm::vec3(0, 1, 0));
-	model_matrix = glm::scale(model_matrix, glm::vec3(10, 10, 10));
-	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->pikachu_texture->bind(1);
-	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 1);
-
-	pikachu->draw();
-
-	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	drawPlayer();
 }
 
 //************************************************************************
@@ -651,37 +653,37 @@ setProjection()
 		//prepare variables
 		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
 		int cp_id = (int)tw->m_Track.trainU;
-		vec3 trainPosition, forward, orient, crossed, up, thisPosition, nextPosition;
+		vec3 orient, crossed, thisPosition, nextPosition;
 		//find trainPosition, forward and orient
 		gmt.setG_pos(cp_id);
-		trainPosition = gmt.calculate(ratio);
+		playerPos = gmt.calculate(ratio);
 
 		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		forward = vec3(nextPosition - trainPosition);
+		playerForward = vec3(nextPosition - playerPos);
 
 		gmt.setG_orient(cp_id);
 		thisPosition = gmt.calculate(ratio);
 		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
 		orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
 		
-		//find up (the orient perpendicular to the rail)
-		crossed = cross(forward, orient);
-		up = cross(crossed, forward);
+		//find playerUp (the orient perpendicular to the rail)
+		crossed = cross(playerForward, orient);
+		playerUp = cross(crossed, playerForward);
 
 		//normalize all vec3s for use
-		forward = normalize(forward);
+		playerForward = normalize(playerForward);
 		orient = normalize(orient);
-		up = normalize(up);
+		playerUp = normalize(playerUp);
 		crossed = normalize(crossed);
 		printf("%d\n", m_pTrack->lane);
-		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-		vec3 viewer_pos = trainPosition + up * 10.0f - forward * 10.0f;
+		//set look at (playerPos(viewerPosition) -> where to look at -> playerUp)
+		vec3 viewer_pos = playerPos + playerUp * 10.0f - playerForward * 10.0f;
 		viewer_pos = viewer_pos + (float)m_pTrack->lane * crossed * 5.0f;
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
-			viewer_pos.x + forward.x,
-			viewer_pos.y + forward.y,
-			viewer_pos.z + forward.z,
-			up.x, up.y, up.z);
+			viewer_pos.x + playerForward.x,
+			viewer_pos.y + playerForward.y,
+			viewer_pos.z + playerForward.z,
+			playerUp.x, playerUp.y, playerUp.z);
 
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
