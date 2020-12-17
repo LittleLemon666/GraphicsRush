@@ -424,6 +424,9 @@ void TrainView::draw()
 		if (!this->path_texture)
 			this->path_texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
 
+		if (!this->pikachu_texture)
+			this->pikachu_texture = new Texture2D("../GraphicsRush/Objects/Pikachu.png");
+
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
 			this->device = alcOpenDevice(NULL);
@@ -482,8 +485,8 @@ void TrainView::draw()
 			//alcCloseDevice(device);
 		}
 
-		if (!pikachu.isLoad)
-			pikachu = Object("../GraphicsRush/Objects/pikachu_blender.obj");
+		if (!pikachu)
+			pikachu = new Object(pikachu_obj);
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -572,10 +575,10 @@ void TrainView::draw()
 	model_matrix = glm::scale(model_matrix, glm::vec3(10, 10, 10));
 	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->path_texture->bind(0);
-	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+	this->pikachu_texture->bind(1);
+	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 1);
 
-	pikachu.draw();
+	pikachu->draw();
 
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);

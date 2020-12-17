@@ -130,7 +130,7 @@ draw()
 		GL_TRIANGLES,      // mode
 		indices.size(),    // count
 		GL_UNSIGNED_SHORT,   // type
-		(void*)0           // element array buffer offset
+		(GLvoid*)0           // element array buffer offset
 	);
 
 	//unbind VAO
@@ -180,8 +180,8 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 		3,                  // size
 		GL_FLOAT,           // type
 		GL_FALSE,           // normalized?
-		0,                  // stride
-		(void*)0            // array buffer offset
+		3 * sizeof(GLfloat),                  // stride
+		(GLvoid*)0            // array buffer offset
 	);
 	glEnableVertexAttribArray(0);
 
@@ -192,8 +192,8 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 		3,                                // size
 		GL_FLOAT,                         // type
 		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
+		3 * sizeof(GLfloat),                                // stride
+		(GLvoid*)0                          // array buffer offset
 	);
 	glEnableVertexAttribArray(1);
 
@@ -204,8 +204,8 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 		2,                                // size
 		GL_FLOAT,                         // type
 		GL_FALSE,                         // normalized?
-		0,                                // stride
-		(void*)0                          // array buffer offset
+		2 * sizeof(GLfloat),                                // stride
+		(GLvoid*)0                          // array buffer offset
 	);
 	glEnableVertexAttribArray(2);
 
