@@ -568,7 +568,8 @@ void TrainView::draw()
 	this->path_shader->Use();
 
 	glm::mat4 model_matrix = glm::mat4();
-	model_matrix = glm::translate(model_matrix, this->source_pos);
+	model_matrix = glm::translate(model_matrix, glm::vec3(0, 1, 0));
+	model_matrix = glm::scale(model_matrix, glm::vec3(10, 10, 10));
 	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
 	this->path_texture->bind(0);
