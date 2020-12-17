@@ -622,7 +622,53 @@ setProjection()
 	// TODO: 
 	// put code for train view projection here!	
 	//####################################################################
-	else {
+	else if (tw->trainCam->value()) {
+
+		//some OpenGL stuff
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
+		//set perspective
+		float aspect = (float)w() / h();
+		gluPerspective(100, aspect, 1, 200);
+
+		//more OpenGL stuff
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		//prepare variables
+		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
+		int cp_id = (int)tw->m_Track.trainU;
+		vec3 trainPosition, forward, orient, up, thisPosition, nextPosition;
+		//find trainPosition, forward and orient
+		gmt.setG_pos(cp_id);
+		trainPosition = gmt.calculate(ratio);
+
+		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+		forward = vec3(nextPosition - trainPosition);
+
+		gmt.setG_orient(cp_id);
+		thisPosition = gmt.calculate(ratio);
+		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+		orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
+		
+		//find up (the orient perpendicular to the rail)
+		up = cross(forward, cross(orient, forward));
+
+		//normalize all vec3s for use
+		forward = normalize(forward);
+		orient = normalize(orient);
+		up = normalize(up);
+
+		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
+		vec3 viewer_pos = trainPosition + up * 10.0f;
+		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
+			viewer_pos.x + forward.x,
+			viewer_pos.y + forward.y,
+			viewer_pos.z + forward.z,
+			up.x, up.y, up.z);
+
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
 #endif
