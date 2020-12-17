@@ -325,6 +325,15 @@ void TrainView::initPath() {
 		glGenBuffers(3, this->path->vertex_data->vbo);
 		glGenBuffers(1, &this->path->vertex_data->ebo);
 	}
+	else 
+	{
+		glad_glDeleteVertexArrays(1, &this->path->vertex_data->vao);
+		glad_glDeleteBuffers(3, this->path->vertex_data->vbo);
+		glad_glDeleteBuffers(1, &this->path->vertex_data->ebo);
+		glGenVertexArrays(1, &this->path->vertex_data->vao);
+		glGenBuffers(3, this->path->vertex_data->vbo);
+		glGenBuffers(1, &this->path->vertex_data->ebo);
+	}
 	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);	
 
 	glBindVertexArray(this->path->vertex_data->vao);
