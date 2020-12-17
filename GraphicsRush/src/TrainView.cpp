@@ -397,7 +397,17 @@ void TrainView::drawPlayer() {
 	//bind shader
 	this->path_shader->Use();
 
-	mat4 model_matrix = inverse(lookAt(train_pos + 5.0f * up, forward + 5.0f * up, up)); // the player is in a 5.0f height position
+	vec3 player_xbias;
+	gmt.calculateAll(m_pTrack->trainU, player_pos, player_forward, player_up, player_xbias);
+	player_forward = normalize(player_forward);
+	player_up = normalize(player_up);
+	player_xbias = normalize(player_xbias);
+	player_pos += (float)m_pTrack->switchLane * player_xbias * 5.0f;
+	if (m_pTrack->jumpingState != -1)
+		player_pos += m_pTrack->airbornePosition[m_pTrack->jumpingState - 1] * player_up * 10.0f; //m_pTrack->jumpingState is added once in setProjection
+
+	mat4 model_matrix = inverse(lookAt(player_pos + 5.0f * player_up, player_forward + 5.0f * player_up, player_pos + player_up)); // the player is in a 5.0f height position
+	//model_matrix = scale(model_matrix, vec3(10, 10, 10));
 	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 	this->pikachu_texture->bind(1);
@@ -453,7 +463,7 @@ void TrainView::draw()
 			this->path_texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
 
 		if (!this->pikachu_texture)
-			this->pikachu_texture = new Texture2D("../GraphicsRush/Objects/Pikachu.png");
+			this->pikachu_texture = new Texture2D(pikachu_texture_path.c_str());
 
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
@@ -594,6 +604,7 @@ void TrainView::draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	drawPath();
+
 	drawPlayer();
 }
 
