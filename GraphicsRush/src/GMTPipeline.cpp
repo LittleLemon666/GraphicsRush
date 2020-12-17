@@ -34,7 +34,7 @@ void GMTPipeline::setG_orient(int cp_id) {
 	};
 };
 vec3 GMTPipeline::calculate(float t) {
-	vec4 T = {t * t * t, t * t, t, 1.0f};
+	vec4 T = { t * t * t, t * t, t, 1.0f };
 	vec4 result = transpose(G) * transpose(M) * T;
 	return vec3(result);
 };

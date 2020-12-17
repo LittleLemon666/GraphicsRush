@@ -1,12 +1,9 @@
 /************************************************************************
 	 File:        TrainView.cpp
-
 	 Author:
 				  Michael Gleicher, gleicher@cs.wisc.edu
-
 	 Modifier
 				  Yu-Chi Lai, yu-chi@cs.wisc.edu
-
 	 Comment:
 						The TrainView is the window that actually shows the
 						train. Its a
@@ -16,12 +13,9 @@
 						The TrainView needs
 						to be aware of the window - since it might need to
 						check the widgets to see how to draw
-
 	  Note:        we need to have pointers to this, but maybe not know
 						about it (beware circular references)
-
 	 Platform:    Visio Studio.Net 2003/2005
-
 *************************************************************************/
 
 #include <iostream>
@@ -59,7 +53,7 @@ TrainView(int x, int y, int w, int h, const char* l)
 	mode(FL_RGB | FL_ALPHA | FL_DOUBLE | FL_STENCIL);
 
 	resetArcball();
-	
+
 }
 
 //************************************************************************
@@ -487,6 +481,9 @@ void TrainView::draw()
 			//alcDestroyContext(context);
 			//alcCloseDevice(device);
 		}
+
+		if (!pikachu.isLoad)
+			pikachu = Object("../GraphicsRush/Objects/pikachu_blender.obj");
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -566,6 +563,21 @@ void TrainView::draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	drawPath();
+
+	//bind shader
+	this->path_shader->Use();
+
+	glm::mat4 model_matrix = glm::mat4();
+	model_matrix = glm::translate(model_matrix, this->source_pos);
+	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+	this->path_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+
+	pikachu.draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 //************************************************************************

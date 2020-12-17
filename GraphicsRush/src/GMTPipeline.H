@@ -4,10 +4,10 @@
 #include "Track.h"
 using namespace glm;
 class GMTPipeline {
-	public:
-		GMTPipeline() { }
-		~GMTPipeline() { }
-		CTrack* gmt_track = nullptr;
+public:
+	GMTPipeline() { }
+	~GMTPipeline() { }
+	CTrack* gmt_track = nullptr;
 
 		mat4 G = {};
 		//M is defaulted to BSpline
@@ -19,5 +19,5 @@ class GMTPipeline {
 		void setG_pos(int cp_id);
 		void setG_orient(int cp_id);
 
-		vec3 calculate(float t);
+	vec3 calculate(float t);
 };
