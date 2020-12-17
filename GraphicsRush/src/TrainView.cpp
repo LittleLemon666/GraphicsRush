@@ -1,12 +1,9 @@
 /************************************************************************
 	 File:        TrainView.cpp
-
 	 Author:
 				  Michael Gleicher, gleicher@cs.wisc.edu
-
 	 Modifier
 				  Yu-Chi Lai, yu-chi@cs.wisc.edu
-
 	 Comment:
 						The TrainView is the window that actually shows the
 						train. Its a
@@ -16,12 +13,9 @@
 						The TrainView needs
 						to be aware of the window - since it might need to
 						check the widgets to see how to draw
-
 	  Note:        we need to have pointers to this, but maybe not know
 						about it (beware circular references)
-
 	 Platform:    Visio Studio.Net 2003/2005
-
 *************************************************************************/
 
 #include <iostream>
@@ -59,7 +53,7 @@ TrainView(int x, int y, int w, int h, const char* l)
 	mode(FL_RGB | FL_ALPHA | FL_DOUBLE | FL_STENCIL);
 
 	resetArcball();
-	
+
 }
 
 //************************************************************************
@@ -180,6 +174,10 @@ void TrainView::initPath() {
 	path->normal = {};
 	path->texture_coordinate = {};
 	path->element = {};
+	vec3 first_segment_r(-1.0f, -1.0f, -1.0f);
+	vec3 first_segment_l(-1.0f, -1.0f, -1.0f);
+	vec3 last_segment_r(-1.0f, -1.0f, -1.0f);
+	vec3 last_segment_l(-1.0f, -1.0f, -1.0f);
 	const int NUM_of_CPs = (int)m_pTrack->points.size();
 	for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
@@ -194,13 +192,12 @@ void TrainView::initPath() {
 		vec3 forward = next_cp - this_cp;
 
 		for (int segment = 0; segment < PATH_DIVIDE; segment++) {
-
 			//create forward vector for this segment
 			vec3 this_segment = this_cp + forward * ((float)segment / (float)PATH_DIVIDE);
 			vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
 
 			//overide linear track with BSpline track
-			gmt.setG(cp_id);
+			gmt.setG_pos(cp_id);
 			this_segment = gmt.calculate((float)segment / (float)PATH_DIVIDE);
 			next_segment = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
 
@@ -208,15 +205,18 @@ void TrainView::initPath() {
 			segment_forward = normalize(segment_forward);
 
 			//create orient vector
+			gmt.setG_orient(cp_id);
 			vec3 this_cp_orient = vec3(
 				m_pTrack->points[cp_id].orient.x * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)segment / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.y * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)segment / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.z * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)segment / (float)PATH_DIVIDE));
+			this_cp_orient = gmt.calculate((float)segment / (float)PATH_DIVIDE);
 			this_cp_orient = normalize(this_cp_orient);
 			vec3 next_cp_orient = vec3(
 				m_pTrack->points[cp_id].orient.x * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)(segment + 1) / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.y * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)(segment + 1) / (float)PATH_DIVIDE),
 				m_pTrack->points[cp_id].orient.z * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)(segment + 1) / (float)PATH_DIVIDE));
+			next_cp_orient = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
 			next_cp_orient = normalize(next_cp_orient);
 
 			//create cross vector
@@ -228,18 +228,55 @@ void TrainView::initPath() {
 			GLfloat roadSize = 10.0f;
 			this_cross = roadSize * this_cross;
 			next_cross = roadSize * next_cross;
-			path->vertices.push_back(this_segment.x - this_cross.x);
-			path->vertices.push_back(this_segment.y - this_cross.y);
-			path->vertices.push_back(this_segment.z - this_cross.z);
-			path->vertices.push_back(this_segment.x + this_cross.x);
-			path->vertices.push_back(this_segment.y + this_cross.y);
-			path->vertices.push_back(this_segment.z + this_cross.z);
-			path->vertices.push_back(next_segment.x + next_cross.x);
-			path->vertices.push_back(next_segment.y + next_cross.y);
-			path->vertices.push_back(next_segment.z + next_cross.z);
-			path->vertices.push_back(next_segment.x - next_cross.x);
-			path->vertices.push_back(next_segment.y - next_cross.y);
-			path->vertices.push_back(next_segment.z - next_cross.z);
+			//record next segment and the first segment so later it can be used to perfectly connect segments
+			if (cp_id == 0 && segment == 0) {
+				first_segment_r = vec3(
+					this_segment.x + this_cross.x,
+					this_segment.y + this_cross.y,
+					this_segment.z + this_cross.z);
+				first_segment_l = vec3(
+					this_segment.x - this_cross.x,
+					this_segment.y - this_cross.y,
+					this_segment.z - this_cross.z);
+				path->vertices.push_back(this_segment.x - this_cross.x);
+				path->vertices.push_back(this_segment.y - this_cross.y);
+				path->vertices.push_back(this_segment.z - this_cross.z);
+				path->vertices.push_back(this_segment.x + this_cross.x);
+				path->vertices.push_back(this_segment.y + this_cross.y);
+				path->vertices.push_back(this_segment.z + this_cross.z);
+			}
+			else {
+				path->vertices.push_back(last_segment_l.x);
+				path->vertices.push_back(last_segment_l.y);
+				path->vertices.push_back(last_segment_l.z);
+				path->vertices.push_back(last_segment_r.x);
+				path->vertices.push_back(last_segment_r.y);
+				path->vertices.push_back(last_segment_r.z);
+			}
+			if (cp_id + 1 == NUM_of_CPs && segment + 1 == PATH_DIVIDE) {
+				path->vertices.push_back(first_segment_r.x);
+				path->vertices.push_back(first_segment_r.y);
+				path->vertices.push_back(first_segment_r.z);
+				path->vertices.push_back(first_segment_l.x);
+				path->vertices.push_back(first_segment_l.y);
+				path->vertices.push_back(first_segment_l.z);
+			}
+			else {
+				path->vertices.push_back(next_segment.x + next_cross.x);
+				path->vertices.push_back(next_segment.y + next_cross.y);
+				path->vertices.push_back(next_segment.z + next_cross.z);
+				path->vertices.push_back(next_segment.x - next_cross.x);
+				path->vertices.push_back(next_segment.y - next_cross.y);
+				path->vertices.push_back(next_segment.z - next_cross.z);
+			}
+			last_segment_r = vec3(
+				next_segment.x + next_cross.x,
+				next_segment.y + next_cross.y,
+				next_segment.z + next_cross.z);
+			last_segment_l = vec3(
+				next_segment.x - next_cross.x,
+				next_segment.y - next_cross.y,
+				next_segment.z - next_cross.z);
 
 			//initialize path->normal
 			path->normal.push_back(this_cp_orient.x);
@@ -274,6 +311,7 @@ void TrainView::initPath() {
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4 + 3);
 		}
 	}
+
 	if (!this->path->vertex_data)
 	{
 		this->path->vertex_data = new VAO;
@@ -281,7 +319,16 @@ void TrainView::initPath() {
 		glGenBuffers(3, this->path->vertex_data->vbo);
 		glGenBuffers(1, &this->path->vertex_data->ebo);
 	}
-	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);	
+	else
+	{
+		glad_glDeleteVertexArrays(1, &this->path->vertex_data->vao);
+		glad_glDeleteBuffers(3, this->path->vertex_data->vbo);
+		glad_glDeleteBuffers(1, &this->path->vertex_data->ebo);
+		glGenVertexArrays(1, &this->path->vertex_data->vao);
+		glGenBuffers(3, this->path->vertex_data->vbo);
+		glGenBuffers(1, &this->path->vertex_data->ebo);
+	}
+	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);
 
 	glBindVertexArray(this->path->vertex_data->vao);
 
@@ -434,6 +481,9 @@ void TrainView::draw()
 			//alcDestroyContext(context);
 			//alcCloseDevice(device);
 		}
+
+		if (!pikachu.isLoad)
+			pikachu = Object("../GraphicsRush/Objects/pikachu_blender.obj");
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -513,6 +563,21 @@ void TrainView::draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	drawPath();
+
+	//bind shader
+	this->path_shader->Use();
+
+	glm::mat4 model_matrix = glm::mat4();
+	model_matrix = glm::translate(model_matrix, this->source_pos);
+	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+	this->path_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+
+	pikachu.draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 //************************************************************************
@@ -556,7 +621,53 @@ setProjection()
 	// TODO: 
 	// put code for train view projection here!	
 	//####################################################################
-	else {
+	else if (tw->trainCam->value()) {
+
+		//some OpenGL stuff
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+
+		//set perspective
+		float aspect = (float)w() / h();
+		gluPerspective(100, aspect, 1, 200);
+
+		//more OpenGL stuff
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+
+		//prepare variables
+		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
+		int cp_id = (int)tw->m_Track.trainU;
+		vec3 trainPosition, forward, orient, up, nextPosition;
+		//find trainPosition, forward and orient
+		gmt.setG_pos(cp_id);
+		trainPosition = gmt.calculate(ratio);
+
+		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+		forward = vec3(nextPosition - trainPosition);
+
+		gmt.setG_orient(cp_id);
+		orient = gmt.calculate(ratio);
+		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+		orient = (1.0f - ratio) * orient + ratio * nextPosition;
+
+		//find up (the orient perpendicular to the rail)
+		up = cross(forward, cross(orient, forward));
+
+		//normalize all vec3s for use
+		normalize(forward);
+		normalize(orient);
+		normalize(up);
+
+		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
+		vec3 viewer_pos = trainPosition + up * 10.0f;
+		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
+			viewer_pos.x + forward.x,
+			viewer_pos.y + forward.y,
+			viewer_pos.z + forward.z,
+			up.x, up.y, up.z);
+
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);
 #endif

@@ -38,6 +38,7 @@ class CTrack;
 #include <vector>
 #include "ShaderInfo.h"
 #include "GMTPipeline.h"
+#include "Object.H"
 
 //#######################################################################
 // TODO
@@ -113,6 +114,8 @@ class TrainView : public Fl_Gl_Window
 		ShaderInfo* path = nullptr;
 		void initPath();
 		void drawPath();
-		const int PATH_DIVIDE = 50;
+		const int PATH_DIVIDE = 2;
 		GMTPipeline gmt;
+
+		Object pikachu;
 };
