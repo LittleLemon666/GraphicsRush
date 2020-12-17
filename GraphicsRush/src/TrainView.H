@@ -118,7 +118,7 @@ class TrainView : public Fl_Gl_Window
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 
-		vec3 playerPos, playerForward, playerUp;
+		vec3 player_pos, player_forward, player_up;
 
 		Object* pikachu = nullptr;
 		std::string pikachu_obj = "../GraphicsRush/Objects/pikachu_blender.obj";

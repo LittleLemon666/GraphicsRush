@@ -61,4 +61,7 @@ class CTrack {
 		// it is in parameter space
 		float trainU;
 		int lane;
+		float switchLane;
+		vector<float> airbornePosition = { 0.36f, 0.64f, 0.84f, 0.96f, 1.0f, 1.0f, 0.96f, 0.84f, 0.64f, 0.36f, 0.0f };
+		int jumpingState;
 };
