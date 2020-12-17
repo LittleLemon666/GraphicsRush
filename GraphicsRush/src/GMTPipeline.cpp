@@ -38,3 +38,14 @@ vec3 GMTPipeline::calculate(float t) {
 	vec4 result = transpose(G) * transpose(M) * T;
 	return vec3(result);
 };
+void GMTPipeline::calculateAll(float trainU, vec3& position, vec3& forward, vec3& up, vec3& crossed) {
+	setG_pos((int)trainU);
+	float ratio = trainU - (int)trainU;
+	position = calculate(ratio);
+	//0.02 comes from 1 / PATH_DIVIDE when it's 50
+	vec3 newPos = calculate(ratio + 0.02f);
+	forward = newPos - position;
+	setG_orient((int)trainU);
+	up = calculate(ratio);
+	crossed = cross(forward, up);
+};

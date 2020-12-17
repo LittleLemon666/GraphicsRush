@@ -20,4 +20,5 @@ public:
 		void setG_orient(int cp_id);
 
 	vec3 calculate(float t);
+	void GMTPipeline::calculateAll(float trainU, vec3 &position, vec3 &forward, vec3 &up, vec3 &crossed);
 };
