@@ -672,7 +672,7 @@ setProjection()
 		crossed = normalize(crossed);
 		printf("%d\n", m_pTrack->lane);
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-		vec3 viewer_pos = trainPosition + up * 10.0f;
+		vec3 viewer_pos = trainPosition + up * 10.0f - forward * 10.0f;
 		viewer_pos = viewer_pos + (float)m_pTrack->lane * crossed * 5.0f;
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
 			viewer_pos.x + forward.x,
