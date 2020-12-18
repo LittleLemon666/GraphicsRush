@@ -426,7 +426,8 @@ void TrainView::drawObstacles() {
 		obstacleForward = normalize(obstacleForward);
 		obstacleUp = normalize(obstacleUp);
 		obstacleCross = normalize(obstacleCross);
-		obstaclePosition += obstacleUp * 5.0f;
+		obstaclePosition += obstacleUp * 10.0f;
+		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
 		float crossSize = 2.0f;
 		glBegin(GL_QUADS);
 		glColor3f(1.0f, 0.0f, 0.0f);
@@ -638,6 +639,15 @@ void TrainView::draw()
 
 	drawPlayer();
 
+	if ((int)m_pTrack->obstacles.size() == 0) {
+		srand(time(NULL));
+		int slices = 10000;
+		for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
+			float pos = ((float)(rand() % slices) / (float)slices) * (int)m_pTrack->points.size();
+			int _lane = (rand() % 3) - 1;
+			m_pTrack->obstacles.push_back(Obstacle(pos, _lane));
+		}
+	}
 	drawObstacles();
 }
 
