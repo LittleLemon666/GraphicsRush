@@ -199,7 +199,20 @@ void TrainWindow::
 advanceTrain(float dir)
 //========================================================================
 {
-	m_Track.trainU += 0.01f;
+	float distance = 1.0f * speed->value(), walked = 0.0f;
+	while (walked < distance) {
+		trainView->gmt.setG_pos((int)m_Track.trainU);
+		float ratio = m_Track.trainU - (int)m_Track.trainU;
+		vec3 thisPos = trainView->gmt.calculate(ratio);
+		vec3 nextPos = trainView->gmt.calculate(ratio + 1.0f / (float)trainView->PATH_DIVIDE);
+		float difference = sqrt(pow(thisPos.x - nextPos.x, 2) + pow(thisPos.y - nextPos.y, 2) + pow(thisPos.z - nextPos.z, 2));
+		if (walked + difference >= distance) {
+			m_Track.trainU += (1.0f / (float)trainView->PATH_DIVIDE) * ((distance - walked) / difference);
+		}
+		else m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
+		walked += difference;
+		if ((int)m_Track.trainU >= (int)m_Track.points.size()) m_Track.trainU -= (int)m_Track.points.size();
+	}
 	//#####################################################################
 	// TODO: make this work for your train
 	//#####################################################################

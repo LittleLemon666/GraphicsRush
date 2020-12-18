@@ -689,7 +689,6 @@ setProjection()
 		orient = normalize(orient);
 		up = normalize(up);
 		crossed = normalize(crossed);
-		printf("%d\n", m_pTrack->lane);
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
 		vec3 viewer_pos = train_pos + up * 10.0f - forward * 10.0f;
 		if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
