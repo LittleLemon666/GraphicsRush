@@ -419,6 +419,37 @@ void TrainView::drawPlayer() {
 	glUseProgram(0);
 };
 
+void TrainView::drawObstacles() {
+	for (int obstacle = 0; obstacle < (int)m_pTrack->num_of_obstacles; obstacle++) {
+		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
+		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
+		obstacleForward = normalize(obstacleForward);
+		obstacleUp = normalize(obstacleUp);
+		obstacleCross = normalize(obstacleCross);
+		obstaclePosition += obstacleUp * 5.0f;
+		float crossSize = 2.0f;
+		glBegin(GL_QUADS);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex3f(
+			obstaclePosition.x + obstacleUp.x * 5.0f + obstacleCross.x * crossSize,
+			obstaclePosition.y + obstacleUp.y * 5.0f + obstacleCross.y * crossSize,
+			obstaclePosition.z + obstacleUp.z * 5.0f + obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x + obstacleUp.x * 5.0f - obstacleCross.x * crossSize,
+			obstaclePosition.y + obstacleUp.y * 5.0f - obstacleCross.y * crossSize,
+			obstaclePosition.z + obstacleUp.z * 5.0f - obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x - obstacleUp.x * 5.0f - obstacleCross.x * crossSize,
+			obstaclePosition.y - obstacleUp.y * 5.0f - obstacleCross.y * crossSize,
+			obstaclePosition.z - obstacleUp.z * 5.0f - obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x - obstacleUp.x * 5.0f + obstacleCross.x * crossSize,
+			obstaclePosition.y - obstacleUp.y * 5.0f + obstacleCross.y * crossSize,
+			obstaclePosition.z - obstacleUp.z * 5.0f + obstacleCross.z * crossSize);
+		glEnd();
+	}
+};
+
 //************************************************************************
 //
 // * this is the code that actually draws the window
@@ -606,6 +637,8 @@ void TrainView::draw()
 	drawPath();
 
 	drawPlayer();
+
+	drawObstacles();
 }
 
 //************************************************************************

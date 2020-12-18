@@ -115,6 +115,7 @@ class TrainView : public Fl_Gl_Window
 		void initPath();
 		void drawPath();
 		void drawPlayer();
+		void drawObstacles();
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 

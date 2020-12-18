@@ -28,6 +28,8 @@
 
 #include <FL/fl_ask.h>
 
+#include "time.h"
+
 //****************************************************************************
 //
 // * Constructor
@@ -36,6 +38,13 @@ CTrack::
 CTrack() : trainU(0), lane(0), switchLane(0), jumpingState(-1)
 //============================================================================
 {
+	srand(time(NULL));
+	int slices = 10000;
+	for (int obstacle = 0; obstacle < num_of_obstacles; obstacle++) {
+		float pos = ((float)(rand() % slices) / (float)slices) * (float)points.size();
+		int _lane = (rand() % 3) - 1;
+		obstacles.push_back(Obstacle(pos, _lane));
+	}
 	resetPoints();
 }
 
