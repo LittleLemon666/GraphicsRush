@@ -418,6 +418,39 @@ void TrainView::drawPlayer() {
 	glUseProgram(0);
 };
 
+void TrainView::drawObstacles() {
+	for (int obstacle = 0; obstacle < (int)m_pTrack->num_of_obstacles; obstacle++) {
+		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
+		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
+		obstacleForward = normalize(obstacleForward);
+		obstacleUp = normalize(obstacleUp);
+		obstacleCross = normalize(obstacleCross);
+		obstaclePosition += obstacleUp * 7.0f;
+		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
+		float crossSize = 2.0f;
+		float upSize = 2.0f;
+		glBegin(GL_QUADS);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		glVertex3f(
+			obstaclePosition.x + obstacleUp.x * upSize + obstacleCross.x * crossSize,
+			obstaclePosition.y + obstacleUp.y * upSize + obstacleCross.y * crossSize,
+			obstaclePosition.z + obstacleUp.z * upSize + obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x + obstacleUp.x * upSize - obstacleCross.x * crossSize,
+			obstaclePosition.y + obstacleUp.y * upSize - obstacleCross.y * crossSize,
+			obstaclePosition.z + obstacleUp.z * upSize - obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x - obstacleUp.x * upSize - obstacleCross.x * crossSize,
+			obstaclePosition.y - obstacleUp.y * upSize - obstacleCross.y * crossSize,
+			obstaclePosition.z - obstacleUp.z * upSize - obstacleCross.z * crossSize);
+		glVertex3f(
+			obstaclePosition.x - obstacleUp.x * upSize + obstacleCross.x * crossSize,
+			obstaclePosition.y - obstacleUp.y * upSize + obstacleCross.y * crossSize,
+			obstaclePosition.z - obstacleUp.z * upSize + obstacleCross.z * crossSize);
+		glEnd();
+	}
+};
+
 //************************************************************************
 //
 // * this is the code that actually draws the window
@@ -605,6 +638,17 @@ void TrainView::draw()
 	drawPath();
 
 	drawPlayer();
+
+	if ((int)m_pTrack->obstacles.size() == 0) {
+		srand(time(NULL));
+		int slices = 10000;
+		for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
+			float pos = ((float)(rand() % slices) / (float)slices) * (int)m_pTrack->points.size();
+			int _lane = (rand() % 3) - 1;
+			m_pTrack->obstacles.push_back(Obstacle(pos, _lane));
+		}
+	}
+	drawObstacles();
 }
 
 //************************************************************************

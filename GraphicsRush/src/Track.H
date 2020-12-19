@@ -32,6 +32,8 @@ using std::vector; // avoid having to say std::vector all of the time
 // make use of other data structures from this project
 #include "ControlPoint.H"
 
+#include "Obstacle.H"
+
 class CTrack {
 	public:		
 		// Constructor
@@ -64,4 +66,6 @@ class CTrack {
 		float switchLane;
 		vector<float> airbornePosition = { 0.36f, 0.64f, 0.84f, 0.96f, 1.0f, 1.0f, 0.96f, 0.84f, 0.64f, 0.36f, 0.0f };
 		int jumpingState;
+		vector<Obstacle> obstacles = {};
+		int num_of_obstacles = 10;
 };
