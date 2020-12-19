@@ -1,3 +1,4 @@
+#pragma once
 #include "Utilities/Pnt3f.H"
 #include "Utilities/3DUtils.h"
 #include <cstdio>

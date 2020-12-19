@@ -419,6 +419,7 @@ void TrainView::drawPlayer() {
 };
 
 void TrainView::drawObstacles() {
+	this->path_shader->Use();
 	for (int obstacle = 0; obstacle < (int)m_pTrack->num_of_obstacles; obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -427,28 +428,20 @@ void TrainView::drawObstacles() {
 		obstacleCross = normalize(obstacleCross);
 		obstaclePosition += obstacleUp * 7.0f;
 		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
-		float crossSize = 2.0f;
+		float forwardSize = 2.0f;
 		float upSize = 2.0f;
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 0.0f, 0.0f);
-		glVertex3f(
-			obstaclePosition.x + obstacleUp.x * upSize + obstacleCross.x * crossSize,
-			obstaclePosition.y + obstacleUp.y * upSize + obstacleCross.y * crossSize,
-			obstaclePosition.z + obstacleUp.z * upSize + obstacleCross.z * crossSize);
-		glVertex3f(
-			obstaclePosition.x + obstacleUp.x * upSize - obstacleCross.x * crossSize,
-			obstaclePosition.y + obstacleUp.y * upSize - obstacleCross.y * crossSize,
-			obstaclePosition.z + obstacleUp.z * upSize - obstacleCross.z * crossSize);
-		glVertex3f(
-			obstaclePosition.x - obstacleUp.x * upSize - obstacleCross.x * crossSize,
-			obstaclePosition.y - obstacleUp.y * upSize - obstacleCross.y * crossSize,
-			obstaclePosition.z - obstacleUp.z * upSize - obstacleCross.z * crossSize);
-		glVertex3f(
-			obstaclePosition.x - obstacleUp.x * upSize + obstacleCross.x * crossSize,
-			obstaclePosition.y - obstacleUp.y * upSize + obstacleCross.y * crossSize,
-			obstaclePosition.z - obstacleUp.z * upSize + obstacleCross.z * crossSize);
-		glEnd();
+
+		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
+		glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		m_pTrack->obstacles[obstacle].obstacle_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+
+		m_pTrack->obstacles[obstacle].obstacle_obj->draw();
 	}
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 };
 
 //************************************************************************
