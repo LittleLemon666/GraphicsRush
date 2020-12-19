@@ -34,6 +34,9 @@
 #include "Utilities/3DUtils.H"
 
 /*********************NEW ADDITIONS*********************/
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 using namespace glm;
 
 #ifdef EXAMPLE_SOLUTION
@@ -54,6 +57,22 @@ TrainView(int x, int y, int w, int h, const char* l)
 
 	resetArcball();
 
+	/*********************NEW ADDITIONS*********************/
+	// loads a cubemap texture from 6 individual texture faces
+	// order:
+	// +X (right)
+	// -X (left)
+	// +Y (top)
+	// -Y (bottom)
+	// -Z (back)
+	// +Z (front) 
+	// -------------------------------------------------------
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/px.png");
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/nx.png");
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/py.png");
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/ny.png");
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/nz.png");
+	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/pz.png");
 }
 
 //************************************************************************
@@ -79,7 +98,8 @@ resetArcball()
 //       (like key presses), you might want to hack this.
 //########################################################################
 //========================================================================
-int TrainView::handle(int event)
+int TrainView::
+handle(int event)
 {
 	// see if the ArcBall will handle the event - if it does, 
 	// then we're done
@@ -169,7 +189,8 @@ int TrainView::handle(int event)
 }
 
 /*********************NEW ADDITIONS*********************/
-void TrainView::initPath() {
+void TrainView::
+initPath() {
 	path->vertices = {};
 	path->normal = {};
 	path->texture_coordinate = {};
@@ -358,16 +379,114 @@ void TrainView::initPath() {
 	glBindVertexArray(0);
 };
 
-void TrainView::drawPath() {
+GLuint TrainView::
+loadCubemap(std::vector<std::string> skybox_textures_faces)
+{
+	GLuint textureID;
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	int width, height;
+	unsigned char* image;
+	for (GLuint i = 0; i < skybox_textures_faces.size(); i++)
+	{
+		image = stbi_load(skybox_textures_faces[i].c_str(), &width, &height, 0, 0);
+		if (image)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+			stbi_image_free(image);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << skybox_textures_faces[i] << std::endl;
+			stbi_image_free(image);
+		}
+	}
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	return textureID;
+}
+
+void TrainView::
+initSkybox()
+{
+	if (!this->skybox->vertex_data)
+	{
+		GLfloat vertices[] = {
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
+
+		this->skybox->vertex_data = new VAO;
+		glGenVertexArrays(1, &this->skybox->vertex_data->vao);
+		glGenBuffers(1, this->skybox->vertex_data->vbo);
+
+		glBindVertexArray(this->skybox->vertex_data->vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->skybox->vertex_data->vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		// Unbind VAO
+		glBindVertexArray(0);
+	}
+}
+
+void TrainView::
+drawPath() {
 	//bind shader
-	this->path_shader->Use();
+	this->basic_shader->Use();
 
 	glm::mat4 model_matrix = glm::mat4();
 	model_matrix = glm::translate(model_matrix, this->source_pos);
-	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
 	this->path_texture->bind(0);
-	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 
 	//bind VAO
 	glBindVertexArray(this->path->vertex_data->vao);
@@ -381,9 +500,10 @@ void TrainView::drawPath() {
 	glUseProgram(0);
 };
 
-void TrainView::drawPlayer() {
+void TrainView::
+drawPlayer() {
 	//bind shader
-	this->path_shader->Use();
+	this->basic_shader->Use();
 
 	vec3 player_xbias;
 	gmt.calculateAll(m_pTrack->trainU, player_pos, player_forward, player_up, player_xbias);
@@ -391,23 +511,24 @@ void TrainView::drawPlayer() {
 	player_up = normalize(player_up);
 	player_xbias = normalize(player_xbias);
 	player_pos += (float)m_pTrack->switchLane * player_xbias * 5.0f;
-	if (m_pTrack->jumpingState != -1)
+	if (m_pTrack->jumpingState > 0)
 		player_pos += m_pTrack->airbornePosition[m_pTrack->jumpingState - 1] * player_up * 10.0f; //m_pTrack->jumpingState is added once in setProjection
 
 	mat4 model_matrix = inverse(lookAt(player_pos + 5.0f * player_up, player_pos + player_forward + 5.0f * player_up, player_up)); // the player is in a 5.0f height position
-	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->pikachu_texture->bind(1);
-	glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 1);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	this->player_texture->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 1);
 
-	pikachu->draw();
+	player_obj->draw();
 
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 };
 
-void TrainView::drawObstacles() {
-	this->path_shader->Use();
+void TrainView::
+drawObstacles() {
+	this->basic_shader->Use();
 	for (int obstacle = 0; obstacle < (int)m_pTrack->num_of_obstacles; obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -421,23 +542,53 @@ void TrainView::drawObstacles() {
 
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
-		glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 		m_pTrack->obstacles[obstacle].obstacle_texture->bind(0);
-		glUniform1i(glGetUniformLocation(this->path_shader->Program, "u_texture"), 0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 
 		m_pTrack->obstacles[obstacle].obstacle_obj->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
-};
+}
+
+void TrainView::
+drawSkybox()
+{
+	glm::mat4 skybox_view_matrix;
+	glGetFloatv(GL_MODELVIEW_MATRIX, &skybox_view_matrix[0][0]);
+	skybox_view_matrix = glm::mat4(glm::mat3(skybox_view_matrix));
+	glm::mat4 skybox_projection_matrix;
+	glGetFloatv(GL_PROJECTION_MATRIX, &skybox_projection_matrix[0][0]);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, this->skybox_matrices->ubo);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), &skybox_projection_matrix[0][0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), &skybox_view_matrix[0][0]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+	// draw skybox as last
+	glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+	skybox_shader->Use();
+	glUniform1i(glGetUniformLocation(this->skybox_shader->Program, "skybox"), 0);
+	// skybox cube
+	glBindVertexArray(this->skybox->vertex_data->vao);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+	glDepthFunc(GL_LESS); // set depth function back to default
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
 
 //************************************************************************
 //
 // * this is the code that actually draws the window
 //   it puts a lot of the work into other routines to simplify things
 //========================================================================
-void TrainView::draw()
+void TrainView::
+draw()
 {
 
 	//*********************************************************************
@@ -450,12 +601,19 @@ void TrainView::draw()
 	{
 		//initiailize VAO, VBO, Shader...
 
-		if (!this->path_shader)
-			this->path_shader = new
+		if (!this->basic_shader)
+			this->basic_shader = new
 			Shader(
 				"../GraphicsRush/src/shaders/simple.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/simple.frag");
+
+		if (!this->skybox_shader)
+			this->skybox_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/skybox.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/skybox.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -467,6 +625,16 @@ void TrainView::draw()
 		glBufferData(GL_UNIFORM_BUFFER, this->commom_matrices->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		if (!this->skybox_matrices)
+		{
+			this->skybox_matrices = new UBO();
+			glGenBuffers(1, &this->skybox_matrices->ubo);
+		}
+		this->skybox_matrices->size = 2 * sizeof(glm::mat4);
+		glBindBuffer(GL_UNIFORM_BUFFER, this->skybox_matrices->ubo);
+		glBufferData(GL_UNIFORM_BUFFER, this->skybox_matrices->size, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		/*********************NEW ADDITIONS*********************/
 		if (!this->path) this->path = new ShaderInfo;
 		//add info for each track between control points
@@ -475,8 +643,8 @@ void TrainView::draw()
 		if (!this->path_texture)
 			this->path_texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
 
-		if (!this->pikachu_texture)
-			this->pikachu_texture = new Texture2D(pikachu_texture_path.c_str());
+		if (!this->player_texture)
+			this->player_texture = new Texture2D(player_texture_path.c_str());
 
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
@@ -536,8 +704,18 @@ void TrainView::draw()
 			//alcCloseDevice(device);
 		}
 
-		if (!pikachu)
-			pikachu = new Object(pikachu_obj);
+		if (!player_obj)
+			player_obj = new Object(player_obj_path);
+
+		if (!cubemap_texture_load)
+		{
+			cubemap_texture_load = true;
+			cubemap_texture.push_back(loadCubemap(skybox_textures_faces));
+		}
+
+		if (!this->skybox) this->skybox = new ShaderInfo;
+
+		initSkybox();
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -616,6 +794,8 @@ void TrainView::draw()
 	setUBO();
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
+	glBindBufferRange(
+		GL_UNIFORM_BUFFER, /*binding point*/1, this->skybox_matrices->ubo, 0, this->skybox_matrices->size);
 	drawPath();
 
 	drawPlayer();
@@ -630,6 +810,8 @@ void TrainView::draw()
 		}
 	}
 	drawObstacles();
+
+	drawSkybox();
 }
 
 //************************************************************************

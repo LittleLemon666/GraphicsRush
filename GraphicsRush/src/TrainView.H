@@ -98,9 +98,10 @@ class TrainView : public Fl_Gl_Window
 		TrainWindow*	tw;				// The parent of this display window
 		CTrack*			m_pTrack;		// The track of the entire scene
 
-		Shader* path_shader		= nullptr;
+		Shader* basic_shader		= nullptr;
 		Texture2D* path_texture	= nullptr;
-		UBO* commom_matrices= nullptr;
+		UBO* commom_matrices = nullptr;
+		UBO* skybox_matrices = nullptr;
 
 		//OpenAL
 		glm::vec3 source_pos;
@@ -112,18 +113,28 @@ class TrainView : public Fl_Gl_Window
 
 		/*********************NEW ADDITIONS*********************/
 		ShaderInfo* path = nullptr;
+		ShaderInfo* skybox = nullptr;
+		Shader* skybox_shader = nullptr;
 		void initPath();
+		void initSkybox();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
+		void drawSkybox();
+		GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 
 		vec3 train_pos, forward, up;
 		vec3 player_pos, player_forward, player_up;
 
-		Object* pikachu = nullptr;
-		std::string pikachu_obj = "../GraphicsRush/Objects/pikachu_blender.obj";
-		std::string pikachu_texture_path = "../GraphicsRush/Objects/Pikachu.png";
-		Texture2D* pikachu_texture = nullptr;
+		Object* player_obj = nullptr;
+		std::string player_obj_path = "../GraphicsRush/Objects/pikachu_blender.obj";
+		std::string player_texture_path = "../GraphicsRush/Objects/Pikachu.png";
+		Texture2D* player_texture = nullptr;
+
+		int chapter = 0;
+		std::vector<GLuint> cubemap_texture;
+		std::vector<std::string> skybox_textures_faces;
+		bool cubemap_texture_load = false;
 };
