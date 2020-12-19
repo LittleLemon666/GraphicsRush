@@ -131,9 +131,8 @@ class TrainView : public Fl_Gl_Window
 		bool initText();
 		void drawPath();
 		void drawPlayer();
-		void loadObstacles();
 		void drawObstacles();
-		void loadMoney();
+		void loadObjects();
 		void drawMoney();
 		void drawSkybox();
 		GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);

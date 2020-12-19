@@ -612,34 +612,6 @@ drawPlayer() {
 	glUseProgram(0);
 };
 
-void TrainView::loadObstacles() {
-	srand(time(NULL));
-	/*create obstacles haphazardly
-	int slices = 10000;
-	for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
-		float pos = ((float)(rand() % slices) / (float)slices) * (float)((int)m_pTrack->points.size() - 1) + 1.0f;
-		int _lane = (rand() % 3) - 1;
-		int _height = (rand() % 2);
-		m_pTrack->obstacles.push_back(Obstacle(pos, _lane, _height));
-	}
-	*/
-	float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
-	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
-		vector<Obstacle> wall = {
-			Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
-			, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
-		int blocked = 5;
-		for (int space = 0; space < 6; space++) {
-			if (blocked == 0) break;
-			if (rand() % 2 == 1) {
-				m_pTrack->obstacles.push_back(wall[space]);
-				blocked--;
-			}
-		}
-		if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
-	}
-};
-
 void TrainView::
 drawObstacles() {
 	this->basic_shader->Use();
@@ -669,16 +641,40 @@ drawObstacles() {
 	glUseProgram(0);
 }
 
-void TrainView::loadMoney() {
+void TrainView::loadObjects() {
 	srand(time(NULL));
 	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
+	int money_to_obstacle_ratio = m_pTrack->num_of_money / m_pTrack->num_of_obstacles, current_ratio = 0;
+	printf("%d\n", money_to_obstacle_ratio);
 	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += money_buffer) {
+
+		//add money
 		vector<Money> line = {
 			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0)
 			, Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
-		m_pTrack->money.push_back(line[rand() % 6]);
+		int money_spot = rand() % 6;
+		m_pTrack->money.push_back(line[money_spot]);
+
+		//add obstacle
+		if (current_ratio == money_to_obstacle_ratio) {
+			vector<Obstacle> wall = {
+					Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
+					, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
+			int blocked = 5;
+			for (int space = 0; space < 6; space++) {
+				if (blocked == 0) break;
+				if (rand() % 2 == 1 && space != money_spot) {
+					m_pTrack->obstacles.push_back(wall[space]);
+					blocked--;
+				}
+			}
+			if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
+			current_ratio = 0;
+		}
+		current_ratio++;
 	}
 };
+
 void TrainView::drawMoney() {
 	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
@@ -958,10 +954,10 @@ draw()
 
 	drawPlayer();
 
-	if ((int)m_pTrack->obstacles.size() == 0) loadObstacles();
-	drawObstacles();
+	//use money to check if world is loaded
+	if ((int)m_pTrack->money.size() == 0) loadObjects();
 
-	if ((int)m_pTrack->money.size() == 0) loadMoney();
+	drawObstacles();
 	drawMoney();
 
 	drawSkybox();
