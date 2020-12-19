@@ -979,7 +979,7 @@ draw()
 	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 
 	char money_info[30];
-	sprintf(money_info, "money_collected: %010d", m_pTrack->money);
+	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 }
 
