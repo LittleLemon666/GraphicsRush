@@ -152,7 +152,7 @@ void runButtonCB(TrainWindow* tw)
 				}
 			}
 			//player obstacle collision
-			for (int obstacle = 0; obstacle < tw->m_Track.num_of_obstacles; obstacle++) {
+			for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 				if (tw->m_Track.collision(obstacle)) {
 					Sleep(1000);
 					tw->runButton->value(0);
