@@ -34,6 +34,9 @@ class Model
 public:
 	Model();
 	Model(const std::string);
+	Model(const Model& model);
+
+	Model operator=(const Model& model);
 
 	bool loadOBJ(const std::string fileName);
 
@@ -57,8 +60,6 @@ public:
 	std::vector<glm::vec3> indexed_normals;
 
 	glm::vec3 pos;
-
-	bool isLoad;
 
 private:
 	GLuint VertexArrayID;

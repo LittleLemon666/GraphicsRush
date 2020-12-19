@@ -148,6 +148,12 @@ class TrainView : public Fl_Gl_Window
 		std::string player_texture_path = "../GraphicsRush/Objects/Pikachu.png";
 		Texture2D* player_texture = nullptr;
 
+		std::string obstacle_obj_path = "../GraphicsRush/Objects/box.obj";
+		std::string obstacle_texture_path = "../GraphicsRush/Objects/box.jpg";
+
+		std::string money_obj_path = "../GraphicsRush/Objects/coin.obj";
+		std::string money_texture_path = "../GraphicsRush/Objects/coin_texture.jpg";
+
 		int chapter = 0;
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::string> skybox_textures_faces;

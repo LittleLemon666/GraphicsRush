@@ -45,6 +45,19 @@ public:
 
 		img.release();
 	}
+	Texture2D(const Texture2D& texture2D)
+	{
+		size = texture2D.size;
+		id = texture2D.id;
+		type = texture2D.type;
+	}
+	Texture2D operator=(const Texture2D& texture2D)
+	{
+		size = texture2D.size;
+		id = texture2D.id;
+		type = texture2D.type;
+		return *this;
+	}
 	void bind(GLenum bind_unit)
 	{
 		glActiveTexture(GL_TEXTURE0 + bind_unit);

@@ -623,11 +623,12 @@ void TrainView::loadObstacles() {
 		m_pTrack->obstacles.push_back(Obstacle(pos, _lane, _height));
 	}
 	*/
+	Obstacle::addObstacleModel(obstacle_obj_path, obstacle_texture_path);
 	float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
 	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
 		vector<Obstacle> wall = {
-			Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
-			, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
+			Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0),
+			Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
 		int blocked = 5;
 		for (int space = 0; space < 6; space++) {
 			if (blocked == 0) break;
@@ -660,10 +661,10 @@ drawObstacles() {
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
 		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-		m_pTrack->obstacles[obstacle].obstacle_texture->bind(0);
+		(m_pTrack->obstacles[obstacle]).obstacle_texture[0].bind(0);
 		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 
-		m_pTrack->obstacles[obstacle].obstacle_obj->draw();
+		m_pTrack->obstacles[obstacle].obstacle_obj[0]->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
@@ -671,15 +672,18 @@ drawObstacles() {
 
 void TrainView::loadMoney() {
 	srand(time(NULL));
+	Money::addMoneyModel(money_obj_path, money_texture_path);
 	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
 	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += money_buffer) {
 		vector<Money> line = {
-			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0)
-			, Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
+			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0),
+			Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
 		m_pTrack->money.push_back(line[rand() % 6]);
 	}
-};
+}
+
 void TrainView::drawMoney() {
+	this->basic_shader->Use();
 	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->money[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -688,18 +692,22 @@ void TrainView::drawMoney() {
 		obstacleCross = normalize(obstacleCross);
 		obstaclePosition += obstacleUp * 7.0f;
 		obstaclePosition += obstacleCross * (float)m_pTrack->money[obstacle].lane * 5.0f;
-		float crossSize = 1.0f;
+		float forwardSize = 1.0f;
 		float upSize = 1.0f;
 		float heightSize = 10.0f;
 		if (m_pTrack->money[obstacle].height) obstaclePosition += obstacleUp * heightSize;
-		glBegin(GL_QUADS);
-		glColor3f(1.0f, 1.0f, 0.0f);
-		glVertex3f(obstaclePosition.x + obstacleCross.x * crossSize, obstaclePosition.y + obstacleCross.y * crossSize, obstaclePosition.z + obstacleCross.z * crossSize);
-		glVertex3f(obstaclePosition.x + obstacleUp.x * upSize, obstaclePosition.y + obstacleUp.y * upSize, obstaclePosition.z + obstacleUp.z * upSize);
-		glVertex3f(obstaclePosition.x - obstacleCross.x * crossSize, obstaclePosition.y - obstacleCross.y * crossSize, obstaclePosition.z - obstacleCross.z * crossSize);
-		glVertex3f(obstaclePosition.x - obstacleUp.x * upSize, obstaclePosition.y - obstacleUp.y * upSize, obstaclePosition.z - obstacleUp.z * upSize);
-		glEnd();
+		
+		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		m_pTrack->money[obstacle].money_texture[0].bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+
+		m_pTrack->money[obstacle].money_obj[0]->draw();
 	}
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 };
 
 void TrainView::

@@ -1,16 +1,49 @@
 #include "Model.H"
 
 Model::
-Model() : isLoad(false)
+Model()
 {
 
 }
 
 Model::
-Model(const std::string fileName) : isLoad(false)
+Model(const std::string fileName)
 {
-	isLoad = loadOBJ(fileName);
+	loadOBJ(fileName);
 	VBOIndex(vertices, uvs, normals);
+}
+
+Model::
+Model(const Model& model)
+{
+	indices = model.indices;
+	indexed_vertices = model.indexed_vertices;
+	indexed_uvs = model.indexed_uvs;
+	indexed_normals = model.indexed_normals;
+
+	pos = model.pos;
+	VertexArrayID = model.VertexArrayID;
+	vertexbuffer = model.vertexbuffer;
+	uvbuffer = model.uvbuffer;
+	normalbuffer = model.normalbuffer;
+	elementbuffer = model.elementbuffer;
+}
+
+Model Model::
+operator=(const Model& model)
+{
+	indices = model.indices;
+	indexed_vertices = model.indexed_vertices;
+	indexed_uvs = model.indexed_uvs;
+	indexed_normals = model.indexed_normals;
+
+	pos = model.pos;
+	VertexArrayID = model.VertexArrayID;
+	vertexbuffer = model.vertexbuffer;
+	uvbuffer = model.uvbuffer;
+	normalbuffer = model.normalbuffer;
+	elementbuffer = model.elementbuffer;
+	return *this;
 }
 
 // from opengl-tutorial
