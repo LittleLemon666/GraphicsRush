@@ -180,7 +180,7 @@ void loadCB(Fl_Widget*, TrainWindow* tw)
 //===========================================================================
 {
 	const char* fname =
-		fl_file_chooser("Pick a Track File", "*.txt", "TrackFiles/track.txt");
+		fl_file_chooser("Pick a Track File", "*.txt", "../GraphicsRush/TrackFiles/default.txt");
 	if (fname) {
 		tw->m_Track.readPoints(fname);
 		tw->damageMe();
