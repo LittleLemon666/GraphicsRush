@@ -529,7 +529,7 @@ drawPlayer() {
 void TrainView::
 drawObstacles() {
 	this->basic_shader->Use();
-	for (int obstacle = 0; obstacle < (int)m_pTrack->num_of_obstacles; obstacle++) {
+	for (int obstacle = 0; obstacle < (int)m_pTrack->obstacles.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
 		obstacleForward = normalize(obstacleForward);
@@ -539,6 +539,8 @@ drawObstacles() {
 		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
 		float forwardSize = 2.0f;
 		float upSize = 2.0f;
+		float heightSize = 10.0f;
+		if (m_pTrack->obstacles[obstacle].height) obstaclePosition += obstacleUp * heightSize;
 
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
@@ -802,11 +804,29 @@ draw()
 
 	if ((int)m_pTrack->obstacles.size() == 0) {
 		srand(time(NULL));
+		/*create obstacles haphazardly
 		int slices = 10000;
 		for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
-			float pos = ((float)(rand() % slices) / (float)slices) * (int)m_pTrack->points.size();
+			float pos = ((float)(rand() % slices) / (float)slices) * (float)((int)m_pTrack->points.size() - 1) + 1.0f;
 			int _lane = (rand() % 3) - 1;
-			m_pTrack->obstacles.push_back(Obstacle(pos, _lane));
+			int _height = (rand() % 2);
+			m_pTrack->obstacles.push_back(Obstacle(pos, _lane, _height));
+		}
+		*/
+		float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
+		for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
+			vector<Obstacle> wall = { 
+				Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
+				, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
+			int blocked = 5;
+			for (int space = 0; space < 6; space++) {
+				if (blocked == 0) break;
+				if (rand() % 2 == 1) {
+					m_pTrack->obstacles.push_back(wall[space]);
+					blocked--;
+				}
+			}
+			if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
 		}
 	}
 	drawObstacles();
@@ -896,21 +916,21 @@ setProjection()
 		up = normalize(up);
 		crossed = normalize(crossed);
 		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-		vec3 viewer_pos = train_pos + up * 10.0f - forward * 10.0f;
+		vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
 		if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
 			if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
 			else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
 		}
-		if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
 		viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
 		if (m_pTrack->jumpingState != -1) {
 			viewer_pos = viewer_pos + m_pTrack->airbornePosition[m_pTrack->jumpingState] * up * 10.0f;
 			m_pTrack->jumpingState++;
 		}
+		if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
-			viewer_pos.x + forward.x,
-			viewer_pos.y + forward.y,
-			viewer_pos.z + forward.z,
+			viewer_pos.x + forward.x * 10.0f, 
+			viewer_pos.y + forward.y * 10.0f,
+			viewer_pos.z + forward.z * 10.0f,
 			up.x, up.y, up.z);
 
 #ifdef EXAMPLE_SOLUTION
