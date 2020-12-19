@@ -203,9 +203,9 @@ bool CTrack::collision(int obstacle) {
 		|| (obstacles[obstacle].lane == -1 && (switchLane < -0.6));
 	bool sameHeight =
 		(obstacles[obstacle].height == 0
-			&& (jumpingState == -1 || airbornePosition[jumpingState] < 0.4))
+			&& (jumpingState == -1 || airbornePosition[jumpingState] < 0.4f))
 		|| (obstacles[obstacle].height == 1
-			&& (jumpingState != -1 && airbornePosition[jumpingState] > 0.6));
+			&& (jumpingState != -1 && airbornePosition[jumpingState] > 0.6f));
 	if (sameLane && sameHeight && pos_diff < 2.0f) return true;
 	return false;
 };

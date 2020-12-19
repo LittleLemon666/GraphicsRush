@@ -526,6 +526,34 @@ drawPlayer() {
 	glUseProgram(0);
 };
 
+void TrainView::loadObstacles() {
+	srand(time(NULL));
+	/*create obstacles haphazardly
+	int slices = 10000;
+	for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
+		float pos = ((float)(rand() % slices) / (float)slices) * (float)((int)m_pTrack->points.size() - 1) + 1.0f;
+		int _lane = (rand() % 3) - 1;
+		int _height = (rand() % 2);
+		m_pTrack->obstacles.push_back(Obstacle(pos, _lane, _height));
+	}
+	*/
+	float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
+	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
+		vector<Obstacle> wall = {
+			Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
+			, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
+		int blocked = 5;
+		for (int space = 0; space < 6; space++) {
+			if (blocked == 0) break;
+			if (rand() % 2 == 1) {
+				m_pTrack->obstacles.push_back(wall[space]);
+				blocked--;
+			}
+		}
+		if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
+	}
+};
+
 void TrainView::
 drawObstacles() {
 	this->basic_shader->Use();
@@ -554,6 +582,13 @@ drawObstacles() {
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
+
+void TrainView::loadMoney() {
+
+};
+void TrainView::drawMoney() {
+
+};
 
 void TrainView::
 drawSkybox()
@@ -802,34 +837,10 @@ draw()
 
 	drawPlayer();
 
-	if ((int)m_pTrack->obstacles.size() == 0) {
-		srand(time(NULL));
-		/*create obstacles haphazardly
-		int slices = 10000;
-		for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
-			float pos = ((float)(rand() % slices) / (float)slices) * (float)((int)m_pTrack->points.size() - 1) + 1.0f;
-			int _lane = (rand() % 3) - 1;
-			int _height = (rand() % 2);
-			m_pTrack->obstacles.push_back(Obstacle(pos, _lane, _height));
-		}
-		*/
-		float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
-		for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
-			vector<Obstacle> wall = { 
-				Obstacle(distance, -1, 0), Obstacle(distance, 0, 0), Obstacle(distance, 1, 0)
-				, Obstacle(distance, -1, 1), Obstacle(distance, 0, 1), Obstacle(distance, 1, 1) };
-			int blocked = 5;
-			for (int space = 0; space < 6; space++) {
-				if (blocked == 0) break;
-				if (rand() % 2 == 1) {
-					m_pTrack->obstacles.push_back(wall[space]);
-					blocked--;
-				}
-			}
-			if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
-		}
-	}
+	if ((int)m_pTrack->obstacles.size() == 0) loadObstacles();
 	drawObstacles();
+
+	if ((int)m_pTrack->money.size() == 0) loadMoney();
 
 	drawSkybox();
 }

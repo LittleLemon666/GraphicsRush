@@ -32,7 +32,7 @@ using std::vector; // avoid having to say std::vector all of the time
 // make use of other data structures from this project
 #include "ControlPoint.H"
 
-#include "Obstacle.H"
+#include "Object.H"
 
 class CTrack {
 	public:		
@@ -68,8 +68,9 @@ class CTrack {
 			1.0f, 1.0f, 0.98f, 0.96f, 0.9f, 0.84f, 0.74f, 0.64f, 0.5f, 0.36f, 0.0f };
 		int jumpingState;
 		vector<Obstacle> obstacles = {};
+		vector<Money> money = {};
 		int num_of_obstacles = 10;
 		bool collision(int obstacle);
 		int score = 0;
-		int money = 0;
+		int money_collected = 0;
 };
