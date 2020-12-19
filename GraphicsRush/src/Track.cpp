@@ -160,6 +160,7 @@ readPoints(const char* filename)
 	}
 	trainU = 0;
 	obstacles = {};
+	money = {};
 }
 
 //****************************************************************************
@@ -205,6 +206,34 @@ bool CTrack::collision(int obstacle) {
 		(obstacles[obstacle].height == 0
 			&& (jumpingState == -1 || airbornePosition[jumpingState] < 0.4f))
 		|| (obstacles[obstacle].height == 1
+			&& (jumpingState != -1 && airbornePosition[jumpingState] > 0.6f));
+	if (sameLane && sameHeight && pos_diff < 2.0f) return true;
+	return false;
+};
+
+bool CTrack::collection(int id) {
+	//position difference
+	GMTPipeline gmt;
+	gmt.gmt_track = this;
+	gmt.setG_pos((int)trainU);
+	float ratio = trainU - (int)trainU;
+	vec3 player_pos = gmt.calculate(ratio);
+	gmt.setG_pos((int)money[id].position);
+	ratio = money[id].position - (int)money[id].position;
+	vec3 id_pos = gmt.calculate(ratio);
+	float pos_diff = sqrt(
+		pow(player_pos.x - id_pos.x, 2)
+		+ pow(player_pos.y - id_pos.y, 2)
+		+ pow(player_pos.z - id_pos.z, 2));
+	//lane difference
+	bool sameLane =
+		(money[id].lane == 1 && switchLane > 0.6)
+		|| (money[id].lane == 0 && (switchLane < 0.4 && switchLane > -0.4))
+		|| (money[id].lane == -1 && (switchLane < -0.6));
+	bool sameHeight =
+		(money[id].height == 0
+			&& (jumpingState == -1 || airbornePosition[jumpingState] < 0.4f))
+		|| (money[id].height == 1
 			&& (jumpingState != -1 && airbornePosition[jumpingState] > 0.6f));
 	if (sameLane && sameHeight && pos_diff < 2.0f) return true;
 	return false;

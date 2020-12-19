@@ -163,6 +163,15 @@ void runButtonCB(TrainWindow* tw)
 					break;
 				}
 			}
+			//player money collection
+			for (int money = 0; money < tw->m_Track.money.size(); money++) {
+				if (tw->m_Track.collection(money)) {
+					tw->m_Track.money.erase(tw->m_Track.money.begin() + money);
+					tw->m_Track.money_collected++;
+					tw->m_Track.score += tw->speed->value();
+					break;
+				}
+			}
 			tw->m_Track.score += tw->speed->value();
 			tw->speed->value(tw->speed->value() + 0.001);
 			lastRedraw = clock();

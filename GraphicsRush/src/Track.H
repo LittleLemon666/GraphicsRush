@@ -72,6 +72,7 @@ class CTrack {
 		int num_of_obstacles = 10;
 		int num_of_money = 100;
 		bool collision(int obstacle);
+		bool collection(int id);
 		int score = 0;
 		int money_collected = 0;
 };
