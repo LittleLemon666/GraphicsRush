@@ -612,35 +612,6 @@ drawPlayer() {
 	glUseProgram(0);
 };
 
-void TrainView::
-drawObstacles() {
-	this->basic_shader->Use();
-	for (int obstacle = 0; obstacle < (int)m_pTrack->obstacles.size(); obstacle++) {
-		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
-		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
-		obstacleForward = normalize(obstacleForward);
-		obstacleUp = normalize(obstacleUp);
-		obstacleCross = normalize(obstacleCross);
-		obstaclePosition += obstacleUp * 7.0f;
-		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
-		float forwardSize = 2.0f;
-		float upSize = 2.0f;
-		float heightSize = 10.0f;
-		if (m_pTrack->obstacles[obstacle].height) obstaclePosition += obstacleUp * heightSize;
-
-		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
-		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
-		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-		m_pTrack->obstacles[obstacle].obstacle_texture->bind(0);
-		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
-
-		m_pTrack->obstacles[obstacle].obstacle_obj->draw();
-	}
-	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
-}
-
 void TrainView::loadObjects() {
 	srand(time(NULL));
 	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
@@ -672,12 +643,45 @@ void TrainView::loadObjects() {
 					blocked--;
 				}
 			}
-			if (blocked == 5) m_pTrack->obstacles.push_back(wall[rand() % 6]);
+			if (blocked == 5) {
+				int space = rand() % 6;
+				while (space == money_spot) space = rand() % 6;
+				m_pTrack->obstacles.push_back(wall[space]);
+			}
 			current_ratio = 0;
 		}
 		current_ratio++;
 	}
 };
+
+void TrainView::
+drawObstacles() {
+	this->basic_shader->Use();
+	for (int obstacle = 0; obstacle < (int)m_pTrack->obstacles.size(); obstacle++) {
+		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
+		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
+		obstacleForward = normalize(obstacleForward);
+		obstacleUp = normalize(obstacleUp);
+		obstacleCross = normalize(obstacleCross);
+		obstaclePosition += obstacleUp * 7.0f;
+		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
+		float forwardSize = 2.0f;
+		float upSize = 2.0f;
+		float heightSize = 10.0f;
+		if (m_pTrack->obstacles[obstacle].height) obstaclePosition += obstacleUp * heightSize;
+
+		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		m_pTrack->obstacles[obstacle].obstacle_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+
+		m_pTrack->obstacles[obstacle].obstacle_obj->draw();
+	}
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
 
 void TrainView::drawMoney() {
 	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
