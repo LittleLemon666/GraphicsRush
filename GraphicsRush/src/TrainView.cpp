@@ -978,7 +978,7 @@ draw()
 	drawSkybox();
 
 	char score_info[20];
-	sprintf(score_info, "Score: %010d", m_pTrack->score);
+	sprintf(score_info, "Score:  %010d", m_pTrack->score);
 	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 
 	char money_info[30];

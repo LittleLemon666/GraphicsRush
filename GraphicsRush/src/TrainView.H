@@ -127,12 +127,12 @@ class TrainView : public Fl_Gl_Window
 		Shader* skybox_shader = nullptr;
 		Shader* text_shader = nullptr;
 		void initPath();
+		void loadObjects();
 		void initSkybox();
 		bool initText();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
-		void loadObjects();
 		void drawMoney();
 		void drawSkybox();
 		GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
