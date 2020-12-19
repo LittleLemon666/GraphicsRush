@@ -5,8 +5,9 @@
 
 class Obstacle {
 	public:
-		Obstacle(float pos, int _lane);
+		Obstacle(float pos, int _lane, int _height);
 		int lane;
+		int height;
 		float position;
 		static Object* obstacle_obj;
 		static Texture2D* obstacle_texture;

@@ -4,9 +4,10 @@ Object* Obstacle::obstacle_obj = nullptr;
 Texture2D* Obstacle::obstacle_texture = nullptr;
 std::string Obstacle::obstacle_obj_path = "../GraphicsRush/Objects/box.obj";
 std::string Obstacle::obstacle_texture_path = "../GraphicsRush/Objects/box.jpg";
-Obstacle::Obstacle(float pos, int _lane) {
+Obstacle::Obstacle(float pos, int _lane, int _height) {
 	position = pos;
 	lane = _lane;
+	height = _height;
 	if (gladLoadGL())
 	{
 		if (!obstacle_obj)
