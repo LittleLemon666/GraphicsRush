@@ -4,7 +4,7 @@ out vec4 f_color;
 
 in V_OUT
 {
-   vec3 texture_coordinate;
+   vec2 texture_coordinate;
 } f_in;
 
 uniform sampler2D text;

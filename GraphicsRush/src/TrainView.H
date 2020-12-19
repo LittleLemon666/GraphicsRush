@@ -39,6 +39,8 @@ class CTrack;
 #include "ShaderInfo.h"
 #include "GMTPipeline.h"
 #include "Model.H"
+#include <ft2build.h>
+#include <freetype/freetype.h>
 
 //#######################################################################
 // TODO
@@ -63,6 +65,14 @@ class CTrack;
 
 // this uses the old ArcBall Code
 #include "Utilities/ArcBallCam.H"
+
+/// Holds all state information relevant to a character as loaded using FreeType
+struct Character {
+	unsigned int TextureID; // ID handle of the glyph texture
+	glm::ivec2   Size;      // Size of glyph
+	glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
+	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
 
 class TrainView : public Fl_Gl_Window
 {
@@ -115,8 +125,10 @@ class TrainView : public Fl_Gl_Window
 		ShaderInfo* path = nullptr;
 		ShaderInfo* skybox = nullptr;
 		Shader* skybox_shader = nullptr;
+		Shader* text_shader = nullptr;
 		void initPath();
 		void initSkybox();
+		bool initText();
 		void drawPath();
 		void drawPlayer();
 		void loadObstacles();
@@ -140,4 +152,10 @@ class TrainView : public Fl_Gl_Window
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::string> skybox_textures_faces;
 		bool cubemap_texture_load = false;
+
+		bool font_isloaded = false;
+		std::string font_name = "../GraphicsRush/fonts/54151___.TTF";
+		std::map<GLchar, Character> Characters;
+		VAO* font_vertex_data = nullptr;
+		void RenderText(std::string text, float x, float y, float scale, vec3 color);
 };
