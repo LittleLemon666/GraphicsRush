@@ -194,7 +194,7 @@ void saveCB(Fl_Widget*, TrainWindow* tw)
 //===========================================================================
 {
 	const char* fname =
-		fl_input("File name for save (should be *.txt)", "TrackFiles/");
+		fl_input("File name for save (should be *.txt)", "../GraphicsRush/TrackFiles/");
 	if (fname)
 		tw->m_Track.writePoints(fname);
 }
