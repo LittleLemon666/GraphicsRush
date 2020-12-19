@@ -1,4 +1,5 @@
 #include "GMTPipeline.h"
+#include "Track.h"
 void GMTPipeline::setG_pos(int cp_id) {
 	G = {
 			{gmt_track->points[(cp_id - 1 + (int)gmt_track->points.size()) % (int)gmt_track->points.size()].pos.x, 

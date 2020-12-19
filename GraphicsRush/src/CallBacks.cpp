@@ -120,6 +120,8 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 
 
 static unsigned long lastRedraw = 0;
+static unsigned long buttonBuffer = 0;
+static unsigned long buffer = 10;
 //***************************************************************************
 //
 // * Callback for idling - if things are sitting, this gets called
@@ -133,6 +135,34 @@ void runButtonCB(TrainWindow* tw)
 {
 	if (tw->runButton->value()) {	// only advance time if appropriate
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
+			//button input
+			if (buttonBuffer > 0) buttonBuffer--;
+			if (buttonBuffer == 0) {
+				if (GetAsyncKeyState('A') && tw->m_Track.lane > -1) {
+					tw->m_Track.lane--;
+					buttonBuffer = buffer;
+				}
+				if (GetAsyncKeyState('D') && tw->m_Track.lane < 1) {
+					tw->m_Track.lane++;
+					buttonBuffer = buffer;
+				}
+				if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
+					tw->m_Track.jumpingState = 0;
+					buttonBuffer = buffer;
+				}
+			}
+			//player obstacle collision
+			for (int obstacle = 0; obstacle < tw->m_Track.num_of_obstacles; obstacle++) {
+				if (tw->m_Track.collision(obstacle)) {
+					Sleep(1000);
+					tw->runButton->value(0);
+					tw->m_Track.trainU = 0.0f;
+					tw->m_Track.lane = 0;
+					tw->m_Track.switchLane = 0.0f;
+					tw->m_Track.jumpingState = -1;
+					break;
+				}
+			}
 			lastRedraw = clock();
 			tw->advanceTrain();
 			tw->damageMe();

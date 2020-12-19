@@ -162,18 +162,6 @@ int TrainView::handle(int event)
 
 			return 1;
 		};
-		if (k == 'a' && m_pTrack->lane > -1) {
-			m_pTrack->lane--;
-			return 1;
-		}
-		if (k == 'd' && m_pTrack->lane < 1) {
-			m_pTrack->lane++;
-			return 1;
-		}
-		if (k == 'w' && m_pTrack->jumpingState == -1) {
-			m_pTrack->jumpingState = 0;
-			return 1;
-		}
 		break;
 	}
 

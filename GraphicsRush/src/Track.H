@@ -64,8 +64,10 @@ class CTrack {
 		float trainU;
 		int lane;
 		float switchLane;
-		vector<float> airbornePosition = { 0.36f, 0.64f, 0.84f, 0.96f, 1.0f, 1.0f, 0.96f, 0.84f, 0.64f, 0.36f, 0.0f };
+		vector<float> airbornePosition = { 0.36f, 0.36, 0.64f, 0.64, 0.84f, 0.84, 0.96f, 0.96, 1.0f, 1.0f, 1.0f, 1.0f, 
+			1.0f, 1.0f, 0.96f, 0.96f, 0.84f, 0.84f, 0.64f, 0.64f, 0.36f, 0.36f, 0.0f };
 		int jumpingState;
 		vector<Obstacle> obstacles = {};
 		int num_of_obstacles = 10;
+		bool collision(int obstacle);
 };

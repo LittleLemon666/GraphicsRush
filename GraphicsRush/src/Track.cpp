@@ -29,6 +29,9 @@
 #include <FL/fl_ask.h>
 
 #include "ctime"
+#include "GMTPipeline.H"
+#include <glm/glm.hpp>
+using namespace glm;
 
 //****************************************************************************
 //
@@ -179,3 +182,25 @@ writePoints(const char* filename)
 		fclose(fp);
 	}
 }
+bool CTrack::collision(int obstacle) {
+	//position difference
+	GMTPipeline gmt;
+	gmt.gmt_track = this;
+	gmt.setG_pos((int)trainU);
+	float ratio = trainU - (int)trainU;
+	vec3 player_pos = gmt.calculate(ratio);
+	gmt.setG_pos((int)obstacles[obstacle].position);
+	ratio = obstacles[obstacle].position - (int)obstacles[obstacle].position;
+	vec3 obstacle_pos = gmt.calculate(ratio);
+	float pos_diff = sqrt(
+		pow(player_pos.x - obstacle_pos.x, 2)
+		+ pow(player_pos.y - obstacle_pos.y, 2)
+		+ pow(player_pos.z - obstacle_pos.z, 2));
+	//lane difference
+	bool sameLane =
+		(obstacles[obstacle].lane == 1 && switchLane > 0.6)
+		|| (obstacles[obstacle].lane == 0 && (switchLane < 0.4 && switchLane > -0.4))
+		|| (obstacles[obstacle].lane == -1 && (switchLane < -0.6));
+	if (sameLane && pos_diff < 2.0f) return true;
+	return false;
+};

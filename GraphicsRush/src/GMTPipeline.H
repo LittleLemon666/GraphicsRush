@@ -1,12 +1,12 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
-#include "Track.h"
+class CTrack;
 using namespace glm;
 class GMTPipeline {
 public:
-	GMTPipeline() { }
-	~GMTPipeline() { }
+	GMTPipeline() { };
+	~GMTPipeline() { };
 	CTrack* gmt_track = nullptr;
 
 		mat4 G = {};
