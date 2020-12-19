@@ -585,20 +585,12 @@ drawObstacles() {
 
 void TrainView::loadMoney() {
 	srand(time(NULL));
-	float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
-	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
-		vector<Money> wall = {
+	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
+	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += money_buffer) {
+		vector<Money> line = {
 			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0)
 			, Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
-		int blocked = 5;
-		for (int space = 0; space < 6; space++) {
-			if (blocked == 0) break;
-			if (rand() % 2 == 1) {
-				m_pTrack->money.push_back(wall[space]);
-				blocked--;
-			}
-		}
-		if (blocked == 5) m_pTrack->money.push_back(wall[rand() % 6]);
+		m_pTrack->money.push_back(line[rand() % 6]);
 	}
 };
 void TrainView::drawMoney() {

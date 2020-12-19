@@ -70,6 +70,7 @@ class CTrack {
 		vector<Obstacle> obstacles = {};
 		vector<Money> money = {};
 		int num_of_obstacles = 10;
+		int num_of_money = 100;
 		bool collision(int obstacle);
 		int score = 0;
 		int money_collected = 0;
