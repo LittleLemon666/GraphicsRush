@@ -163,6 +163,7 @@ void runButtonCB(TrainWindow* tw)
 					break;
 				}
 			}
+			tw->m_Track.score += tw->speed->value();
 			tw->speed->value(tw->speed->value() + 0.001);
 			lastRedraw = clock();
 			tw->advanceTrain();

@@ -804,7 +804,7 @@ draw()
 
 	if ((int)m_pTrack->obstacles.size() == 0) {
 		srand(time(NULL));
-		/*
+		/*create obstacles haphazardly
 		int slices = 10000;
 		for (int obstacle = 0; obstacle < m_pTrack->num_of_obstacles; obstacle++) {
 			float pos = ((float)(rand() % slices) / (float)slices) * (float)((int)m_pTrack->points.size() - 1) + 1.0f;
