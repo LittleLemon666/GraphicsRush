@@ -653,6 +653,10 @@ void TrainView::loadObjects() {
 			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0)
 			, Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
 		int money_spot = rand() % 6;
+		if ((int)m_pTrack->money.size() != 0) {
+			while (abs(((money_spot % 3) - 1) - m_pTrack->money[(int)m_pTrack->money.size() - 1].lane)
+				+ abs((money_spot / 3) - m_pTrack->money[(int)m_pTrack->money.size() - 1].height) > 1) money_spot = rand() % 6;
+		}
 		m_pTrack->money.push_back(line[money_spot]);
 
 		//add obstacle
