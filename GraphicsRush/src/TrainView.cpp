@@ -584,10 +584,44 @@ drawObstacles() {
 }
 
 void TrainView::loadMoney() {
-
+	srand(time(NULL));
+	float obstacle_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_obstacles;
+	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += obstacle_buffer) {
+		vector<Money> wall = {
+			Money(distance, -1, 0), Money(distance, 0, 0), Money(distance, 1, 0)
+			, Money(distance, -1, 1), Money(distance, 0, 1), Money(distance, 1, 1) };
+		int blocked = 5;
+		for (int space = 0; space < 6; space++) {
+			if (blocked == 0) break;
+			if (rand() % 2 == 1) {
+				m_pTrack->money.push_back(wall[space]);
+				blocked--;
+			}
+		}
+		if (blocked == 5) m_pTrack->money.push_back(wall[rand() % 6]);
+	}
 };
 void TrainView::drawMoney() {
-
+	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
+		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
+		gmt.calculateAll(m_pTrack->money[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
+		obstacleForward = normalize(obstacleForward);
+		obstacleUp = normalize(obstacleUp);
+		obstacleCross = normalize(obstacleCross);
+		obstaclePosition += obstacleUp * 7.0f;
+		obstaclePosition += obstacleCross * (float)m_pTrack->money[obstacle].lane * 5.0f;
+		float crossSize = 1.0f;
+		float upSize = 1.0f;
+		float heightSize = 10.0f;
+		if (m_pTrack->money[obstacle].height) obstaclePosition += obstacleUp * heightSize;
+		glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 0.0f);
+		glVertex3f(obstaclePosition.x + obstacleCross.x * crossSize, obstaclePosition.y + obstacleCross.y * crossSize, obstaclePosition.z + obstacleCross.z * crossSize);
+		glVertex3f(obstaclePosition.x + obstacleUp.x * upSize, obstaclePosition.y + obstacleUp.y * upSize, obstaclePosition.z + obstacleUp.z * upSize);
+		glVertex3f(obstaclePosition.x - obstacleCross.x * crossSize, obstaclePosition.y - obstacleCross.y * crossSize, obstaclePosition.z - obstacleCross.z * crossSize);
+		glVertex3f(obstaclePosition.x - obstacleUp.x * upSize, obstaclePosition.y - obstacleUp.y * upSize, obstaclePosition.z - obstacleUp.z * upSize);
+		glEnd();
+	}
 };
 
 void TrainView::
@@ -841,6 +875,7 @@ draw()
 	drawObstacles();
 
 	if ((int)m_pTrack->money.size() == 0) loadMoney();
+	drawMoney();
 
 	drawSkybox();
 }
