@@ -406,8 +406,7 @@ void TrainView::drawPlayer() {
 	if (m_pTrack->jumpingState != -1)
 		player_pos += m_pTrack->airbornePosition[m_pTrack->jumpingState - 1] * player_up * 10.0f; //m_pTrack->jumpingState is added once in setProjection
 
-	mat4 model_matrix = inverse(lookAt(player_pos + 5.0f * player_up, player_forward + 5.0f * player_up, player_pos + player_up)); // the player is in a 5.0f height position
-	//model_matrix = scale(model_matrix, vec3(10, 10, 10));
+	mat4 model_matrix = inverse(lookAt(player_pos + 5.0f * player_up, player_pos + player_forward + 5.0f * player_up, player_up)); // the player is in a 5.0f height position
 	glUniformMatrix4fv(glGetUniformLocation(this->path_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->path_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 	this->pikachu_texture->bind(1);

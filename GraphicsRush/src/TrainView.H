@@ -122,7 +122,7 @@ class TrainView : public Fl_Gl_Window
 		vec3 player_pos, player_forward, player_up;
 
 		Object* pikachu = nullptr;
-		std::string pikachu_obj = "../GraphicsRush/Objects/pikachu.obj";
+		std::string pikachu_obj = "../GraphicsRush/Objects/pikachu_blender.obj";
 		std::string pikachu_texture_path = "../GraphicsRush/Objects/Pikachu.png";
 		Texture2D* pikachu_texture = nullptr;
 };
