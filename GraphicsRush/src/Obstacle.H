@@ -1,6 +1,6 @@
 #pragma once
 #include <glad/glad.h>
-#include "Object.H"
+#include "Model.H"
 #include "RenderUtilities/Texture.h"
 
 class Obstacle {
@@ -9,7 +9,7 @@ class Obstacle {
 		int lane;
 		int height;
 		float position;
-		static Object* obstacle_obj;
+		static Model* obstacle_obj;
 		static Texture2D* obstacle_texture;
 		static std::string obstacle_obj_path;
 		static std::string obstacle_texture_path;

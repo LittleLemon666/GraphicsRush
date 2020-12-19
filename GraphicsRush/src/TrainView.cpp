@@ -707,7 +707,7 @@ draw()
 		}
 
 		if (!player_obj)
-			player_obj = new Object(player_obj_path);
+			player_obj = new Model(player_obj_path);
 
 		if (!cubemap_texture_load)
 		{

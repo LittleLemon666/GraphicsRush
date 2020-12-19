@@ -38,7 +38,7 @@ class CTrack;
 #include <vector>
 #include "ShaderInfo.h"
 #include "GMTPipeline.h"
-#include "Object.H"
+#include "Model.H"
 
 //#######################################################################
 // TODO
@@ -128,7 +128,7 @@ class TrainView : public Fl_Gl_Window
 		vec3 train_pos, forward, up;
 		vec3 player_pos, player_forward, player_up;
 
-		Object* player_obj = nullptr;
+		Model* player_obj = nullptr;
 		std::string player_obj_path = "../GraphicsRush/Objects/pikachu_blender.obj";
 		std::string player_texture_path = "../GraphicsRush/Objects/Pikachu.png";
 		Texture2D* player_texture = nullptr;

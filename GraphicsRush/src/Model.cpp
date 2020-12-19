@@ -1,20 +1,20 @@
-#include "Model.H"
+#include "Object.H"
 
-Model::
-Model() : isLoad(false)
+Object::
+Object() : isLoad(false)
 {
 
 }
 
-Model::
-Model(const std::string fileName) : isLoad(false)
+Object::
+Object(const std::string fileName) : isLoad(false)
 {
 	isLoad = loadOBJ(fileName);
 	VBOIndex(vertices, uvs, normals);
 }
 
 // from opengl-tutorial
-bool Model::
+bool Object::
 loadOBJ(const std::string fileName)
 {
 	printf("Loading OBJ file %s...\n", fileName.c_str());
@@ -109,7 +109,7 @@ loadOBJ(const std::string fileName)
 }
 
 
-void Model::
+void Object::
 draw()
 {
 	/*glBegin(GL_TRIANGLES);
@@ -137,7 +137,7 @@ draw()
 	glBindVertexArray(0);
 }
 
-void Model::
+void Object::
 VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals)
 {
 	std::map<PackedVertex, unsigned short> VertexToOutIndex;
@@ -216,7 +216,7 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 	glBindVertexArray(0);
 }
 
-bool Model::
+bool Object::
 getSimilarVertexIndex_fast(PackedVertex& packed, std::map<PackedVertex, unsigned short>& VertexToOutIndex, unsigned short& result)
 {
 	std::map<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
@@ -229,7 +229,7 @@ getSimilarVertexIndex_fast(PackedVertex& packed, std::map<PackedVertex, unsigned
 	}
 }
 
-void Model::
+void Object::
 translate(const glm::vec3 move)
 {
     for (int i = 0; i < vertices.size(); ++i)
@@ -238,7 +238,7 @@ translate(const glm::vec3 move)
     pos = pos + move;
 }
 
-void Model::
+void Object::
 scaling(const glm::vec3 scale)
 {
     for (int i = 0; i < vertices.size(); ++i)
@@ -249,7 +249,7 @@ scaling(const glm::vec3 scale)
     }
 }
 
-void Model::
+void Object::
 rotate(const glm::vec3 rotate)
 {
     glm::vec3 eulerAngles(glm::radians(rotate));
@@ -265,8 +265,8 @@ rotate(const glm::vec3 rotate)
     }
 }
 
-Model::
-~Model()
+Object::
+~Object()
 {
 	// Cleanup VBO and shader
 	glDeleteBuffers(1, &vertexbuffer);
