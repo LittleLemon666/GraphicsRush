@@ -1444,6 +1444,9 @@ RenderText(std::string text, float x, float y, float scale, vec3 color)
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 }
