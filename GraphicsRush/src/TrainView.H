@@ -120,6 +120,8 @@ class TrainView : public Fl_Gl_Window
 		ALCcontext* context = nullptr;
 		ALuint source;
 		ALuint buffer;
+		ALuint moneySource;
+		ALuint moneyBuffer;
 
 		/*********************NEW ADDITIONS*********************/
 		ShaderInfo* path = nullptr;

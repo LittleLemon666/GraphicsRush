@@ -930,7 +930,7 @@ draw()
 			ALboolean loop = AL_TRUE;
 
 			//Material from: ThinMatrix
-			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/bounce.wav", &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/wholesome.wav", &format, &data, &size, &freq, &loop);
 			alBufferData(this->buffer, format, data, size, freq);
 			alSourcei(this->source, AL_BUFFER, this->buffer);
 
@@ -940,6 +940,28 @@ draw()
 				puts("TYPE::MONO");
 
 			alSourcePlay(this->source);
+
+			//money sound
+			alGenSources((ALuint)1, &this->moneySource);
+			alSourcef(this->moneySource, AL_PITCH, 1);
+			alSourcef(this->moneySource, AL_GAIN, 1.0f);
+			alSource3f(this->moneySource, AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
+			alSource3f(this->moneySource, AL_VELOCITY, 0, 0, 0);
+			alSourcei(this->moneySource, AL_LOOPING, AL_FALSE);
+
+			alGenBuffers((ALuint)1, &this->moneyBuffer);
+
+			loop = AL_FALSE;
+
+			//Material from: ThinMatrix
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/bounce.wav", &format, &data, &size, &freq, &loop);
+			alBufferData(this->moneyBuffer, format, data, size, freq);
+			alSourcei(this->moneySource, AL_BUFFER, this->moneyBuffer);
+
+			if (format == AL_FORMAT_STEREO16 || format == AL_FORMAT_STEREO8)
+				puts("TYPE::STEREO");
+			else if (format == AL_FORMAT_MONO16 || format == AL_FORMAT_MONO8)
+				puts("TYPE::MONO");
 
 			// cleanup context
 			//alDeleteSources(1, &source);

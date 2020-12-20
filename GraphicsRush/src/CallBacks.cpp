@@ -171,9 +171,11 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.money.erase(tw->m_Track.money.begin() + money);
 					tw->m_Track.money_collected++;
 					tw->m_Track.score += tw->speed->value();
+					alSourcePlay(tw->trainView->moneySource);
 					break;
 				}
 			}
+			if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
 			tw->m_Track.score += tw->speed->value();
 			tw->speed->value(tw->speed->value() + 0.001);
 			lastRedraw = clock();
