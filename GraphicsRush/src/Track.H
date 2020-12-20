@@ -33,6 +33,7 @@ using std::vector; // avoid having to say std::vector all of the time
 #include "ControlPoint.H"
 
 #include "Object.H"
+#include "Player.H"
 
 class CTrack {
 	public:		
@@ -75,4 +76,5 @@ class CTrack {
 		bool collection(int id);
 		int score = 0;
 		int money_collected = 0;
+		Player player;
 };
