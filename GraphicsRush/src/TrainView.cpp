@@ -78,28 +78,28 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/right.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/left.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/top.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/bottom.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/back.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/front.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/right.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/left.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/top.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/bottom.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/back.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/front.jpg");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/right.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/left.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/top.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/bottom.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/back.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/rollercoaster/front.png");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/right.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/left.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/top.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/bottom.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/back.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/skybox/front.jpg");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
