@@ -160,6 +160,8 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.lane = 0;
 					tw->m_Track.switchLane = 0.0f;
 					tw->m_Track.jumpingState = -1;
+					tw->trainView->camera_movement_state = 0;
+					tw->trainView->camera_movement_index = 0;
 					break;
 				}
 			}

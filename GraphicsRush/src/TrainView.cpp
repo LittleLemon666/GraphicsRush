@@ -563,6 +563,82 @@ initText()
 }
 
 void TrainView::
+initCameraMovement()
+{
+	camera_movement = {};
+	camera_movement.push_back(std::vector<vec3>());
+
+	//prepare variables
+	vec3 orient, crossed, thisPosition, nextPosition;
+	//find trainPosition, forward and orient
+	gmt.setG_pos(0);
+	train_pos = gmt.calculate(0);
+
+	nextPosition = gmt.calculate(1.0f / PATH_DIVIDE);
+	forward = vec3(nextPosition - train_pos);
+
+	gmt.setG_orient(0);
+	thisPosition = gmt.calculate(0);
+	nextPosition = gmt.calculate(1.0f / PATH_DIVIDE);
+	orient = thisPosition;
+
+	//find playerUp (the orient perpendicular to the rail)
+	crossed = cross(forward, orient);
+	up = cross(crossed, forward);
+
+	//normalize all vec3s for use
+	forward = normalize(forward);
+	orient = normalize(orient);
+	up = normalize(up);
+	crossed = normalize(crossed);
+	forward = -normalize(forward + up * 1.5f);
+	//set look at (trainPosition(viewerPosition) -> where to look at -> up)
+	for (float camera_angle = 0, dt = 0; camera_angle < 150; camera_angle += 10.0f, dt += 2.0f / PATH_DIVIDE)
+	{
+		vec3 viewer_forward = normalize(vec3(forward.x * cos(radians(camera_angle)) + forward.z * sin(radians(camera_angle)),
+			forward.y,
+			forward.x * sin(radians(camera_angle)) + forward.z * cos(radians(camera_angle))));
+		
+		gmt.setG_pos(dt);
+
+		vec3 viewer_pos = gmt.calculate(dt) - viewer_forward * (20.0f - camera_angle / 10.0f);
+		//viewer_pos.y -= camera_angle / 10.0f;
+		//vec3 viewer_up = normalize(cross(viewer_forward, crossed));
+		vec3 viewer_up = vec3(up.x * cos(radians(camera_angle)) + up.z * sin(radians(camera_angle)),
+			up.y,
+			up.x * sin(radians(camera_angle)) + up.z * cos(radians(camera_angle)));
+
+		viewer_pos += viewer_up * (10.0f * camera_angle / 180.0f);
+		camera_movement[0].push_back(viewer_pos);
+		camera_movement[0].push_back(viewer_forward);
+		camera_movement[0].push_back(viewer_up);
+	}
+}
+
+void TrainView::
+cameraMovement()
+{
+	if (camera_movement_state == 0)
+	{
+		vec3 viewer_pos = camera_movement[camera_movement_state][camera_movement_index++];
+		forward = camera_movement[camera_movement_state][camera_movement_index++];
+		up = camera_movement[camera_movement_state][camera_movement_index++];
+		//vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
+
+		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
+			viewer_pos.x + forward.x * 10.0f,
+			viewer_pos.y + forward.y * 10.0f,
+			viewer_pos.z + forward.z * 10.0f,
+			up.x, up.y, up.z);
+
+		if (camera_movement_index >= camera_movement[camera_movement_state].size())
+		{
+			camera_movement_state++;
+		}
+	}
+}
+
+void TrainView::
 drawPath() {
 	//bind shader
 	this->basic_shader->Use();
@@ -888,6 +964,8 @@ draw()
 		initSkybox();
 
 		if (!font_isloaded) font_isloaded = initText();
+
+		if (camera_movement.size() == 0) initCameraMovement();
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -942,9 +1020,9 @@ draw()
 	// set to opengl fixed pipeline(use opengl 1.x draw function)
 	glUseProgram(0);
 
-	setupFloor();
+	//setupFloor();
 	//glDisable(GL_LIGHTING);
-	drawFloor(200, 10);
+	//drawFloor(200, 10);
 
 
 	//*********************************************************************
@@ -1045,48 +1123,54 @@ setProjection()
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 
-		//prepare variables
-		float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
-		int cp_id = (int)tw->m_Track.trainU;
-		vec3 orient, crossed, thisPosition, nextPosition;
-		//find trainPosition, forward and orient
-		gmt.setG_pos(cp_id);
-		train_pos = gmt.calculate(ratio);
+		if (camera_movement_state == 0)
+			cameraMovement();
+		else
+		{
+			//prepare variables
+			float ratio = m_pTrack->trainU - (int)m_pTrack->trainU;
+			int cp_id = (int)tw->m_Track.trainU;
+			vec3 orient, crossed, thisPosition, nextPosition;
+			//find trainPosition, forward and orient
+			gmt.setG_pos(cp_id);
+			train_pos = gmt.calculate(ratio);
 
-		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		forward = vec3(nextPosition - train_pos);
+			nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+			forward = vec3(nextPosition - train_pos);
 
-		gmt.setG_orient(cp_id);
-		thisPosition = gmt.calculate(ratio);
-		nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
-		orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
-		
-		//find playerUp (the orient perpendicular to the rail)
-		crossed = cross(forward, orient);
-		up = cross(crossed, forward);
+			gmt.setG_orient(cp_id);
+			thisPosition = gmt.calculate(ratio);
+			nextPosition = gmt.calculate(ratio + 1.0f / PATH_DIVIDE);
+			orient = (1.0f - ratio) * thisPosition + ratio * nextPosition;
 
-		//normalize all vec3s for use
-		forward = normalize(forward);
-		orient = normalize(orient);
-		up = normalize(up);
-		crossed = normalize(crossed);
-		//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-		vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
-		if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
-			if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
-			else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
+			//find playerUp (the orient perpendicular to the rail)
+			crossed = cross(forward, orient);
+			up = cross(crossed, forward);
+
+			//normalize all vec3s for use
+			forward = normalize(forward);
+			orient = normalize(orient);
+			up = normalize(up);
+			crossed = normalize(crossed);
+			//set look at (trainPosition(viewerPosition) -> where to look at -> up)
+			vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
+			if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
+				if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
+				else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
+			}
+			viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
+			if (m_pTrack->jumpingState != -1) {
+				viewer_pos = viewer_pos + m_pTrack->airbornePosition[m_pTrack->jumpingState] * up * 10.0f;
+				m_pTrack->jumpingState++;
 		}
-		viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
-		if (m_pTrack->jumpingState != -1) {
-			viewer_pos = viewer_pos + m_pTrack->airbornePosition[m_pTrack->jumpingState] * up * 10.0f;
-			m_pTrack->jumpingState++;
+			if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
+			gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
+				viewer_pos.x + forward.x * 10.0f,
+				viewer_pos.y + forward.y * 10.0f,
+				viewer_pos.z + forward.z * 10.0f,
+				up.x, up.y, up.z);
 		}
-		if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
-		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
-			viewer_pos.x + forward.x * 10.0f, 
-			viewer_pos.y + forward.y * 10.0f,
-			viewer_pos.z + forward.z * 10.0f,
-			up.x, up.y, up.z);
+
 
 #ifdef EXAMPLE_SOLUTION
 		trainCamView(this, aspect);

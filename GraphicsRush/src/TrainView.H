@@ -130,6 +130,8 @@ class TrainView : public Fl_Gl_Window
 		void loadObjects();
 		void initSkybox();
 		bool initText();
+		void initCameraMovement();
+		void cameraMovement();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
@@ -154,6 +156,9 @@ class TrainView : public Fl_Gl_Window
 		std::string money_texture_path = "../GraphicsRush/Objects/coin_texture.jpg";
 		int money_rotate = 0;
 
+		int camera_movement_state = 0;
+		int camera_movement_index = 0;
+		std::vector<std::vector<vec3>> camera_movement;
 		int chapter = 0;
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::string> skybox_textures_faces;
