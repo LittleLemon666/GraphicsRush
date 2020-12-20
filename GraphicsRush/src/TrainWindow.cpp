@@ -211,7 +211,12 @@ advanceTrain(float dir)
 		}
 		else m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
 		walked += difference;
-		if ((int)m_Track.trainU >= (int)m_Track.points.size()) m_Track.trainU -= (int)m_Track.points.size();
+		if ((int)m_Track.trainU >= (int)m_Track.points.size())
+		{
+			m_Track.trainU -= (int)m_Track.points.size();
+			trainView->chapter++;
+			trainView->load_chapter = false;
+		}
 	}
 	//#####################################################################
 	// TODO: make this work for your train

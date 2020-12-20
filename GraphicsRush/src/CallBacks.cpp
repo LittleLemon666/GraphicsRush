@@ -162,6 +162,8 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.jumpingState = -1;
 					tw->trainView->camera_movement_state = 0;
 					tw->trainView->camera_movement_index = 0;
+					tw->trainView->chapter = 0;
+					tw->trainView->load_chapter = false;
 					break;
 				}
 			}

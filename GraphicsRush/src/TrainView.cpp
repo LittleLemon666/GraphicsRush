@@ -58,6 +58,8 @@ TrainView(int x, int y, int w, int h, const char* l)
 	resetArcball();
 
 	/*********************NEW ADDITIONS*********************/
+	srand(time(NULL));
+
 	// loads a cubemap texture from 6 individual texture faces
 	// order:
 	// +X (right)
@@ -67,12 +69,51 @@ TrainView(int x, int y, int w, int h, const char* l)
 	// -Z (back)
 	// +Z (front) 
 	// -------------------------------------------------------
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/px.png");
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/nx.png");
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/py.png");
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/ny.png");
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/nz.png");
-	skybox_textures_faces.push_back("../GraphicsRush/Images/classroom/pz.png");
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/right.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/left.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/top.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/bottom.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/back.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/maze/front.png");
+
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/px.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nx.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/py.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/ny.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/nz.png");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/classroom/pz.png");
+
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P1.txt");
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P2.txt");
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P3.txt");
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P4.txt");
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P5.txt");
 }
 
 //************************************************************************
@@ -380,7 +421,7 @@ initPath() {
 };
 
 GLuint TrainView::
-loadCubemap(std::vector<std::string> skybox_textures_faces)
+loadCubemap(std::vector<std::string> chapters_skybox_textures_faces)
 {
 	GLuint textureID;
 	glGenTextures(1, &textureID);
@@ -388,9 +429,9 @@ loadCubemap(std::vector<std::string> skybox_textures_faces)
 
 	int width, height;
 	unsigned char* image;
-	for (GLuint i = 0; i < skybox_textures_faces.size(); i++)
+	for (GLuint i = 0; i < chapters_skybox_textures_faces.size(); i++)
 	{
-		image = stbi_load(skybox_textures_faces[i].c_str(), &width, &height, 0, 0);
+		image = stbi_load(chapters_skybox_textures_faces[i].c_str(), &width, &height, 0, 0);
 		if (image)
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
@@ -398,7 +439,7 @@ loadCubemap(std::vector<std::string> skybox_textures_faces)
 		}
 		else
 		{
-			std::cout << "Cubemap texture failed to load at path: " << skybox_textures_faces[i] << std::endl;
+			std::cout << "Cubemap texture failed to load at path: " << chapters_skybox_textures_faces[i] << std::endl;
 			stbi_image_free(image);
 		}
 	}
@@ -689,12 +730,16 @@ drawPlayer() {
 };
 
 void TrainView::loadObjects() {
-	srand(time(NULL));
-	Obstacle::addObstacleModel(obstacle_obj_path, obstacle_texture_path);
-	Money::addMoneyModel(money_obj_path, money_texture_path);
+	if (!load_game_objects)
+	{
+		Obstacle::addObstacleModel(obstacle_obj_path, obstacle_texture_path);
+		Money::addMoneyModel(money_obj_path, money_texture_path);
+		load_game_objects = true;
+	}
+	
 	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
 	int money_to_obstacle_ratio = m_pTrack->num_of_money / m_pTrack->num_of_obstacles, current_ratio = 0;
-	printf("%d\n", money_to_obstacle_ratio);
+	//printf("%d\n", money_to_obstacle_ratio);
 	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += money_buffer) {
 
 		//add money
@@ -884,6 +929,14 @@ draw()
 		/*********************NEW ADDITIONS*********************/
 		if (!this->path) this->path = new ShaderInfo;
 		//add info for each track between control points
+
+		if (!load_chapter)
+		{
+			tw->m_Track.readPoints(chapter_path_file[chapter].c_str());
+			initCameraMovement();
+			load_chapter = true;
+		}
+
 		initPath();
 
 		if (!this->path_texture)
@@ -978,7 +1031,11 @@ draw()
 		if (!cubemap_texture_load)
 		{
 			cubemap_texture_load = true;
-			cubemap_texture.push_back(loadCubemap(skybox_textures_faces));
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[0])); // chapter 1
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[1])); // chapter 2
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[2])); // chapter 3
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[3])); // chapter 4
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[4])); // chapter 5
 		}
 
 		if (!this->skybox) this->skybox = new ShaderInfo;
@@ -986,8 +1043,6 @@ draw()
 		initSkybox();
 
 		if (!font_isloaded) font_isloaded = initText();
-
-		if (camera_movement.size() == 0) initCameraMovement();
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -1084,7 +1139,7 @@ draw()
 	sprintf(score_info, "Score:  %010d", m_pTrack->score);
 	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 
-	char money_info[30];
+	char money_info[20];
 	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 }

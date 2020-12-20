@@ -139,7 +139,7 @@ class TrainView : public Fl_Gl_Window
 		void drawObstacles();
 		void drawMoney();
 		void drawSkybox();
-		GLuint loadCubemap(std::vector<std::string> skybox_textures_faces);
+		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 
@@ -162,8 +162,11 @@ class TrainView : public Fl_Gl_Window
 		int camera_movement_index = 0;
 		std::vector<std::vector<vec3>> camera_movement;
 		int chapter = 0;
+		bool load_chapter = false;
+		bool load_game_objects = false;
+		std::vector<std::string> chapter_path_file;
 		std::vector<GLuint> cubemap_texture;
-		std::vector<std::string> skybox_textures_faces;
+		std::vector<std::vector<std::string>> chapters_skybox_textures_faces;
 		bool cubemap_texture_load = false;
 
 		bool font_isloaded = false;
