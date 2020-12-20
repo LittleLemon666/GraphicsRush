@@ -7,7 +7,11 @@ set(LIB_DIR ${PROJECT_SOURCE_DIR}/lib/)
 
 set(SRC_SHADER 
     ${SRC_DIR}shaders/simple.vert
-    ${SRC_DIR}shaders/simple.frag)
+    ${SRC_DIR}shaders/simple.frag
+    ${SRC_DIR}shaders/skybox.vert
+    ${SRC_DIR}shaders/skybox.frag
+    ${SRC_DIR}shaders/text.vert
+    ${SRC_DIR}shaders/text.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
@@ -27,13 +31,21 @@ add_executable(GraphicsRush
     ${SRC_DIR}Track.h
     ${SRC_DIR}TrainView.h
     ${SRC_DIR}TrainWindow.h
+    ${SRC_DIR}GMTPipeline.h
+    ${SRC_DIR}Model.h
+    ${SRC_DIR}Player.h
+    ${SRC_DIR}ShaderInfo.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
     ${SRC_DIR}ControlPoint.cpp
+    ${SRC_DIR}Object.cpp
     ${SRC_DIR}Track.cpp
     ${SRC_DIR}TrainView.cpp
     ${SRC_DIR}TrainWindow.cpp
+    ${SRC_DIR}GMTPipeline.cpp
+    ${SRC_DIR}Model.cpp
+    ${SRC_DIR}Player.cpp
 
     ${SRC_SHADER}
     ${SRC_RENDER_UTILITIES}
@@ -69,7 +81,8 @@ target_link_libraries(GraphicsRush
     ${LIB_DIR}ex-common.lib
     ${LIB_DIR}OpenAL32.lib
     ${LIB_DIR}alut.lib
-    ${LIB_DIR}alut_static.lib)
+    ${LIB_DIR}alut_static.lib
+    ${LIB_DIR}freetyped.lib)
 
 target_link_libraries(GraphicsRush Utilities)
     
