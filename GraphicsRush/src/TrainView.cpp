@@ -962,6 +962,7 @@ drawScreenQuad()
 	glActiveTexture(GL_TEXTURE0 + 5);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
 	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 5);
+	glUniform1f(glGetUniformLocation(this->screen_shader->Program, "brightness"), screen_brightness);
 
 	glBindVertexArray(this->screen_quad->vao);
 	glDrawArrays(GL_QUADS, 0, 4);

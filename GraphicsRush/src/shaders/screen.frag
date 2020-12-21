@@ -7,8 +7,9 @@ in V_OUT
 } f_in;
 
 uniform sampler2D screen;
+uniform float brightness;
 
 void main()
 {
-    f_color = texture(screen, f_in.uv);
+    f_color = texture(screen, f_in.uv) * brightness;
 }

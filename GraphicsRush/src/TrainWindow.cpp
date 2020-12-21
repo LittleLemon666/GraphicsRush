@@ -211,6 +211,8 @@ advanceTrain(float dir)
 		}
 		else m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
 		walked += difference;
+		if (m_Track.trainU >= m_Track.points.size() - 0.15f) trainView->screen_brightness -= 0.1f;
+		if (m_Track.trainU < 1 && trainView->screen_brightness < 1.0f) trainView->screen_brightness += 0.1f;
 		if ((int)m_Track.trainU >= (int)m_Track.points.size())
 		{
 			m_Track.trainU -= (int)m_Track.points.size();

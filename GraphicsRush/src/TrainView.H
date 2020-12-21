@@ -189,4 +189,5 @@ class TrainView : public Fl_Gl_Window
 		FBO* screen_FBO = nullptr;
 		GLuint screen_id;
 		bool load_screen = false;
+		float screen_brightness = 1.0f;
 };
