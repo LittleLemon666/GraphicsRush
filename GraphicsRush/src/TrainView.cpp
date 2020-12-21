@@ -458,6 +458,7 @@ void TrainView::
 switchChapter(const int& chapter_index)
 {
 	chapter = chapter_index;
+	if (chapter >= chapter_path_file.size()) chapter = rand() % chapter_path_file.size();
 	load_chapter = false;
 }
 
