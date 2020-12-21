@@ -114,6 +114,8 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P3.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P4.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P5.txt");
+	for (auto it = chapter_path_file.begin(); it != chapter_path_file.end(); it++)
+		chapter_path_file_name.push_back(getFileName(*it));
 }
 
 //************************************************************************
@@ -1449,4 +1451,13 @@ RenderText(std::string text, float x, float y, float scale, vec3 color)
 
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
+}
+
+std::string TrainView::
+getFileName(std::string file_path)
+{
+	std::stringstream ss(file_path);
+	std::string file_name, file_name_t;
+	while (getline(ss, file_name_t, '/')) file_name = file_name_t;
+	return file_name;
 }

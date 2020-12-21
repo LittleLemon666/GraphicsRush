@@ -18,6 +18,7 @@
 
 #include <time.h>
 #include <math.h>
+#include <sstream>
 
 #include "TrainWindow.H"
 #include "TrainView.H"
@@ -162,8 +163,12 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.jumpingState = -1;
 					tw->trainView->camera_movement_state = 0;
 					tw->trainView->camera_movement_index = 0;
-					tw->trainView->chapter = 0;
-					tw->trainView->load_chapter = false;
+
+					if (!tw->debug_mode->value())
+					{
+						tw->trainView->chapter = 0;
+						tw->trainView->load_chapter = false;
+					}
 					break;
 				}
 			}
@@ -198,6 +203,16 @@ void loadCB(Fl_Widget*, TrainWindow* tw)
 		fl_file_chooser("Pick a Track File", "*.txt", "../GraphicsRush/TrackFiles/default.txt");
 	if (fname) {
 		tw->m_Track.readPoints(fname);
+		std::string file_name = tw->trainView->getFileName(fname);
+		for (int find_chapter_path_file = 0; find_chapter_path_file < tw->trainView->chapter_path_file_name.size(); find_chapter_path_file++)
+		{
+			if (file_name == tw->trainView->chapter_path_file_name[find_chapter_path_file])
+			{
+				tw->trainView->chapter = find_chapter_path_file;
+				tw->trainView->load_chapter = false;
+				break;
+			}
+		}
 		tw->damageMe();
 	}
 }

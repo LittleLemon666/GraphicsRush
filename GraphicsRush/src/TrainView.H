@@ -165,6 +165,8 @@ class TrainView : public Fl_Gl_Window
 		bool load_chapter = false;
 		bool load_game_objects = false;
 		std::vector<std::string> chapter_path_file;
+		std::vector<std::string> chapter_path_file_name;
+		std::string getFileName(std::string);
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::vector<std::string>> chapters_skybox_textures_faces;
 		bool cubemap_texture_load = false;
