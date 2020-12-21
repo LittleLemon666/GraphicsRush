@@ -817,8 +817,6 @@ drawObstacles() {
 
 void TrainView::drawMoney() {
 	this->basic_shader->Use();
-	money_rotate += 5;
-	money_rotate = money_rotate % 360;
 	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->money[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -833,7 +831,7 @@ void TrainView::drawMoney() {
 		if (m_pTrack->money[obstacle].height) obstaclePosition += obstacleUp * heightSize;
 		
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
-		model_matrix = rotate(model_matrix, (float)money_rotate, vec3(0, 1, 0));
+		model_matrix = rotate(model_matrix, money_rotate, vec3(0, 1, 0));
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
 		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
