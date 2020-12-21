@@ -130,17 +130,23 @@ class TrainView : public Fl_Gl_Window
 		ShaderInfo* skybox = nullptr;
 		Shader* skybox_shader = nullptr;
 		Shader* text_shader = nullptr;
+		Shader* screen_shader = nullptr;
 		void initPath();
 		void loadObjects();
 		void initSkybox();
 		bool initText();
 		void initCameraMovement();
 		void cameraMovement();
+		void initScreenRender();
+		void renderScreenBegin();
+		void renderScreenEnd();
+		void initScreenQuad();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
 		void drawMoney();
 		void drawSkybox();
+		void drawScreenQuad();
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
@@ -178,4 +184,9 @@ class TrainView : public Fl_Gl_Window
 		std::map<GLchar, Character> Characters;
 		VAO* font_vertex_data = nullptr;
 		void RenderText(std::string text, float x, float y, float scale, vec3 color);
+
+		VAO* screen_quad = nullptr;
+		FBO* screen_FBO = nullptr;
+		GLuint screen_id;
+		bool load_screen = false;
 };

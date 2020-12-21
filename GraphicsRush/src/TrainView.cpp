@@ -690,6 +690,87 @@ cameraMovement()
 }
 
 void TrainView::
+initScreenRender()
+{
+	//************************************************************************
+	//
+	// * generate a new texture
+	//
+	//========================================================================
+	if (load_screen)
+		glad_glDeleteTextures(1, &screen_id);
+	load_screen = true;
+	glGenTextures(1, &screen_id);
+	glBindTexture(GL_TEXTURE_2D, screen_id);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w(), h(), 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+}
+
+void TrainView::
+renderScreenBegin()
+{
+	if (!screen_FBO)
+	{
+		screen_FBO = new FBO;
+	}
+	glGenFramebuffers(1, &screen_FBO->fbo);
+	glGenRenderbuffers(1, &screen_FBO->rbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, screen_FBO->fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, screen_FBO->rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, w(), h()); //GL_DEPTH_COMPONENT24
+	// attach it
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, screen_FBO->rbo);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, screen_id, 0);
+
+	// clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void TrainView::
+renderScreenEnd()
+{
+	//unbind
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glad_glDeleteRenderbuffers(1, &screen_FBO->rbo);
+	glad_glDeleteFramebuffers(1, &screen_FBO->fbo);
+}
+
+void TrainView::
+initScreenQuad()
+{
+	if (!this->screen_quad)
+	{
+		GLfloat vertices[] = {
+			-1.0f,  1.0f, 0.0f,
+			-1.0f, -1.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f
+		};
+
+		this->screen_quad = new VAO;
+		glGenVertexArrays(1, &this->screen_quad->vao);
+		glGenBuffers(1, this->screen_quad->vbo);
+
+		glBindVertexArray(this->screen_quad->vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->screen_quad->vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		// Unbind VAO
+		glBindVertexArray(0);
+	}
+}
+
+void TrainView::
 drawPath() {
 	//bind shader
 	this->basic_shader->Use();
@@ -874,6 +955,21 @@ drawSkybox()
 	glUseProgram(0);
 }
 
+void TrainView::
+drawScreenQuad()
+{
+	this->screen_shader->Use();
+	glActiveTexture(GL_TEXTURE0 + 5);
+	glBindTexture(GL_TEXTURE_2D, screen_id);
+	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 5);
+
+	glBindVertexArray(this->screen_quad->vao);
+	glDrawArrays(GL_QUADS, 0, 4);
+	glBindVertexArray(0);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
 //************************************************************************
 //
 // * this is the code that actually draws the window
@@ -913,6 +1009,13 @@ draw()
 				"../GraphicsRush/src/shaders/text.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/text.frag");
+
+		if (!this->screen_shader)
+			this->screen_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/screen.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/screen.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -1051,6 +1154,10 @@ draw()
 		initSkybox();
 
 		if (!font_isloaded) font_isloaded = initText();
+
+		initScreenRender();
+
+		initScreenQuad();
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -1115,7 +1222,10 @@ draw()
 	// once for real, and then once for shadows
 	//*********************************************************************
 	//glEnable(GL_LIGHTING);
+
 	setupObjects();
+
+	renderScreenBegin();
 
 	drawStuff();
 
@@ -1131,6 +1241,7 @@ draw()
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/1, this->skybox_matrices->ubo, 0, this->skybox_matrices->size);
+
 	drawPath();
 
 	drawPlayer();
@@ -1150,6 +1261,10 @@ draw()
 	char money_info[20];
 	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+	renderScreenEnd();
+
+	drawScreenQuad();
 }
 
 //************************************************************************

@@ -11,7 +11,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/skybox.vert
     ${SRC_DIR}shaders/skybox.frag
     ${SRC_DIR}shaders/text.vert
-    ${SRC_DIR}shaders/text.frag)
+    ${SRC_DIR}shaders/text.frag
+    ${SRC_DIR}shaders/screen.vert
+    ${SRC_DIR}shaders/screen.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
