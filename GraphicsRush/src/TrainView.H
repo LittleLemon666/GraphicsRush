@@ -158,7 +158,7 @@ class TrainView : public Fl_Gl_Window
 
 		std::string money_obj_path = "../GraphicsRush/Objects/coin.obj";
 		std::string money_texture_path = "../GraphicsRush/Objects/coin_texture.jpg";
-		int money_rotate = 0;
+		float money_rotate = 0;
 
 		int camera_movement_state = 0;
 		int camera_movement_index = 0;
