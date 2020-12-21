@@ -214,8 +214,7 @@ advanceTrain(float dir)
 		if ((int)m_Track.trainU >= (int)m_Track.points.size())
 		{
 			m_Track.trainU -= (int)m_Track.points.size();
-			trainView->chapter++;
-			trainView->load_chapter = false;
+			trainView->switchChapter(trainView->chapter + 1);
 		}
 	}
 	//#####################################################################
