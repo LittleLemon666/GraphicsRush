@@ -157,6 +157,7 @@ void runButtonCB(TrainWindow* tw)
 				if (tw->m_Track.collision(obstacle)) {
 					Sleep(1000);
 					tw->runButton->value(0);
+					tw->speed->value(1);
 					tw->m_Track.trainU = 0.0f;
 					tw->m_Track.lane = 0;
 					tw->m_Track.switchLane = 0.0f;
@@ -183,7 +184,7 @@ void runButtonCB(TrainWindow* tw)
 			}
 			if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
 			tw->m_Track.score += tw->speed->value();
-			tw->speed->value(tw->speed->value() + 0.001);
+			if (tw->speed->value() < 10) tw->speed->value(tw->speed->value() + 0.0001);
 			tw->trainView->money_rotate += 0.1f;
 			if (tw->trainView->money_rotate > 360) tw->trainView->money_rotate -= 360;
 			lastRedraw = clock();
