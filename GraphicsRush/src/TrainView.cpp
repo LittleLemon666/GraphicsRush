@@ -154,78 +154,81 @@ handle(int event)
 	// remember what button was used
 	static int last_push;
 
-	switch (event) {
-		// Mouse button being pushed event
-	case FL_PUSH:
-		last_push = Fl::event_button();
-		// if the left button be pushed is left mouse button
-		if (last_push == FL_LEFT_MOUSE) {
-			doPick();
+	if (!tw->trainCam->value())
+	{
+		switch (event) {
+			// Mouse button being pushed event
+		case FL_PUSH:
+			last_push = Fl::event_button();
+			// if the left button be pushed is left mouse button
+			if (last_push == FL_LEFT_MOUSE) {
+				doPick();
+				damage(1);
+				return 1;
+			};
+			break;
+
+			// Mouse button release event
+		case FL_RELEASE: // button release
 			damage(1);
+			last_push = 0;
 			return 1;
-		};
-		break;
 
-		// Mouse button release event
-	case FL_RELEASE: // button release
-		damage(1);
-		last_push = 0;
-		return 1;
+			// Mouse button drag event
+		case FL_DRAG:
 
-		// Mouse button drag event
-	case FL_DRAG:
+			// Compute the new control point position
+			if ((last_push == FL_LEFT_MOUSE) && (selectedCube >= 0)) {
+				ControlPoint* cp = &m_pTrack->points[selectedCube];
 
-		// Compute the new control point position
-		if ((last_push == FL_LEFT_MOUSE) && (selectedCube >= 0)) {
-			ControlPoint* cp = &m_pTrack->points[selectedCube];
+				double r1x, r1y, r1z, r2x, r2y, r2z;
+				getMouseLine(r1x, r1y, r1z, r2x, r2y, r2z);
 
-			double r1x, r1y, r1z, r2x, r2y, r2z;
-			getMouseLine(r1x, r1y, r1z, r2x, r2y, r2z);
+				double rx, ry, rz;
+				mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
+					static_cast<double>(cp->pos.x),
+					static_cast<double>(cp->pos.y),
+					static_cast<double>(cp->pos.z),
+					rx, ry, rz,
+					(Fl::event_state() & FL_CTRL) != 0);
 
-			double rx, ry, rz;
-			mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
-				static_cast<double>(cp->pos.x),
-				static_cast<double>(cp->pos.y),
-				static_cast<double>(cp->pos.z),
-				rx, ry, rz,
-				(Fl::event_state() & FL_CTRL) != 0);
+				cp->pos.x = (float)rx;
+				cp->pos.y = (float)ry;
+				cp->pos.z = (float)rz;
+				damage(1);
+			}
+			break;
 
-			cp->pos.x = (float)rx;
-			cp->pos.y = (float)ry;
-			cp->pos.z = (float)rz;
-			damage(1);
+			// in order to get keyboard events, we need to accept focus
+		case FL_FOCUS:
+			return 1;
+
+			// every time the mouse enters this window, aggressively take focus
+		case FL_ENTER:
+			focus(this);
+			break;
+
+		case FL_KEYBOARD:
+			int k = Fl::event_key();
+			int ks = Fl::event_state();
+			if (k == 'p') {
+				// Print out the selected control point information
+				if (selectedCube >= 0)
+					printf("Selected(%d) (%g %g %g) (%g %g %g)\n",
+						selectedCube,
+						m_pTrack->points[selectedCube].pos.x,
+						m_pTrack->points[selectedCube].pos.y,
+						m_pTrack->points[selectedCube].pos.z,
+						m_pTrack->points[selectedCube].orient.x,
+						m_pTrack->points[selectedCube].orient.y,
+						m_pTrack->points[selectedCube].orient.z);
+				else
+					printf("Nothing Selected\n");
+
+				return 1;
+			};
+			break;
 		}
-		break;
-
-		// in order to get keyboard events, we need to accept focus
-	case FL_FOCUS:
-		return 1;
-
-		// every time the mouse enters this window, aggressively take focus
-	case FL_ENTER:
-		focus(this);
-		break;
-
-	case FL_KEYBOARD:
-		int k = Fl::event_key();
-		int ks = Fl::event_state();
-		if (k == 'p') {
-			// Print out the selected control point information
-			if (selectedCube >= 0)
-				printf("Selected(%d) (%g %g %g) (%g %g %g)\n",
-					selectedCube,
-					m_pTrack->points[selectedCube].pos.x,
-					m_pTrack->points[selectedCube].pos.y,
-					m_pTrack->points[selectedCube].pos.z,
-					m_pTrack->points[selectedCube].orient.x,
-					m_pTrack->points[selectedCube].orient.y,
-					m_pTrack->points[selectedCube].orient.z);
-			else
-				printf("Nothing Selected\n");
-
-			return 1;
-		};
-		break;
 	}
 
 	return Fl_Gl_Window::handle(event);
