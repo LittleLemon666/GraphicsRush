@@ -101,6 +101,8 @@ class TrainView : public Fl_Gl_Window
 
 		//set ubo
 		void setUBO();
+
+		bool load_chapter = false;
 	public:
 		ArcBallCam		arcball;			// keep an ArcBall for the UI
 		int				selectedCube = -1;  // simple - just remember which cube is selected
@@ -162,7 +164,6 @@ class TrainView : public Fl_Gl_Window
 		int camera_movement_index = 0;
 		std::vector<std::vector<vec3>> camera_movement;
 		int chapter = 0;
-		bool load_chapter = false;
 		bool load_game_objects = false;
 		std::vector<std::string> chapter_path_file;
 		std::vector<std::string> chapter_path_file_name;
@@ -170,6 +171,7 @@ class TrainView : public Fl_Gl_Window
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::vector<std::string>> chapters_skybox_textures_faces;
 		bool cubemap_texture_load = false;
+		void switchChapter(const int&);
 
 		bool font_isloaded = false;
 		std::string font_name = "../GraphicsRush/fonts/54151___.TTF";

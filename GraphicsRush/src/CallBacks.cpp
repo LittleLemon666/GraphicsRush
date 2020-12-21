@@ -166,8 +166,7 @@ void runButtonCB(TrainWindow* tw)
 
 					if (!tw->debug_mode->value())
 					{
-						tw->trainView->chapter = 0;
-						tw->trainView->load_chapter = false;
+						tw->trainView->switchChapter(0);
 					}
 					break;
 				}
@@ -208,8 +207,7 @@ void loadCB(Fl_Widget*, TrainWindow* tw)
 		{
 			if (file_name == tw->trainView->chapter_path_file_name[find_chapter_path_file])
 			{
-				tw->trainView->chapter = find_chapter_path_file;
-				tw->trainView->load_chapter = false;
+				tw->trainView->switchChapter(find_chapter_path_file);
 				break;
 			}
 		}

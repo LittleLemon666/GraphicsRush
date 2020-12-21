@@ -455,6 +455,13 @@ loadCubemap(std::vector<std::string> chapters_skybox_textures_faces)
 }
 
 void TrainView::
+switchChapter(const int& chapter_index)
+{
+	chapter = chapter_index;
+	load_chapter = false;
+}
+
+void TrainView::
 initSkybox()
 {
 	if (!this->skybox->vertex_data)
