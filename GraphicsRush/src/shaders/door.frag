@@ -4,7 +4,6 @@ out vec4 f_color;
 in V_OUT
 {
    vec3 position;
-   vec3 normal;
    vec2 texture_coordinate;
 } f_in;
 
