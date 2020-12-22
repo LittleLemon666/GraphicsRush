@@ -530,6 +530,65 @@ initSkybox()
 	}
 }
 
+void TrainView::
+initDoor()
+{
+	if (!this->door)
+	{
+		this->door = new ShaderInfo;
+		GLfloat vertices[] = {
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f
+		};
+
+		GLfloat normal[] = {
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+			 0.0f,  0.0f, -1.0f,
+		};
+
+		GLfloat texture_coordinate[] = {
+				0.0f, 0.0f,
+				0.0f, 1.0f,
+				1.0f, 1.0f,
+				0.0f, 0.0f,
+				1.0f, 1.0f,
+				1.0f, 0.0f
+		};
+
+		this->door->vertex_data = new VAO;
+		glGenVertexArrays(1, &this->door->vertex_data->vao);
+		glGenBuffers(3, this->door->vertex_data->vbo);
+
+		glBindVertexArray(this->door->vertex_data->vao);
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->door->vertex_data->vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->door->vertex_data->vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(normal), &normal, GL_STATIC_DRAW);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
+
+		glBindBuffer(GL_ARRAY_BUFFER, this->door->vertex_data->vbo[2]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(texture_coordinate), &texture_coordinate, GL_STATIC_DRAW);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(2);
+
+		// Unbind VAO
+		glBindVertexArray(0);
+	}
+}
+
 bool TrainView::
 initText()
 {
@@ -646,19 +705,28 @@ initCameraMovement()
 	up = normalize(up);
 	crossed = normalize(crossed);
 	forward = -normalize(forward + up * 1.5f);
+	vec3 viewer_forward = forward;
+	vec3 viewer_up = up;
+	vec3 viewer_pos = train_pos - viewer_forward * 20.0f + viewer_up;
 	//set look at (trainPosition(viewerPosition) -> where to look at -> up)
+	for (int i = 0; i < 25; i++)
+	{
+		camera_movement[0].push_back(viewer_pos);
+		camera_movement[0].push_back(viewer_forward);
+		camera_movement[0].push_back(viewer_up);
+	}
 	for (float camera_angle = 0, dt = 0; camera_angle < 150; camera_angle += 10.0f, dt += 2.0f / PATH_DIVIDE)
 	{
-		vec3 viewer_forward = normalize(vec3(forward.x * cos(radians(camera_angle)) + forward.z * sin(radians(camera_angle)),
+		viewer_forward = normalize(vec3(forward.x * cos(radians(camera_angle)) + forward.z * sin(radians(camera_angle)),
 			forward.y,
 			forward.x * sin(radians(camera_angle)) + forward.z * cos(radians(camera_angle))));
 		
 		gmt.setG_pos(dt);
 
-		vec3 viewer_pos = gmt.calculate(dt) - viewer_forward * (20.0f - camera_angle / 10.0f);
+		viewer_pos = gmt.calculate(dt) - viewer_forward * (20.0f - camera_angle / 10.0f);
 		//viewer_pos.y -= camera_angle / 10.0f;
 		//vec3 viewer_up = normalize(cross(viewer_forward, crossed));
-		vec3 viewer_up = vec3(up.x * cos(radians(camera_angle)) + up.z * sin(radians(camera_angle)),
+		viewer_up = vec3(up.x * cos(radians(camera_angle)) + up.z * sin(radians(camera_angle)),
 			up.y,
 			up.x * sin(radians(camera_angle)) + up.z * cos(radians(camera_angle)));
 
@@ -959,12 +1027,40 @@ drawSkybox()
 }
 
 void TrainView::
+drawDoor()
+{
+	if (camera_movement_state == 1) return; // don't draw the door after beginning camera movement
+	if (!load_door_position) // maintain the position in front of the player (setting in the beginning)
+	{
+		load_door_position = true;
+		door_pos = player_pos - 12.0f * player_forward - 11.0f * player_up;
+		door_forward = player_forward + player_up;
+		door_up = player_up - player_forward;
+	}
+
+	this->door_shader->Use();
+	mat4 model_matrix = inverse(lookAt(door_pos, door_pos + door_forward, door_up)); // the player is in a 5.0f height position
+	model_matrix = scale(model_matrix, vec3(25, 25, 25));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	door_scene_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->door_shader->Program, "door_scene_texture"), 0); //a picture within green on the door
+	door_texture->bind(1);
+	glUniform1i(glGetUniformLocation(this->door_shader->Program, "door_texture"), 1); //a picture include the door
+	glUniform1f(glGetUniformLocation(this->door_shader->Program, "offset"), door_offset); //the door move between [-0.5, 0] in texture coordinate
+	glBindVertexArray(this->door->vertex_data->vao);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
 drawScreenQuad()
 {
 	this->screen_shader->Use();
-	glActiveTexture(GL_TEXTURE0 + 5);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
-	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 5);
+	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 0);
 	glUniform1f(glGetUniformLocation(this->screen_shader->Program, "brightness"), screen_brightness);
 
 	glBindVertexArray(this->screen_quad->vao);
@@ -1020,6 +1116,13 @@ draw()
 				"../GraphicsRush/src/shaders/screen.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/screen.frag");
+
+		if (!this->door_shader)
+			this->door_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/door.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/door.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -1143,6 +1246,14 @@ draw()
 		if (!player_obj)
 			player_obj = new Model(player_obj_path);
 
+		if (!door_scene_texture)
+			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
+
+		if (!door_texture)
+			door_texture = new Texture2D(door_texture_path.c_str());
+
+		initDoor();
+
 		if (!cubemap_texture_load)
 		{
 			cubemap_texture_load = true;
@@ -1249,6 +1360,8 @@ draw()
 	drawPath();
 
 	drawPlayer();
+
+	drawDoor();
 
 	//use money to check if world is loaded
 	if ((int)m_pTrack->money.size() == 0) loadObjects();

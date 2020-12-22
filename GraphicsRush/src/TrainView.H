@@ -128,12 +128,15 @@ class TrainView : public Fl_Gl_Window
 		/*********************NEW ADDITIONS*********************/
 		ShaderInfo* path = nullptr;
 		ShaderInfo* skybox = nullptr;
+		ShaderInfo* door = nullptr;
+		Shader* door_shader = nullptr;
 		Shader* skybox_shader = nullptr;
 		Shader* text_shader = nullptr;
 		Shader* screen_shader = nullptr;
 		void initPath();
 		void loadObjects();
 		void initSkybox();
+		void initDoor();
 		bool initText();
 		void initCameraMovement();
 		void cameraMovement();
@@ -146,6 +149,7 @@ class TrainView : public Fl_Gl_Window
 		void drawObstacles();
 		void drawMoney();
 		void drawSkybox();
+		void drawDoor();
 		void drawScreenQuad();
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
@@ -156,8 +160,8 @@ class TrainView : public Fl_Gl_Window
 
 		Model* player_obj = nullptr;
 		std::string player_obj_path = "../GraphicsRush/Objects/pikachu_blender.obj";
-		std::string player_texture_path = "../GraphicsRush/Objects/Pikachu.png";
 		Texture2D* player_texture = nullptr;
+		std::string player_texture_path = "../GraphicsRush/Objects/Pikachu.png";
 
 		std::string obstacle_obj_path = "../GraphicsRush/Objects/box.obj";
 		std::string obstacle_texture_path = "../GraphicsRush/Objects/box.jpg";
@@ -174,6 +178,15 @@ class TrainView : public Fl_Gl_Window
 		std::vector<std::string> chapter_path_file;
 		std::vector<std::string> chapter_path_file_name;
 		std::string getFileName(std::string);
+
+		Texture2D* door_scene_texture = nullptr;
+		std::string door_scene_texture_path = "../GraphicsRush/Images/lb001_door_scene.jpg";
+		Texture2D* door_texture = nullptr;
+		std::string door_texture_path = "../GraphicsRush/Images/lb001_door.jpg";
+		bool load_door_position = false;
+		vec3 door_pos, door_forward, door_up;
+		float door_offset = 0.0f;
+
 		std::vector<GLuint> cubemap_texture;
 		std::vector<std::vector<std::string>> chapters_skybox_textures_faces;
 		bool cubemap_texture_load = false;

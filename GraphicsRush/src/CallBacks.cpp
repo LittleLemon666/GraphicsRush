@@ -136,6 +136,9 @@ void runButtonCB(TrainWindow* tw)
 {
 	if (tw->runButton->value()) {	// only advance time if appropriate
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
+			//open the door
+			if (tw->trainView->camera_movement_state == 0 && tw->trainView->door_offset > -0.5) tw->trainView->door_offset -= 0.02f; //open the door in the begin
+
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
 			if (buttonBuffer == 0) {
@@ -164,6 +167,7 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.jumpingState = -1;
 					tw->trainView->camera_movement_state = 0;
 					tw->trainView->camera_movement_index = 0;
+					tw->trainView->door_offset = 0.0f;
 
 					if (!tw->debug_mode->value())
 					{
@@ -188,7 +192,7 @@ void runButtonCB(TrainWindow* tw)
 			tw->trainView->money_rotate += 0.1f;
 			if (tw->trainView->money_rotate > 360) tw->trainView->money_rotate -= 360;
 			lastRedraw = clock();
-			tw->advanceTrain();
+			if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			tw->damageMe();
 		}
 	}
