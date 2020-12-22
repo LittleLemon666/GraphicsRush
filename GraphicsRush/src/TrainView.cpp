@@ -963,6 +963,15 @@ drawObstacles() {
 		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 
 		m_pTrack->obstacles[obstacle].obstacle_obj[0]->draw();
+		/*
+		glBegin(GL_QUADS);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		glVertex3f(obstaclePosition.x + obstacleCross.x + obstacleUp.x, obstaclePosition.y + obstacleCross.y + obstacleUp.y, obstaclePosition.z + obstacleCross.z + obstacleUp.z);
+		glVertex3f(obstaclePosition.x + obstacleCross.x - obstacleUp.x, obstaclePosition.y + obstacleCross.y - obstacleUp.y, obstaclePosition.z + obstacleCross.z - obstacleUp.z);
+		glVertex3f(obstaclePosition.x - obstacleCross.x - obstacleUp.x, obstaclePosition.y - obstacleCross.y - obstacleUp.y, obstaclePosition.z - obstacleCross.z - obstacleUp.z);
+		glVertex3f(obstaclePosition.x - obstacleCross.x + obstacleUp.x, obstaclePosition.y - obstacleCross.y + obstacleUp.y, obstaclePosition.z - obstacleCross.z + obstacleUp.z);
+		glEnd();
+		*/
 	}
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);

@@ -188,7 +188,7 @@ void runButtonCB(TrainWindow* tw)
 			}
 			if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
 			tw->m_Track.score += tw->speed->value();
-			if (tw->speed->value() < 10) tw->speed->value(tw->speed->value() + 0.0001);
+			if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
 			tw->trainView->money_rotate += 0.1f;
 			if (tw->trainView->money_rotate > 360) tw->trainView->money_rotate -= 360;
 			lastRedraw = clock();

@@ -49,4 +49,5 @@ void GMTPipeline::calculateAll(float trainU, vec3& position, vec3& forward, vec3
 	setG_orient((int)trainU);
 	up = calculate(ratio);
 	crossed = cross(forward, up);
+	up = cross(crossed, forward);
 };
