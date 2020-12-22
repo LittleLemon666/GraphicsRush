@@ -545,15 +545,6 @@ initDoor()
 			-1.0f, -1.0f, -1.0f
 		};
 
-		GLfloat normal[] = {
-			 0.0f,  0.0f, -1.0f,
-			 0.0f,  0.0f, -1.0f,
-			 0.0f,  0.0f, -1.0f,
-			 0.0f,  0.0f, -1.0f,
-			 0.0f,  0.0f, -1.0f,
-			 0.0f,  0.0f, -1.0f,
-		};
-
 		GLfloat texture_coordinate[] = {
 				0.0f, 0.0f,
 				0.0f, 1.0f,
@@ -565,7 +556,7 @@ initDoor()
 
 		this->door->vertex_data = new VAO;
 		glGenVertexArrays(1, &this->door->vertex_data->vao);
-		glGenBuffers(3, this->door->vertex_data->vbo);
+		glGenBuffers(2, this->door->vertex_data->vbo);
 
 		glBindVertexArray(this->door->vertex_data->vao);
 
@@ -575,14 +566,9 @@ initDoor()
 		glEnableVertexAttribArray(0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, this->door->vertex_data->vbo[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(normal), &normal, GL_STATIC_DRAW);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, this->door->vertex_data->vbo[2]);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(texture_coordinate), &texture_coordinate, GL_STATIC_DRAW);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
+		glEnableVertexAttribArray(1);
 
 		// Unbind VAO
 		glBindVertexArray(0);
