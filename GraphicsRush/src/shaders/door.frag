@@ -20,14 +20,15 @@ bool isGreen(vec3 color)
 void main()
 {   
     vec3 door_scene_color = vec3(texture(door_scene_texture, f_in.texture_coordinate));
-    vec3 door_scene_out_color = vec3(texture(door_scene_texture, vec2(f_in.texture_coordinate.x - offset, f_in.texture_coordinate.y)));
-    vec3 door_color = vec3(texture(door_texture, vec2(f_in.texture_coordinate.x - offset, f_in.texture_coordinate.y)));
-    vec3 color = door_scene_color;
+    vec3 door_scene_color_offset = vec3(texture(door_scene_texture, vec2(f_in.texture_coordinate.x - offset, f_in.texture_coordinate.y)));
+    vec3 door_color = vec3(texture(door_texture, vec2(f_in.texture_coordinate.x, f_in.texture_coordinate.y)));
+    vec3 door_color_offset = vec3(texture(door_texture, vec2(f_in.texture_coordinate.x - offset, f_in.texture_coordinate.y)));
+    vec3 color = door_color;
     if (isGreen(door_scene_color))
     {
-        if (!isGreen(door_scene_out_color))
+        if (!isGreen(door_scene_color_offset))
             discard;
-        color = door_color;
+        color = door_color_offset;
     }
     f_color = vec4(color, 1.0f);
 }
