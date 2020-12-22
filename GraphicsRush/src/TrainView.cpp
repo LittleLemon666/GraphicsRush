@@ -1482,9 +1482,9 @@ setProjection()
 		}
 			if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
 			gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
-				viewer_pos.x + forward.x * 10.0f,
-				viewer_pos.y + forward.y * 10.0f,
-				viewer_pos.z + forward.z * 10.0f,
+				viewer_pos.x + forward.x * 30.0f - up.x * 20.0f,
+				viewer_pos.y + forward.y * 30.0f - up.y * 20.0f,
+				viewer_pos.z + forward.z * 30.0f - up.z * 20.0f,
 				up.x, up.y, up.z);
 		}
 
