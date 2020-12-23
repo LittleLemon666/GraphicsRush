@@ -44,7 +44,7 @@ void GMTPipeline::calculateAll(float trainU, vec3& position, vec3& forward, vec3
 	float ratio = trainU - (int)trainU;
 	position = calculate(ratio);
 	//0.02 comes from 1 / PATH_DIVIDE when it's 50
-	vec3 newPos = calculate(ratio + 0.02f);
+	vec3 newPos = calculate(ratio + 0.0001f);
 	forward = newPos - position;
 	setG_orient((int)trainU);
 	up = calculate(ratio);

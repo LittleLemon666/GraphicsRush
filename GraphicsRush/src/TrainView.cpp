@@ -865,7 +865,7 @@ drawPlayer() {
 	if (m_pTrack->jumpingState > 0)
 		player_pos += m_pTrack->airbornePosition[m_pTrack->jumpingState - 1] * player_up * 10.0f; //m_pTrack->jumpingState is added once in setProjection
 
-	mat4 model_matrix = inverse(lookAt(player_pos + 5.0f * player_up, player_pos + player_forward + 5.0f * player_up, player_up)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(player_pos, player_pos + player_forward, player_up)); // the player is in a 5.0f height position
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 	this->player_texture->bind(1);
@@ -934,7 +934,7 @@ drawObstacles() {
 		obstacleForward = normalize(obstacleForward);
 		obstacleUp = normalize(obstacleUp);
 		obstacleCross = normalize(obstacleCross);
-		obstaclePosition += obstacleUp * 7.0f;
+		obstaclePosition += obstacleUp * 2.0f;
 		obstaclePosition += obstacleCross * (float)m_pTrack->obstacles[obstacle].lane * 5.0f;
 		float forwardSize = 2.0f;
 		float upSize = 2.0f;
@@ -971,7 +971,7 @@ void TrainView::drawMoney() {
 		obstacleForward = normalize(obstacleForward);
 		obstacleUp = normalize(obstacleUp);
 		obstacleCross = normalize(obstacleCross);
-		obstaclePosition += obstacleUp * 7.0f;
+		obstaclePosition += obstacleUp * 2.0f;
 		obstaclePosition += obstacleCross * (float)m_pTrack->money[obstacle].lane * 5.0f;
 		float forwardSize = 1.0f;
 		float upSize = 1.0f;
@@ -1184,7 +1184,7 @@ draw()
 			if (!alcMakeContextCurrent(context))
 				puts("Failed to make context current");
 
-			this->source_pos = glm::vec3(0.0f, 5.0f, 0.0f);
+			this->source_pos = glm::vec3(0.0f, 0.0f, 0.0f);
 
 			ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 			alListener3f(AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
