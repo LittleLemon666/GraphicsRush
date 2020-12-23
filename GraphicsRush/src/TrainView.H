@@ -112,8 +112,9 @@ class TrainView : public Fl_Gl_Window
 
 		Shader* basic_shader		= nullptr;
 		Texture2D* path_texture	= nullptr;
-		UBO* commom_matrices = nullptr;
-		UBO* skybox_matrices = nullptr;
+		UBO* commom_matrices = nullptr; // bind 0
+		UBO* skybox_matrices = nullptr; // bind 1
+		UBO* dir_light_properties = nullptr; // bind 2
 
 		//OpenAL
 		glm::vec3 source_pos;
@@ -144,6 +145,7 @@ class TrainView : public Fl_Gl_Window
 		void renderScreenBegin();
 		void renderScreenEnd();
 		void initScreenQuad();
+		void setDirLightUBO();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
@@ -203,4 +205,13 @@ class TrainView : public Fl_Gl_Window
 		GLuint screen_id;
 		bool load_screen = false;
 		float screen_brightness = 1.0f;
+
+		struct DirLight
+		{
+			float shininess = 32.0f;
+			vec3 light_direction = vec3(1.0, -1.0, 1.0);
+			vec3 light_ambient = vec3(0.5, 0.5, 0.5);
+			vec3 light_diffuse = vec3(0.95, 0.95, 0.95);
+			vec3 light_specular = vec3(1.0, 1.0, 1.0);
+		}dir_light;
 };

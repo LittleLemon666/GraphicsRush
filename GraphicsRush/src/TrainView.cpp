@@ -1139,6 +1139,16 @@ draw()
 		glBufferData(GL_UNIFORM_BUFFER, this->skybox_matrices->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		if (!this->dir_light_properties)
+		{
+			this->dir_light_properties = new UBO();
+			glGenBuffers(1, &this->dir_light_properties->ubo);
+		}
+		this->dir_light_properties->size = 96; // 16bytes * 6
+		glBindBuffer(GL_UNIFORM_BUFFER, this->dir_light_properties->ubo);
+		glBufferData(GL_UNIFORM_BUFFER, this->dir_light_properties->size, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		/*********************NEW ADDITIONS*********************/
 		if (!this->path) this->path = new ShaderInfo;
 		//add info for each track between control points
@@ -1351,6 +1361,10 @@ draw()
 		GL_UNIFORM_BUFFER, /*binding point*/0, this->commom_matrices->ubo, 0, this->commom_matrices->size);
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/1, this->skybox_matrices->ubo, 0, this->skybox_matrices->size);
+
+	setDirLightUBO();
+	glBindBufferRange(
+		GL_UNIFORM_BUFFER, /*binding point*/2, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
 
 	drawPath();
 
@@ -1693,4 +1707,23 @@ getFileName(std::string file_path)
 	std::string file_name, file_name_t;
 	while (getline(ss, file_name_t, '/')) file_name = file_name_t;
 	return file_name;
+}
+
+void TrainView::
+setDirLightUBO()
+{
+	// setting camera position
+	mat4 modelViewMat4;
+	glGetFloatv(GL_MODELVIEW_MATRIX, &modelViewMat4[0][0]);
+	modelViewMat4 = glm::inverse(modelViewMat4);
+	vec3 camera_pos = vec3(modelViewMat4[3][0], modelViewMat4[3][1], modelViewMat4[3][2]);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, this->dir_light_properties->ubo); // all data with 16 bytes in GLSL
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &dir_light.shininess);
+	glBufferSubData(GL_UNIFORM_BUFFER, 16, sizeof(vec3), &dir_light.light_direction[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 32, sizeof(vec3), &dir_light.light_ambient[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 48, sizeof(vec3), &dir_light.light_diffuse[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(vec3), &dir_light.light_specular[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 80, sizeof(vec3), &camera_pos[0]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
