@@ -1028,7 +1028,7 @@ drawDoor()
 	if (!load_door_position) // maintain the position in front of the player (setting in the beginning)
 	{
 		load_door_position = true;
-		door_pos = player_pos - 12.0f * player_forward - 11.0f * player_up;
+		door_pos = player_pos - 10.0f * player_forward - 11.0f * player_up;
 		door_forward = player_forward + player_up;
 		door_up = player_up - player_forward;
 	}
