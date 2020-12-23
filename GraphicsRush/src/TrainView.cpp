@@ -1174,7 +1174,7 @@ draw()
 			if (!alcMakeContextCurrent(context))
 				puts("Failed to make context current");
 
-			this->source_pos = glm::vec3(0.0f, 5.0f, 0.0f);
+			this->source_pos = glm::vec3(0.0f, 0.0f, 0.0f);
 
 			ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 			alListener3f(AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
