@@ -240,6 +240,9 @@ initPath() {
 	path->vertices = {};
 	path->normal = {};
 	path->texture_coordinate = {};
+	water_surface_data.environmentCenter = {};
+	water_surface_data.bboxMax = {};
+	water_surface_data.bboxMin = {};
 	path->element = {};
 	vec3 first_segment_r(-1.0f, -1.0f, -1.0f);
 	vec3 first_segment_l(-1.0f, -1.0f, -1.0f);
@@ -295,6 +298,11 @@ initPath() {
 			GLfloat roadSize = 10.0f;
 			this_cross = roadSize * this_cross;
 			next_cross = roadSize * next_cross;
+
+			vec3 thisbboxMax;
+			vec3 thisbboxMin;
+			vec3 thisEnvironmentCenter;
+
 			//record next segment and the first segment so later it can be used to perfectly connect segments
 			if (cp_id == 0 && segment == 0) {
 				first_segment_r = vec3(
@@ -311,6 +319,8 @@ initPath() {
 				path->vertices.push_back(this_segment.x + this_cross.x);
 				path->vertices.push_back(this_segment.y + this_cross.y);
 				path->vertices.push_back(this_segment.z + this_cross.z);
+				thisbboxMax = max(this_segment - this_cross, this_segment + this_cross);
+				thisbboxMin = min(this_segment - this_cross, this_segment + this_cross);
 			}
 			else {
 				path->vertices.push_back(last_segment_l.x);
@@ -319,6 +329,8 @@ initPath() {
 				path->vertices.push_back(last_segment_r.x);
 				path->vertices.push_back(last_segment_r.y);
 				path->vertices.push_back(last_segment_r.z);
+				thisbboxMax = max(last_segment_l, last_segment_r);
+				thisbboxMin = min(last_segment_l, last_segment_r);
 			}
 			if (cp_id + 1 == NUM_of_CPs && segment + 1 == PATH_DIVIDE) {
 				path->vertices.push_back(first_segment_r.x);
@@ -327,6 +339,8 @@ initPath() {
 				path->vertices.push_back(first_segment_l.x);
 				path->vertices.push_back(first_segment_l.y);
 				path->vertices.push_back(first_segment_l.z);
+				thisbboxMax = max(first_segment_r, first_segment_l);
+				thisbboxMin = min(first_segment_r, first_segment_l);
 			}
 			else {
 				path->vertices.push_back(next_segment.x + next_cross.x);
@@ -335,6 +349,8 @@ initPath() {
 				path->vertices.push_back(next_segment.x - next_cross.x);
 				path->vertices.push_back(next_segment.y - next_cross.y);
 				path->vertices.push_back(next_segment.z - next_cross.z);
+				thisbboxMax = max(next_segment + next_cross, next_segment - next_cross);
+				thisbboxMin = min(next_segment + next_cross, next_segment - next_cross);
 			}
 			last_segment_r = vec3(
 				next_segment.x + next_cross.x,
@@ -344,6 +360,8 @@ initPath() {
 				next_segment.x - next_cross.x,
 				next_segment.y - next_cross.y,
 				next_segment.z - next_cross.z);
+
+			thisEnvironmentCenter = (thisbboxMax + thisbboxMin) / 2.0f;
 
 			//initialize path->normal
 			path->normal.push_back(this_cp_orient.x);
@@ -369,6 +387,19 @@ initPath() {
 			path->texture_coordinate.push_back((GLfloat)0.0);
 			path->texture_coordinate.push_back((GLfloat)1.0);
 
+			for (int face_i = 0; face_i < 4; face_i++)
+			{
+				water_surface_data.bboxMax.push_back(thisbboxMax.x);
+				water_surface_data.bboxMax.push_back(thisbboxMax.y);
+				water_surface_data.bboxMax.push_back(thisbboxMax.z);
+				water_surface_data.bboxMin.push_back(thisbboxMin.x);
+				water_surface_data.bboxMin.push_back(thisbboxMin.y);
+				water_surface_data.bboxMin.push_back(thisbboxMin.z);
+				water_surface_data.environmentCenter.push_back(thisEnvironmentCenter.x);
+				water_surface_data.environmentCenter.push_back(thisEnvironmentCenter.y);
+				water_surface_data.environmentCenter.push_back(thisEnvironmentCenter.z);
+			}
+
 			//initialize path->element
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4);
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4 + 1);
@@ -383,18 +414,19 @@ initPath() {
 	{
 		this->path->vertex_data = new VAO;
 		glGenVertexArrays(1, &this->path->vertex_data->vao);
-		glGenBuffers(3, this->path->vertex_data->vbo);
-		glGenBuffers(1, &this->path->vertex_data->ebo);
+		glGenBuffers(6, this->path->vertex_data->vbo);
+		glGenBuffers(1, &this->path->vertex_data->ebo);	
 	}
 	else 
 	{
 		glad_glDeleteVertexArrays(1, &this->path->vertex_data->vao);
-		glad_glDeleteBuffers(3, this->path->vertex_data->vbo);
+		glad_glDeleteBuffers(6, this->path->vertex_data->vbo);
 		glad_glDeleteBuffers(1, &this->path->vertex_data->ebo);
 		glGenVertexArrays(1, &this->path->vertex_data->vao);
-		glGenBuffers(3, this->path->vertex_data->vbo);
+		glGenBuffers(6, this->path->vertex_data->vbo);
 		glGenBuffers(1, &this->path->vertex_data->ebo);
 	}
+
 	this->path->vertex_data->element_amount = (int)path->element.size() * sizeof(GLuint);	
 
 	glBindVertexArray(this->path->vertex_data->vao);
@@ -416,6 +448,24 @@ initPath() {
 	glBufferData(GL_ARRAY_BUFFER, (int)path->texture_coordinate.size() * sizeof(GLfloat), &path->texture_coordinate[0], GL_STATIC_DRAW);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(2);
+
+	// environmentCenter attribute
+	glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[3]);
+	glBufferData(GL_ARRAY_BUFFER, (int)water_surface_data.environmentCenter.size() * sizeof(GLfloat), &water_surface_data.environmentCenter[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(3);
+
+	// bboxMax attribute
+	glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[4]);
+	glBufferData(GL_ARRAY_BUFFER, (int)water_surface_data.bboxMax.size() * sizeof(GLfloat), &water_surface_data.bboxMax[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(4);
+
+	// bboxMin attribute
+	glBindBuffer(GL_ARRAY_BUFFER, this->path->vertex_data->vbo[5]);
+	glBufferData(GL_ARRAY_BUFFER, (int)water_surface_data.bboxMin.size() * sizeof(GLfloat), &water_surface_data.bboxMin[0], GL_STATIC_DRAW);
+	glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(5);
 
 	//Element attribute
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->path->vertex_data->ebo);
@@ -1138,7 +1188,7 @@ draw()
 		if (!this->water_surface_shader)
 			this->water_surface_shader = new
 			Shader(
-				"../GraphicsRush/src/shaders/simple.vert",
+				"../GraphicsRush/src/shaders/water_surface.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/water_surface.frag");
 

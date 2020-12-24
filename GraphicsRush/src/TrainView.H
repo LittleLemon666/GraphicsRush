@@ -219,4 +219,11 @@ class TrainView : public Fl_Gl_Window
 		}dir_light;
 
 		vec3 camera_pos;
+
+		struct WaterSurface
+		{
+			std::vector<GLfloat> environmentCenter = {};
+			std::vector<GLfloat> bboxMax = {};
+			std::vector<GLfloat> bboxMin = {};
+		}water_surface_data;
 };

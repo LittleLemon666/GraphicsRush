@@ -2,7 +2,7 @@
 #include <glad\glad.h>
 
 #define MAX_FBO_TEXTURE_AMOUNT 4
-#define MAX_VAO_VBO_AMOUNT 3
+#define MAX_VAO_VBO_AMOUNT 6
 
 struct VAO
 {

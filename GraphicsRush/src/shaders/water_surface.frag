@@ -2,13 +2,16 @@
 
 #extension GL_NV_shadow_samplers_cube : enable
 
+
 out vec4 f_color;
 
 in V_OUT
 {
    vec3 position;
    vec3 normal;
-   vec2 texture_coordinate;
+   vec3 environmentCenter;
+   vec3 bboxMax;
+   vec3 bboxMin;
 } f_in;
 
 uniform samplerCube skybox;
@@ -21,9 +24,6 @@ layout (std140, binding = 2) uniform Viewer
 
 uniform float Eta = 1 / 1.33;
 
-uniform vec3 environmentCenter;
-uniform vec3 bboxMax;
-uniform vec3 bboxMin;
 vec3 LocalCorrect(vec3 origVec, vec3 vertexPos)
 {
     //*********************************************************************
@@ -33,9 +33,9 @@ vec3 LocalCorrect(vec3 origVec, vec3 vertexPos)
 
     vec3 invOrigVec = vec3(1.0,1.0,1.0)/origVec;
 
-    vec3 intersecAtMaxPlane = (bboxMax - vertexPos) * invOrigVec;
+    vec3 intersecAtMaxPlane = (f_in.bboxMax - vertexPos) * invOrigVec;
 
-    vec3 intersecAtMinPlane = (bboxMin - vertexPos) * invOrigVec;
+    vec3 intersecAtMinPlane = (f_in.bboxMin - vertexPos) * invOrigVec;
 
     // Get the largest intersection values (we are not intersted in negative values)
 
@@ -51,7 +51,7 @@ vec3 LocalCorrect(vec3 origVec, vec3 vertexPos)
 
     // Get corrected vector
 
-    vec3 localCorrectedVec = IntersectPositionWS - environmentCenter;
+    vec3 localCorrectedVec = IntersectPositionWS - f_in.environmentCenter;
 
     return localCorrectedVec;
 }
