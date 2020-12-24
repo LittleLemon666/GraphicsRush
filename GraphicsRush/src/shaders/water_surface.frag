@@ -12,7 +12,6 @@ in V_OUT
 } f_in;
 
 uniform samplerCube skybox;
-uniform samplerCube environmentbox;
 
 layout (std140, binding = 2) uniform Viewer
 {
@@ -20,41 +19,6 @@ layout (std140, binding = 2) uniform Viewer
 }viewer;
 
 uniform float Eta = 1 / 1.33;
-
-uniform vec3 environmentCenter;
-uniform vec3 bboxMax;
-uniform vec3 bboxMin;
-vec3 LocalCorrect(vec3 origVec, vec3 vertexPos)
-{
-    //*********************************************************************
-	// Author: Roberto Lopez Mendez
-	// URL: https://community.arm.com/developer/tools-software/graphics/b/blog/posts/reflections-based-on-local-cubemaps-in-unity
-	//*********************************************************************
-
-    vec3 invOrigVec = vec3(1.0,1.0,1.0)/origVec;
-
-    vec3 intersecAtMaxPlane = (bboxMax - vertexPos) * invOrigVec;
-
-    vec3 intersecAtMinPlane = (bboxMin - vertexPos) * invOrigVec;
-
-    // Get the largest intersection values (we are not intersted in negative values)
-
-    vec3 largestIntersec = max(intersecAtMaxPlane, intersecAtMinPlane);
-
-    // Get the closest of all solutions
-
-   float Distance = min(min(largestIntersec.x, largestIntersec.y), largestIntersec.z);
-
-    // Get the intersection position
-
-    vec3 IntersectPositionWS = vertexPos + origVec * Distance;
-
-    // Get corrected vector
-
-    vec3 localCorrectedVec = IntersectPositionWS - environmentCenter;
-
-    return localCorrectedVec;
-}
 
 void main()
 {
@@ -68,17 +32,13 @@ void main()
         RefractVec = refract(InVec, -f_in.normal, 1.33); //Eta¡A§é®g²v¡A1.33
     else
         RefractVec = refract(InVec, f_in.normal, Eta); //Eta¡A§é®g²v¡A1 / 1.33
-    vec3 newReflectVec = LocalCorrect(ReflectVec, f_in.position);
-    vec3 newRefractVec = LocalCorrect(RefractVec, f_in.position);
-    //vec3 ReflectColor = vec3(textureCube(environmentbox, newReflectVec));
-    //vec3 RefractColor = vec3(textureCube(environmentbox, newRefractVec));
+
     vec3 ReflectColor = vec3(textureCube(skybox, ReflectVec));
     vec3 RefractColor = vec3(textureCube(skybox, RefractVec));
 
     float ratio = 0.4 + 0.6 * pow(min(0.0, 1.0 - dot(-InVec, f_in.normal)), 4.0); //float fresnel 
 
     vec3 color = mix(RefractColor, ReflectColor, ratio);
-    //vec3 color = RefractColor;
     
     f_color =  vec4(color, 1.0);
 }

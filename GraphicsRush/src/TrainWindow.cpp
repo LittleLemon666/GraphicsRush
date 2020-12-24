@@ -89,12 +89,12 @@ TrainWindow(const int x, const int y)
 		camGroup->begin();
 		worldCam = new Fl_Button(605, pty, 60, 20, "World");
         worldCam->type(FL_RADIO_BUTTON);		// radio button
-        worldCam->value(1);			// turned on
+        worldCam->value(0);			// turned on
         worldCam->selection_color((Fl_Color)3); // yellow when pressed
 		worldCam->callback((Fl_Callback*)damageCB,this);
 		trainCam = new Fl_Button(670, pty, 60, 20, "Train");
         trainCam->type(FL_RADIO_BUTTON);
-        trainCam->value(0);
+        trainCam->value(1);
         trainCam->selection_color((Fl_Color)3);
 		trainCam->callback((Fl_Callback*)damageCB,this);
 		topCam = new Fl_Button(735, pty, 60, 20, "Top");
