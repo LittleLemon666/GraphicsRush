@@ -12,15 +12,18 @@ uniform vec3 u_color;
 
 uniform sampler2D u_texture;
 
-layout (std140, binding = 2) uniform Dir_light
+layout (std140, binding = 2) uniform Viewer
+{
+    vec3 view_pos;     //16
+}viewer;
+
+layout (std140, binding = 3) uniform Dir_light
 {
     float shininess;    //16
     vec3 direction;     //16
     vec3 ambient;       //16
     vec3 diffuse;       //16
     vec3 specular;      //16
-
-    vec3 viewPos;       //16
 }dir_light;
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)
@@ -40,7 +43,7 @@ vec3 CalcDirLight(vec3 normal, vec3 viewDir)
 
 void main()
 {   
-    vec3 viewDir = normalize(dir_light.viewPos - f_in.position);
+    vec3 viewDir = normalize(viewer.view_pos - f_in.position);
     vec3 color = CalcDirLight(f_in.normal, viewDir);
     //vec3 color = vec3(texture(u_texture, f_in.texture_coordinate));
     f_color = vec4(color, 1.0f);

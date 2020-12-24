@@ -114,7 +114,8 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* path_texture	= nullptr;
 		UBO* commom_matrices = nullptr; // bind 0
 		UBO* skybox_matrices = nullptr; // bind 1
-		UBO* dir_light_properties = nullptr; // bind 2
+		UBO* camera_properties = nullptr; // bind 2
+		UBO* dir_light_properties = nullptr; // bind 3
 
 		//OpenAL
 		glm::vec3 source_pos;
@@ -134,6 +135,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* skybox_shader = nullptr;
 		Shader* text_shader = nullptr;
 		Shader* screen_shader = nullptr;
+		Shader* water_surface_shader = nullptr;
 		void initPath();
 		void loadObjects();
 		void initSkybox();
@@ -146,6 +148,7 @@ class TrainView : public Fl_Gl_Window
 		void renderScreenEnd();
 		void initScreenQuad();
 		void setDirLightUBO();
+		void setCameraUBO();
 		void drawPath();
 		void drawPlayer();
 		void drawObstacles();
@@ -214,4 +217,6 @@ class TrainView : public Fl_Gl_Window
 			vec3 light_diffuse = vec3(0.95, 0.95, 0.95);
 			vec3 light_specular = vec3(1.0, 1.0, 1.0);
 		}dir_light;
+
+		vec3 camera_pos;
 };

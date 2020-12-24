@@ -15,7 +15,8 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/screen.vert
     ${SRC_DIR}shaders/screen.frag
     ${SRC_DIR}shaders/door.vert
-    ${SRC_DIR}shaders/door.frag)
+    ${SRC_DIR}shaders/door.frag
+    ${SRC_DIR}shaders/water_surface.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h

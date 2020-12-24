@@ -829,15 +829,31 @@ initScreenQuad()
 
 void TrainView::
 drawPath() {
-	//bind shader
-	this->basic_shader->Use();
+	if (chapter != 3)
+	{
+		//bind shader
+		this->basic_shader->Use();
 
-	glm::mat4 model_matrix = glm::mat4();
-	model_matrix = glm::translate(model_matrix, this->source_pos);
-	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->path_texture->bind(0);
-	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+		glm::mat4 model_matrix = glm::mat4();
+		model_matrix = glm::translate(model_matrix, this->source_pos);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+		this->path_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	}
+	else
+	{
+		//bind shader
+		this->water_surface_shader->Use();
+
+		glm::mat4 model_matrix = glm::mat4();
+		model_matrix = glm::translate(model_matrix, this->source_pos);
+		glUniformMatrix4fv(glGetUniformLocation(this->water_surface_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
+		glUniform1i(glGetUniformLocation(this->water_surface_shader->Program, "skybox"), 0);
+	}
+	
 
 	//bind VAO
 	glBindVertexArray(this->path->vertex_data->vao);
@@ -1119,6 +1135,13 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/door.frag");
 
+		if (!this->water_surface_shader)
+			this->water_surface_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/simple.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/water_surface.frag");
+
 		if (!this->commom_matrices)
 		{
 			this->commom_matrices = new UBO();
@@ -1139,12 +1162,22 @@ draw()
 		glBufferData(GL_UNIFORM_BUFFER, this->skybox_matrices->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		if (!this->camera_properties)
+		{
+			this->camera_properties = new UBO();
+			glGenBuffers(1, &this->camera_properties->ubo);
+		}
+		this->camera_properties->size = 16; // 16bytes
+		glBindBuffer(GL_UNIFORM_BUFFER, this->camera_properties->ubo);
+		glBufferData(GL_UNIFORM_BUFFER, this->camera_properties->size, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		if (!this->dir_light_properties)
 		{
 			this->dir_light_properties = new UBO();
 			glGenBuffers(1, &this->dir_light_properties->ubo);
 		}
-		this->dir_light_properties->size = 96; // 16bytes * 6
+		this->dir_light_properties->size = 80; // 16bytes * 5
 		glBindBuffer(GL_UNIFORM_BUFFER, this->dir_light_properties->ubo);
 		glBufferData(GL_UNIFORM_BUFFER, this->dir_light_properties->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
@@ -1362,9 +1395,13 @@ draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/1, this->skybox_matrices->ubo, 0, this->skybox_matrices->size);
 
+	setCameraUBO();
+	glBindBufferRange(
+		GL_UNIFORM_BUFFER, /*binding point*/2, this->camera_properties->ubo, 0, this->camera_properties->size);
+
 	setDirLightUBO();
 	glBindBufferRange(
-		GL_UNIFORM_BUFFER, /*binding point*/2, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
+		GL_UNIFORM_BUFFER, /*binding point*/3, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
 
 	drawPath();
 
@@ -1710,20 +1747,27 @@ getFileName(std::string file_path)
 }
 
 void TrainView::
-setDirLightUBO()
+setDirLightUBO() // need to behide setViewerUBO()
 {
-	// setting camera position
-	mat4 modelViewMat4;
-	glGetFloatv(GL_MODELVIEW_MATRIX, &modelViewMat4[0][0]);
-	modelViewMat4 = glm::inverse(modelViewMat4);
-	vec3 camera_pos = vec3(modelViewMat4[3][0], modelViewMat4[3][1], modelViewMat4[3][2]);
-
 	glBindBuffer(GL_UNIFORM_BUFFER, this->dir_light_properties->ubo); // all data with 16 bytes in GLSL
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &dir_light.shininess);
 	glBufferSubData(GL_UNIFORM_BUFFER, 16, sizeof(vec3), &dir_light.light_direction[0]);
 	glBufferSubData(GL_UNIFORM_BUFFER, 32, sizeof(vec3), &dir_light.light_ambient[0]);
 	glBufferSubData(GL_UNIFORM_BUFFER, 48, sizeof(vec3), &dir_light.light_diffuse[0]);
 	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(vec3), &dir_light.light_specular[0]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 80, sizeof(vec3), &camera_pos[0]);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void TrainView::
+setCameraUBO()
+{
+	// setting camera position
+	mat4 modelViewMat4;
+	glGetFloatv(GL_MODELVIEW_MATRIX, &modelViewMat4[0][0]);
+	modelViewMat4 = glm::inverse(modelViewMat4);
+	camera_pos = vec3(modelViewMat4[3][0], modelViewMat4[3][1], modelViewMat4[3][2]);
+
+	glBindBuffer(GL_UNIFORM_BUFFER, this->camera_properties->ubo); // all data with 16 bytes in GLSL
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(vec3), &camera_pos[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
