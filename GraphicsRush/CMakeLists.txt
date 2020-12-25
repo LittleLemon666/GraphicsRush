@@ -16,12 +16,15 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/screen.frag
     ${SRC_DIR}shaders/door.vert
     ${SRC_DIR}shaders/door.frag
-    ${SRC_DIR}shaders/water_surface.frag)
+    ${SRC_DIR}shaders/water_surface.frag
+    ${SRC_DIR}shaders/shadow.vert
+    ${SRC_DIR}shaders/shadow.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
     ${SRC_DIR}RenderUtilities/Shader.h
-    ${SRC_DIR}RenderUtilities/Texture.h)
+    ${SRC_DIR}RenderUtilities/Texture.h
+    ${SRC_DIR}RenderUtilities/Shadow.h)
 
 include_directories(${INCLUDE_DIR})
 include_directories(${INCLUDE_DIR}glad4.6/include/)

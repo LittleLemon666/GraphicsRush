@@ -828,6 +828,41 @@ initScreenQuad()
 }
 
 void TrainView::
+drawWorld()
+{
+	drawStuff();
+
+	// this time drawing is for shadows (except for top view)
+	if (!tw->topCam->value()) {
+		setupShadows();
+		drawStuff(true);
+		unsetupShadows();
+	}
+
+	drawPath();
+
+	drawPlayer();
+
+	drawDoor();
+
+	//use money to check if world is loaded
+	if ((int)m_pTrack->money.size() == 0) loadObjects();
+
+	drawObstacles();
+	drawMoney();
+
+	drawSkybox();
+
+	char score_info[20];
+	sprintf(score_info, "Score:  %010d", m_pTrack->score);
+	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+	char money_info[20];
+	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
+	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+}
+
+void TrainView::
 drawPath() {
 	if (chapter != 3)
 	{
@@ -1142,6 +1177,20 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/water_surface.frag");
 
+		if (!this->shadowShader)
+			this->shadowShader = new
+			Shader(
+				"../GraphicsRush/src/shaders/shadow.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/shadow.frag");
+
+		if (!this->shadowDebugShader)
+			this->shadowDebugShader = new
+			Shader(
+				"../GraphicsRush/src/shaders/shadowDebug.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/shadowDebug.frag");
+
 		if (!this->commom_matrices)
 		{
 			this->commom_matrices = new UBO();
@@ -1311,6 +1360,10 @@ draw()
 		initScreenRender();
 
 		initScreenQuad();
+
+		if (!shadow)
+			shadow = new Shadow();
+		//renderDepthMap(shadow);
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -1335,16 +1388,8 @@ draw()
 	glLoadIdentity();
 	setProjection();		// put the code to set up matrices here
 
-	//######################################################################
-	// TODO: 
-	// you might want to set the lighting up differently. if you do, 
-	// we need to set up the lights AFTER setting up the projection
-	//######################################################################
-	// enable the lighting
 	glEnable(GL_COLOR_MATERIAL);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
-	//glEnable(GL_LIGHT0);
 
 	// set linstener position 
 	if (selectedCube >= 0)
@@ -1365,29 +1410,7 @@ draw()
 	// set to opengl fixed pipeline(use opengl 1.x draw function)
 	glUseProgram(0);
 
-	//setupFloor();
-	//glDisable(GL_LIGHTING);
-	//drawFloor(200, 10);
-
-
-	//*********************************************************************
-	// now draw the object and we need to do it twice
-	// once for real, and then once for shadows
-	//*********************************************************************
-	//glEnable(GL_LIGHTING);
-
 	setupObjects();
-
-	renderScreenBegin();
-
-	drawStuff();
-
-	// this time drawing is for shadows (except for top view)
-	if (!tw->topCam->value()) {
-		setupShadows();
-		drawStuff(true);
-		unsetupShadows();
-	}
 
 	setUBO();
 	glBindBufferRange(
@@ -1403,27 +1426,9 @@ draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/3, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
 
-	drawPath();
+	renderScreenBegin();
 
-	drawPlayer();
-
-	drawDoor();
-
-	//use money to check if world is loaded
-	if ((int)m_pTrack->money.size() == 0) loadObjects();
-
-	drawObstacles();
-	drawMoney();
-
-	drawSkybox();
-
-	char score_info[20];
-	sprintf(score_info, "Score:  %010d", m_pTrack->score);
-	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
-
-	char money_info[20];
-	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
-	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+	drawWorld();
 
 	renderScreenEnd();
 
