@@ -13,7 +13,7 @@ Object::Object(float pos, int _lane, int _height) {
 
 Obstacle::
 Obstacle(float pos, int _lane, int _height) : Object(pos, _lane, _height) {
-
+	type = "default";
 }
 
 void Obstacle::
