@@ -179,8 +179,10 @@ void runButtonCB(TrainWindow* tw)
 			}
 
 			//miniBoss movement
-			if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.05;
-			if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.05;
+			if (tw->m_Track.miniBoss) {
+				if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.05;
+				if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.05;
+			}
 
 			//player obstacle collision
 			for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
