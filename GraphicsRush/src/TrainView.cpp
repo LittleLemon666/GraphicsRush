@@ -1207,7 +1207,7 @@ drawObstacles(bool doShadow) {
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			(m_pTrack->obstacles[obstacle]).obstacle_texture[chapter * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
+			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4) ? chapter : rand() % 4) * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);

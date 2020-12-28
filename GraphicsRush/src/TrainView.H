@@ -141,7 +141,6 @@ class TrainView : public Fl_Gl_Window
 		ShaderInfo* path = nullptr;
 		ShaderInfo* skybox = nullptr;
 		ShaderInfo* door = nullptr;
-		ShaderInfo* mini_boss = nullptr;
 		Shader* door_shader = nullptr;
 		Shader* skybox_shader = nullptr;
 		Shader* text_shader = nullptr;
