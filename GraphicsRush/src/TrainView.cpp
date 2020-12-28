@@ -1066,7 +1066,8 @@ void TrainView::drawMiniBoss() {
 	miniBossForward = normalize(miniBossForward);
 	miniBossUp = normalize(miniBossUp);
 	miniBossCross = normalize(miniBossCross);
-	miniBossPos += miniBossUp * 10.0f;
+	miniBossPos += miniBossUp * MiniBoss::bossHeight;
+	miniBossPos += miniBossCross * MiniBoss::bossLane * 10.0f;
 	glBegin(GL_QUADS);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex3f(miniBossPos.x + miniBossUp.x, miniBossPos.y + miniBossUp.y, miniBossPos.z + miniBossUp.z);
@@ -1296,10 +1297,13 @@ draw()
 			this->path_texture = m_pTrack->defaultTrack;
 		}
 
-		if (m_pTrack->miniBoss == true && clock() - clipTime > CLOCKS_PER_SEC * 3) {
-			if (MiniBoss::clipping != -99) MiniBoss::clipping = -99;
-			else MiniBoss::clipping = (rand() % 3) - 1;
-			clipTime = clock();
+		if (m_pTrack->miniBoss) {
+			if (clock() - clipTime > CLOCKS_PER_SEC * 3) {
+				MiniBoss::bossTarget = (rand() % 3) - 1;
+				clipTime = clock();
+			}
+			if (abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.02) MiniBoss::clipping = MiniBoss::bossTarget;
+			else MiniBoss::clipping = -99;
 		}
 
 		if (!this->player_texture)

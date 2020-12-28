@@ -23,6 +23,7 @@
 #include "TrainWindow.H"
 #include "TrainView.H"
 #include "CallBacks.H"
+#include "MiniBoss.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -155,6 +156,11 @@ void runButtonCB(TrainWindow* tw)
 					buttonBuffer = buffer;
 				}
 			}
+
+			//miniBoss movement
+			if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.02;
+			if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.02;
+
 			//player obstacle collision
 			for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 				if (tw->m_Track.collision(obstacle)) {

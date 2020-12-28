@@ -1,6 +1,8 @@
+#pragma once
 static class MiniBoss {
 	public:
-		static int clipping;
-		static int bossLane;
-		static int bossHeight;
+		static float clipping;
+		static float bossLane;
+		static float bossHeight;
+		static float bossTarget;
 };
