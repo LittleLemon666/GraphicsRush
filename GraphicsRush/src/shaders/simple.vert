@@ -11,11 +11,14 @@ layout (std140, binding = 0) uniform commom_matrices
     mat4 u_view;
 };
 
+uniform mat4 lightSpaceMatrix;
+
 out V_OUT
 {
    vec3 position;
    vec3 normal;
    vec2 texture_coordinate;
+   vec4 frag_pos_light_space;
 } v_out;
 
 void main()
@@ -25,4 +28,5 @@ void main()
     v_out.position = vec3(u_model * vec4(position, 1.0f));
     v_out.normal = mat3(transpose(inverse(u_model))) * normal;
     v_out.texture_coordinate = vec2(texture_coordinate.x, 1.0f - texture_coordinate.y);
+    v_out.frag_pos_light_space = lightSpaceMatrix * vec4(v_out.position, 1.0);
 }

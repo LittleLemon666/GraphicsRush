@@ -43,6 +43,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Model.h
     ${SRC_DIR}Player.h
     ${SRC_DIR}ShaderInfo.h
+    ${SRC_DIR}MiniBoss.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
@@ -54,6 +55,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}GMTPipeline.cpp
     ${SRC_DIR}Model.cpp
     ${SRC_DIR}Player.cpp
+    ${SRC_DIR}MiniBoss.cpp
 
     ${SRC_SHADER}
     ${SRC_RENDER_UTILITIES}

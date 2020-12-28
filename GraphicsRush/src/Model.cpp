@@ -145,16 +145,6 @@ loadOBJ(const std::string fileName)
 void Model::
 draw()
 {
-	/*glBegin(GL_TRIANGLES);
-    if (!doingShadows)
-        glColor3ub(255, 255, 255);
-    for (unsigned int i = 0; i < vertices.size(); i++)
-    {
-        glNormal3f(normals[i].x, normals[i].y, normals[i].z);
-        glVertex3f(vertices[i].x, vertices[i].y, vertices[i].z);
-    }
-    glEnd();*/
-
 	//bind VAO
 	glBindVertexArray(VertexArrayID);
 

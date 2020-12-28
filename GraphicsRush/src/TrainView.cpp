@@ -807,6 +807,52 @@ renderScreenEnd()
 }
 
 void TrainView::
+renderDepthMapBegin()
+{
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	// 1. render depth of scene to texture (from light's perspective)
+	// --------------------------------------------------------------
+	setLightSpaceMatrix();
+	
+	// render scene from light's point of view
+	shadow_shader->Use();
+	glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	
+	glViewport(0, 0, Shadow::SHADOW_WIDTH, Shadow::SHADOW_HEIGHT);
+	glBindFramebuffer(GL_FRAMEBUFFER, shadow->getDepthMapFBO());
+	glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void TrainView::
+setLightSpaceMatrix()
+{
+	float ortho_size = 1000.0f;
+	float near_plane = 1.0f, far_plane = ortho_size * 0.95f;
+	lightProjection = glm::ortho(-ortho_size, ortho_size, -ortho_size, ortho_size, near_plane, far_plane);
+	glm::vec3 lightPos = ortho_size * 0.3f * -dir_light.light_direction;
+	lightView = glm::lookAt(lightPos, vec3(0.0f), vec3(0.0, 1.0, 0.0));
+	lightSpaceMatrix = lightProjection * lightView;
+}
+
+void TrainView::
+renderDepthMapEnd()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	
+	glViewport(0, 0, w(), h()); // reset viewport
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// clear the window, be sure to clear the Z-Buffer too
+	glClearColor(0, 0, .3f, 0);		// background should be blue
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
 initScreenQuad()
 {
 	if (!this->screen_quad)
@@ -876,18 +922,27 @@ drawWorld()
 }
 
 void TrainView::
-drawPath() {
+drawPath(bool doShadow) {
 	if (chapter != 3)
 	{
 		//bind shader
-		this->basic_shader->Use();
+		if (!doShadow)
+			this->basic_shader->Use();
 
 		glm::mat4 model_matrix = glm::mat4();
 		model_matrix = glm::translate(model_matrix, this->source_pos);
-		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-		this->path_texture->bind(0);
-		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+		if (!doShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+			this->path_texture->bind(0);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+			this->shadow->bind(1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+		}
+		else
+			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 	}
 	else
 	{
@@ -912,13 +967,15 @@ drawPath() {
 	glBindVertexArray(0);
 
 	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	if (!doShadow)
+		glUseProgram(0);
 };
 
 void TrainView::
-drawPlayer() {
+drawPlayer(bool doShadow) {
 	//bind shader
-	this->basic_shader->Use();
+	if (!doShadow)
+		this->basic_shader->Use();
 
 	vec3 player_xbias;
 	gmt.calculateAll(m_pTrack->trainU, player_pos, player_forward, player_up, player_xbias);
@@ -930,15 +987,24 @@ drawPlayer() {
 		player_pos += m_pTrack->airbornePosition[m_pTrack->jumpingState - 1] * player_up * 10.0f; //m_pTrack->jumpingState is added once in setProjection
 
 	mat4 model_matrix = inverse(lookAt(player_pos, player_pos + player_forward, player_up)); // the player is in a 5.0f height position
-	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-	this->player_texture->bind(1);
-	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 1);
+	if (!doShadow)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+		this->player_texture->bind(1);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 1);
+		this->shadow->bind(2);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 2);
+	}
+	else
+		glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 
 	player_obj->draw();
 
 	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	if (!doShadow)
+		glUseProgram(0);
 };
 
 void TrainView::loadObjects() {
@@ -994,8 +1060,10 @@ void TrainView::loadMiniBoss() {
 }
 
 void TrainView::
-drawObstacles() {
-	this->basic_shader->Use();
+drawObstacles(bool doShadow) {
+	if (!doShadow)
+		this->basic_shader->Use();
+
 	for (int obstacle = 0; obstacle < (int)m_pTrack->obstacles.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->obstacles[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -1011,28 +1079,31 @@ drawObstacles() {
 
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
-		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-		(m_pTrack->obstacles[obstacle]).obstacle_texture[chapter * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
-		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+		
+		if (!doShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+			(m_pTrack->obstacles[obstacle]).obstacle_texture[chapter * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+			this->shadow->bind(1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+		}
+		else	
+			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 
 		m_pTrack->obstacles[obstacle].obstacle_obj[0]->draw();
-		/*
-		glBegin(GL_QUADS);
-		glColor3f(0.0f, 0.0f, 1.0f);
-		glVertex3f(obstaclePosition.x + obstacleCross.x + obstacleUp.x, obstaclePosition.y + obstacleCross.y + obstacleUp.y, obstaclePosition.z + obstacleCross.z + obstacleUp.z);
-		glVertex3f(obstaclePosition.x + obstacleCross.x - obstacleUp.x, obstaclePosition.y + obstacleCross.y - obstacleUp.y, obstaclePosition.z + obstacleCross.z - obstacleUp.z);
-		glVertex3f(obstaclePosition.x - obstacleCross.x - obstacleUp.x, obstaclePosition.y - obstacleCross.y - obstacleUp.y, obstaclePosition.z - obstacleCross.z - obstacleUp.z);
-		glVertex3f(obstaclePosition.x - obstacleCross.x + obstacleUp.x, obstaclePosition.y - obstacleCross.y + obstacleUp.y, obstaclePosition.z - obstacleCross.z + obstacleUp.z);
-		glEnd();
-		*/
 	}
 	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	if (!doShadow)
+		glUseProgram(0);
 }
 
-void TrainView::drawMoney() {
-	this->basic_shader->Use();
+void TrainView::drawMoney(bool doShadow) {
+	if (!doShadow)
+		this->basic_shader->Use();
+
 	for (int obstacle = 0; obstacle < (int)m_pTrack->money.size(); obstacle++) {
 		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
 		gmt.calculateAll(m_pTrack->money[obstacle].position, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
@@ -1049,15 +1120,25 @@ void TrainView::drawMoney() {
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = rotate(model_matrix, money_rotate, vec3(0, 1, 0));
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
-		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-		m_pTrack->money[obstacle].money_texture[0].bind(0);
-		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+
+		if (!doShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+			m_pTrack->money[obstacle].money_texture[0].bind(0);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+			this->shadow->bind(1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+		}
+		else
+			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 
 		m_pTrack->money[obstacle].money_obj[0]->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+	if (!doShadow)
+		glUseProgram(0);
 };
 
 void TrainView::drawMiniBoss() {
@@ -1140,6 +1221,7 @@ drawScreenQuad()
 	this->screen_shader->Use();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, screen_id);
+	//this->shadow->bind(0);
 	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 0);
 	glUniform1f(glGetUniformLocation(this->screen_shader->Program, "brightness"), screen_brightness);
 
@@ -1211,19 +1293,12 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/water_surface.frag");
 
-		if (!this->shadowShader)
-			this->shadowShader = new
+		if (!this->shadow_shader)
+			this->shadow_shader = new
 			Shader(
 				"../GraphicsRush/src/shaders/shadow.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/shadow.frag");
-
-		if (!this->shadowDebugShader)
-			this->shadowDebugShader = new
-			Shader(
-				"../GraphicsRush/src/shaders/shadowDebug.vert",
-				nullptr, nullptr, nullptr,
-				"../GraphicsRush/src/shaders/shadowDebug.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -1422,7 +1497,6 @@ draw()
 
 		if (!shadow)
 			shadow = new Shadow();
-		//renderDepthMap(shadow);
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -1485,9 +1559,20 @@ draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/3, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
 
+	//renderDepthMapBegin();
+
+	//for render depth map
+	/*drawPlayer(true);
+	drawObstacles(true);
+	drawMoney(true);
+	drawPath(true);*/
+	//====================
+
+	//renderDepthMapEnd();
+
 	renderScreenBegin();
 
-	drawWorld();
+	drawWorld(); //for rendering to screen
 
 	renderScreenEnd();
 
