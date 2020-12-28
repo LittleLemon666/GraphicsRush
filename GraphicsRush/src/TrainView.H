@@ -137,8 +137,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* text_shader = nullptr;
 		Shader* screen_shader = nullptr;
 		Shader* water_surface_shader = nullptr;
-		Shader* shadowShader = nullptr;
-		Shader* shadowDebugShader = nullptr;
+		Shader* shadow_shader = nullptr;
 		void initPath();
 		void loadObjects();
 		void initSkybox();
@@ -149,14 +148,17 @@ class TrainView : public Fl_Gl_Window
 		void initScreenRender();
 		void renderScreenBegin();
 		void renderScreenEnd();
+		void renderDepthMapBegin();
+		void renderDepthMapEnd();
+		void setLightSpaceMatrix();
 		void initScreenQuad();
 		void setDirLightUBO();
 		void setCameraUBO();
 		void drawWorld();
-		void drawPath();
-		void drawPlayer();
-		void drawObstacles();
-		void drawMoney();
+		void drawPath(bool doShadow = false);
+		void drawPlayer(bool doShadow = false);
+		void drawObstacles(bool doShadow = false);
+		void drawMoney(bool doShadow = false);
 		void drawSkybox();
 		void drawDoor();
 		void drawScreenQuad();
@@ -225,4 +227,6 @@ class TrainView : public Fl_Gl_Window
 		vec3 camera_pos;
 
 		Shadow* shadow = nullptr;
+		mat4 lightProjection, lightView;
+		mat4 lightSpaceMatrix;
 };
