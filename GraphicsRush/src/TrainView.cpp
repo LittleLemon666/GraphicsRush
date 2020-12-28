@@ -996,7 +996,7 @@ drawObstacles() {
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
 		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
-		(m_pTrack->obstacles[obstacle]).obstacle_texture[0].bind(0);
+		(m_pTrack->obstacles[obstacle]).obstacle_texture[chapter * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
 		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 
 		m_pTrack->obstacles[obstacle].obstacle_obj[0]->draw();

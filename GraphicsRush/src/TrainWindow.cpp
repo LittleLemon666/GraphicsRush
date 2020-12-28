@@ -35,7 +35,7 @@
 #include "TrainView.H"
 #include "CallBacks.H"
 
-
+#include "Object.h"
 
 //************************************************************************
 //
@@ -217,6 +217,7 @@ advanceTrain(float dir)
 		{
 			m_Track.trainU -= (int)m_Track.points.size();
 			trainView->switchChapter(trainView->chapter + 1);
+			objectChapter = trainView->chapter;
 		}
 	}
 	//#####################################################################
