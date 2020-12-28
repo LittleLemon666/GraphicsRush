@@ -23,6 +23,7 @@
 #include "TrainWindow.H"
 #include "TrainView.H"
 #include "CallBacks.H"
+#include "MiniBoss.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -136,6 +137,8 @@ void runButtonCB(TrainWindow* tw)
 {
 	if (tw->runButton->value()) {	// only advance time if appropriate
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
+			
+
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
 			if (buttonBuffer == 0) {
@@ -157,6 +160,33 @@ void runButtonCB(TrainWindow* tw)
 			{
 				//open the door
 				if (tw->trainView->camera_movement_state == 0 && tw->trainView->door_offset > -0.5) tw->trainView->door_offset -= 0.02f; //open the door in the begin
+
+				//player clipping collision
+				if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.1 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.05) {
+					Sleep(1000);
+					tw->runButton->value(0);
+					tw->speed->value(1);
+					tw->m_Track.trainU = 0.0f;
+					tw->m_Track.lane = 0;
+					tw->m_Track.switchLane = 0.0f;
+					tw->m_Track.jumpingState = -1;
+					MiniBoss::bossLane = 5;
+					MiniBoss::clipping = -99;
+					tw->trainView->camera_movement_state = 0;
+					tw->trainView->camera_movement_index = 0;
+					tw->trainView->door_offset = 0.0f;
+
+					if (!tw->debug_mode->value())
+					{
+						tw->trainView->switchChapter(0);
+					}
+				}
+
+				//miniBoss movement
+				if (tw->m_Track.miniBoss) {
+					if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.05;
+					if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.05;
+				}
 
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
