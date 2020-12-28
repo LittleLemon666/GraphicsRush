@@ -18,7 +18,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/door.frag
     ${SRC_DIR}shaders/water_surface.frag
     ${SRC_DIR}shaders/shadow.vert
-    ${SRC_DIR}shaders/shadow.frag)
+    ${SRC_DIR}shaders/shadow.frag
+    ${SRC_DIR}shaders/choose.vert
+    ${SRC_DIR}shaders/choose.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
@@ -44,6 +46,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Player.h
     ${SRC_DIR}ShaderInfo.h
     ${SRC_DIR}MiniBoss.h
+    ${SRC_DIR}Shop.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
@@ -56,6 +59,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Model.cpp
     ${SRC_DIR}Player.cpp
     ${SRC_DIR}MiniBoss.cpp
+    ${SRC_DIR}Shop.cpp
 
     ${SRC_SHADER}
     ${SRC_RENDER_UTILITIES}

@@ -155,81 +155,78 @@ handle(int event)
 	// remember what button was used
 	static int last_push;
 
-	if (!tw->trainCam->value())
-	{
-		switch (event) {
-			// Mouse button being pushed event
-		case FL_PUSH:
-			last_push = Fl::event_button();
-			// if the left button be pushed is left mouse button
-			if (last_push == FL_LEFT_MOUSE) {
-				doPick();
-				damage(1);
-				return 1;
-			};
-			break;
-
-			// Mouse button release event
-		case FL_RELEASE: // button release
+	switch (event) {
+		// Mouse button being pushed event
+	case FL_PUSH:
+		last_push = Fl::event_button();
+		// if the left button be pushed is left mouse button
+		if (last_push == FL_LEFT_MOUSE) {
+			doPick();
 			damage(1);
-			last_push = 0;
 			return 1;
+		};
+		break;
 
-			// Mouse button drag event
-		case FL_DRAG:
+		// Mouse button release event
+	case FL_RELEASE: // button release
+		damage(1);
+		last_push = 0;
+		return 1;
 
-			// Compute the new control point position
-			if ((last_push == FL_LEFT_MOUSE) && (selectedCube >= 0)) {
-				ControlPoint* cp = &m_pTrack->points[selectedCube];
+		// Mouse button drag event
+	case FL_DRAG:
 
-				double r1x, r1y, r1z, r2x, r2y, r2z;
-				getMouseLine(r1x, r1y, r1z, r2x, r2y, r2z);
+		// Compute the new control point position
+		if (!tw->trainCam->value() && (last_push == FL_LEFT_MOUSE) && (selectedCube >= 0)) {
+			ControlPoint* cp = &m_pTrack->points[selectedCube];
 
-				double rx, ry, rz;
-				mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
-					static_cast<double>(cp->pos.x),
-					static_cast<double>(cp->pos.y),
-					static_cast<double>(cp->pos.z),
-					rx, ry, rz,
-					(Fl::event_state() & FL_CTRL) != 0);
+			double r1x, r1y, r1z, r2x, r2y, r2z;
+			getMouseLine(r1x, r1y, r1z, r2x, r2y, r2z);
 
-				cp->pos.x = (float)rx;
-				cp->pos.y = (float)ry;
-				cp->pos.z = (float)rz;
-				damage(1);
-			}
-			break;
+			double rx, ry, rz;
+			mousePoleGo(r1x, r1y, r1z, r2x, r2y, r2z,
+				static_cast<double>(cp->pos.x),
+				static_cast<double>(cp->pos.y),
+				static_cast<double>(cp->pos.z),
+				rx, ry, rz,
+				(Fl::event_state() & FL_CTRL) != 0);
 
-			// in order to get keyboard events, we need to accept focus
-		case FL_FOCUS:
-			return 1;
-
-			// every time the mouse enters this window, aggressively take focus
-		case FL_ENTER:
-			focus(this);
-			break;
-
-		case FL_KEYBOARD:
-			int k = Fl::event_key();
-			int ks = Fl::event_state();
-			if (k == 'p') {
-				// Print out the selected control point information
-				if (selectedCube >= 0)
-					printf("Selected(%d) (%g %g %g) (%g %g %g)\n",
-						selectedCube,
-						m_pTrack->points[selectedCube].pos.x,
-						m_pTrack->points[selectedCube].pos.y,
-						m_pTrack->points[selectedCube].pos.z,
-						m_pTrack->points[selectedCube].orient.x,
-						m_pTrack->points[selectedCube].orient.y,
-						m_pTrack->points[selectedCube].orient.z);
-				else
-					printf("Nothing Selected\n");
-
-				return 1;
-			};
-			break;
+			cp->pos.x = (float)rx;
+			cp->pos.y = (float)ry;
+			cp->pos.z = (float)rz;
+			damage(1);
 		}
+		break;
+
+		// in order to get keyboard events, we need to accept focus
+	case FL_FOCUS:
+		return 1;
+
+		// every time the mouse enters this window, aggressively take focus
+	case FL_ENTER:
+		focus(this);
+		break;
+
+	case FL_KEYBOARD:
+		int k = Fl::event_key();
+		int ks = Fl::event_state();
+		if (k == 'p') {
+			// Print out the selected control point information
+			if (selectedCube >= 0)
+				printf("Selected(%d) (%g %g %g) (%g %g %g)\n",
+					selectedCube,
+					m_pTrack->points[selectedCube].pos.x,
+					m_pTrack->points[selectedCube].pos.y,
+					m_pTrack->points[selectedCube].pos.z,
+					m_pTrack->points[selectedCube].orient.x,
+					m_pTrack->points[selectedCube].orient.y,
+					m_pTrack->points[selectedCube].orient.z);
+			else
+				printf("Nothing Selected\n");
+
+			return 1;
+		};
+		break;
 	}
 
 	return Fl_Gl_Window::handle(event);
@@ -735,10 +732,19 @@ cameraMovement()
 {
 	if (camera_movement_state == 0)
 	{
-		vec3 viewer_pos = camera_movement[camera_movement_state][camera_movement_index++];
-		forward = camera_movement[camera_movement_state][camera_movement_index++];
-		up = camera_movement[camera_movement_state][camera_movement_index++];
-		//vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
+		vec3 viewer_pos;
+		if (game_state == CGAME)
+		{
+			viewer_pos = camera_movement[camera_movement_state][camera_movement_index++];
+			forward = camera_movement[camera_movement_state][camera_movement_index++];
+			up = camera_movement[camera_movement_state][camera_movement_index++];
+		}
+		else
+		{
+			viewer_pos = camera_movement[camera_movement_state][0];
+			forward = camera_movement[camera_movement_state][1];
+			up = camera_movement[camera_movement_state][2];
+		}
 
 		gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
 			viewer_pos.x + forward.x * 10.0f,
@@ -881,6 +887,111 @@ initScreenQuad()
 }
 
 void TrainView::
+renderChooseBegin()
+{
+	if (!chooser_FBO)
+	{
+		chooser_FBO = new FBO;
+	}
+	glGenFramebuffers(1, &chooser_FBO->fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, chooser_FBO->fbo);
+
+	glClearColor(.0f, .0f, .0f, 1.0f);
+	// clear
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void TrainView::
+renderChooseEnd()
+{
+	//unbind
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glad_glDeleteRenderbuffers(1, &chooser_FBO->rbo);
+	glad_glDeleteFramebuffers(1, &chooser_FBO->fbo);
+}
+
+void TrainView::
+choose(int x, int y)
+{
+	renderChooseBegin();
+
+	drawChooser();
+
+	renderChooseEnd();
+	
+	vec3 uv;
+	glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, &uv[0]);
+	//printf("%d %d %lf %lf %lf\n", x, y, uv.r, uv.g, uv.b);
+
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+
+	game_state = decodeChoose(uv);
+	//printf("%d\n", game_state);
+	switch (game_state)
+	{
+	case CSHOP:
+
+		break;
+	default:
+		game_state = CGAME;
+		break;
+	}
+	glad_glDeleteBuffers(1, &chooser_FBO->fbo);
+}
+
+int TrainView::
+decodeChoose(vec3 uv)
+{
+	return (int)(uv.r * 1000 + 0.5f) + (int)(uv.g * 100 + 0.5f) + (int)(uv.b * 10 + 0.5f);
+}
+
+void TrainView::
+drawShop(bool buttom)
+{
+	if (game_state != CLOBBY) return; // don't draw the shop if not in lobby
+
+	if (buttom)
+		this->choose_shader->Use();
+	else
+		this->basic_shader->Use();
+
+	vec3 shop_pos = door_pos + 22.0f * door_forward + 2.0f * door_up;
+	vec3 shop_forward = door_forward;
+	vec3 shop_up = door_up;
+	vec3 shop_cross = normalize(cross(shop_forward, shop_up));
+	shop_pos += 4.0f * shop_cross;
+	
+	mat4 model_matrix = inverse(lookAt(shop_pos, shop_pos + shop_forward, shop_up)); // the player is in a 5.0f height position
+	model_matrix = rotate(model_matrix, money_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(2.5f, 2.5f, 2.5f));
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_shader->Program, "chooser"), CSHOP);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+		this->shop->shop_buttom_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	}
+
+	shop->shop_buttom->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawChooser()
+{
+	drawShop(true);
+}
+
+void TrainView::
 drawWorld()
 {
 	drawStuff();
@@ -898,6 +1009,8 @@ drawWorld()
 
 	drawDoor();
 
+	drawShop();
+
 	//use money to check if world is loaded
 	if ((int)m_pTrack->money.size() == 0 && !(m_pTrack->first_P2 && chapter == 1) && !(m_pTrack->first_P5 && chapter == 4)) {
 		loadObjects();
@@ -912,13 +1025,22 @@ drawWorld()
 
 	drawSkybox();
 
-	char score_info[20];
-	sprintf(score_info, "Score:  %010d", m_pTrack->score);
-	RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+	if (game_state == CLOBBY)
+	{
+		char shop_info[20];
+		sprintf(shop_info, "140.118.127.125");
+		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+	}
+	else if (game_state == CGAME)
+	{
+		char score_info[20];
+		sprintf(score_info, "Score:  %010d", m_pTrack->score);
+		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 
-	char money_info[20];
-	sprintf(money_info, "money: %010d", m_pTrack->money_collected);
-	RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		char money_info[20];
+		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
+		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+	}
 }
 
 void TrainView::
@@ -1299,6 +1421,13 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/shadow.frag");
 
+		if (!this->choose_shader)
+			this->choose_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/choose.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/choose.frag");
+
 		if (!this->commom_matrices)
 		{
 			this->commom_matrices = new UBO();
@@ -1379,6 +1508,9 @@ draw()
 
 		if (!this->player_texture)
 			this->player_texture = new Texture2D(player_texture_path.c_str());
+
+		if (!this->shop)
+			this->shop = new Shop;
 
 		if (!this->device) {
 			//Tutorial: https://ffainelli.github.io/openal-example/
@@ -1774,6 +1906,8 @@ doPick()
 	// now set up the projection
 	setProjection();
 
+	choose(mx, h() - my - 1); // choose own items
+
 	// now draw the objects - but really only see what we hit
 	GLuint buf[100];
 	glSelectBuffer(100, buf);
@@ -1799,7 +1933,7 @@ doPick()
 	else // nothing hit, nothing selected
 		selectedCube = -1;
 
-	printf("Selected Cube %d\n", selectedCube);
+	//printf("Selected Cube %d\n", selectedCube);
 }
 
 void TrainView::setUBO()

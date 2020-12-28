@@ -41,6 +41,7 @@ class CTrack;
 #include "GMTPipeline.h"
 #include "Model.H"
 #include "MiniBoss.H"
+#include "Shop.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -74,6 +75,13 @@ struct Character {
 	glm::ivec2   Size;      // Size of glyph
 	glm::ivec2   Bearing;   // Offset from baseline to left/top of glyph
 	unsigned int Advance;   // Horizontal offset to advance to next glyph
+};
+
+enum Chooser
+{
+	CLOBBY, // 0 is back ground in chooser
+	CSHOP,
+	CGAME
 };
 
 class TrainView : public Fl_Gl_Window
@@ -139,6 +147,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* screen_shader = nullptr;
 		Shader* water_surface_shader = nullptr;
 		Shader* shadow_shader = nullptr;
+		Shader* choose_shader = nullptr;
 		void initPath();
 		void loadObjects();
 		void loadMiniBoss();
@@ -151,11 +160,17 @@ class TrainView : public Fl_Gl_Window
 		void renderScreenBegin();
 		void renderScreenEnd();
 		void renderDepthMapBegin();
-		void renderDepthMapEnd();
+		void renderDepthMapEnd(); //may be fault in unsetupShadows
 		void setLightSpaceMatrix();
 		void initScreenQuad();
 		void setDirLightUBO();
 		void setCameraUBO();
+		void renderChooseBegin();
+		void renderChooseEnd();
+		void choose(int x, int y);
+		int decodeChoose(vec3 uv);
+		void drawShop(bool buttom = false);
+		void drawChooser();
 		void drawWorld();
 		void drawPath(bool doShadow = false);
 		void drawPlayer(bool doShadow = false);
@@ -232,4 +247,9 @@ class TrainView : public Fl_Gl_Window
 		Shadow* shadow = nullptr;
 		mat4 lightProjection, lightView;
 		mat4 lightSpaceMatrix;
+
+		Shop* shop = nullptr;
+
+		FBO* chooser_FBO = nullptr;
+		int game_state = CLOBBY;
 };

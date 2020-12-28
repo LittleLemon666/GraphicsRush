@@ -136,9 +136,6 @@ void runButtonCB(TrainWindow* tw)
 {
 	if (tw->runButton->value()) {	// only advance time if appropriate
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
-			//open the door
-			if (tw->trainView->camera_movement_state == 0 && tw->trainView->door_offset > -0.5) tw->trainView->door_offset -= 0.02f; //open the door in the begin
-
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
 			if (buttonBuffer == 0) {
@@ -155,44 +152,53 @@ void runButtonCB(TrainWindow* tw)
 					buttonBuffer = buffer;
 				}
 			}
-			//player obstacle collision
-			for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
-				if (tw->m_Track.collision(obstacle)) {
-					Sleep(1000);
-					tw->runButton->value(0);
-					tw->speed->value(1);
-					tw->m_Track.trainU = 0.0f;
-					tw->m_Track.lane = 0;
-					tw->m_Track.switchLane = 0.0f;
-					tw->m_Track.jumpingState = -1;
-					tw->trainView->camera_movement_state = 0;
-					tw->trainView->camera_movement_index = 0;
-					tw->trainView->door_offset = 0.0f;
+			
+			if (tw->trainView->game_state == CGAME)
+			{
+				//open the door
+				if (tw->trainView->camera_movement_state == 0 && tw->trainView->door_offset > -0.5) tw->trainView->door_offset -= 0.02f; //open the door in the begin
 
-					if (!tw->debug_mode->value())
-					{
-						tw->trainView->switchChapter(0);
+				//player obstacle collision
+				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
+					if (tw->m_Track.collision(obstacle)) {
+						Sleep(1000);
+						tw->runButton->value(0);
+						tw->speed->value(1);
+						tw->m_Track.trainU = 0.0f;
+						tw->m_Track.lane = 0;
+						tw->m_Track.switchLane = 0.0f;
+						tw->m_Track.jumpingState = -1;
+						tw->trainView->camera_movement_state = 0;
+						tw->trainView->camera_movement_index = 0;
+						tw->trainView->door_offset = 0.0f;
+
+						if (!tw->debug_mode->value())
+						{
+							tw->trainView->switchChapter(0);
+						}
+						break;
 					}
-					break;
 				}
-			}
-			//player money collection
-			for (int money = 0; money < tw->m_Track.money.size(); money++) {
-				if (tw->m_Track.collection(money)) {
-					tw->m_Track.money.erase(tw->m_Track.money.begin() + money);
-					tw->m_Track.money_collected++;
-					tw->m_Track.score += tw->speed->value();
-					alSourcePlay(tw->trainView->moneySource);
-					break;
+
+				//player money collection
+				for (int money = 0; money < tw->m_Track.money.size(); money++) {
+					if (tw->m_Track.collection(money)) {
+						tw->m_Track.money.erase(tw->m_Track.money.begin() + money);
+						tw->m_Track.money_collected++;
+						tw->m_Track.score += tw->speed->value();
+						alSourcePlay(tw->trainView->moneySource);
+						break;
+					}
 				}
+
+				if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
+				if (tw->trainView->door_offset < -0.25f) tw->m_Track.score += tw->speed->value(); // add score after door opened 50%
+				if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
+				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
-			if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
-			if (tw->trainView->door_offset < -0.25f) tw->m_Track.score += tw->speed->value(); // add score after door opened 50%
-			if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
 			tw->trainView->money_rotate += 0.1f;
 			if (tw->trainView->money_rotate > 360) tw->trainView->money_rotate -= 360;
 			lastRedraw = clock();
-			if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			tw->damageMe();
 		}
 	}
