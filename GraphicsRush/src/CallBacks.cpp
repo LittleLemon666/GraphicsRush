@@ -161,6 +161,25 @@ void runButtonCB(TrainWindow* tw)
 			if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.02;
 			if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.02;
 
+			//player clipping collision
+			if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.4 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.02) {
+				Sleep(1000);
+				tw->runButton->value(0);
+				tw->speed->value(1);
+				tw->m_Track.trainU = 0.0f;
+				tw->m_Track.lane = 0;
+				tw->m_Track.switchLane = 0.0f;
+				tw->m_Track.jumpingState = -1;
+				tw->trainView->camera_movement_state = 0;
+				tw->trainView->camera_movement_index = 0;
+				tw->trainView->door_offset = 0.0f;
+
+				if (!tw->debug_mode->value())
+				{
+					tw->trainView->switchChapter(0);
+				}
+			}
+
 			//player obstacle collision
 			for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 				if (tw->m_Track.collision(obstacle)) {
