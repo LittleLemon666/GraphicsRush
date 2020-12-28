@@ -64,24 +64,37 @@ class CTrack {
 		//###################################################################
 		// the state of the train - basically, all I need to remember is where
 		// it is in parameter space
+
+		//player position
 		float trainU;
-		int lane;
 		float switchLane;
-		vector<float> airbornePosition = { 0.36f, 0.5f, 0.64f, 0.74f, 0.84f, 0.9f, 0.96f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f, 
-			1.0f, 1.0f, 0.98f, 0.96f, 0.9f, 0.84f, 0.74f, 0.64f, 0.5f, 0.36f, 0.0f };
+		int lane;
 		int jumpingState;
+		vector<float> airbornePosition = { 
+			0.36f, 0.5f, 0.64f, 0.74f, 0.84f, 0.9f, 0.96f, 0.98f, 1.0f, 1.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 0.98f, 0.96f, 0.9f, 0.84f, 0.74f, 0.64f, 0.5f, 0.36f, 0.0f };
+
+		//obstacle
 		vector<Obstacle> obstacles = {};
-		vector<Money> money = {};
 		int num_of_obstacles = 10;
-		int num_of_money = 100;
 		bool collision(int obstacle);
+
+		//money
+		vector<Money> money = {};
+		int num_of_money = 100;
 		bool collection(int id);
+
+		//display
 		int score = 0;
 		int money_collected = 0;
+
+		//player-boss encounters
 		Player player;
 		bool first_P2 = true;
 		bool first_P5 = true;
 		bool miniBoss = false;
+
+		//track Textures
 		Texture2D *defaultTrack = nullptr;
 		Texture2D* leftTrack = nullptr;
 		Texture2D* middleTrack = nullptr;
