@@ -1660,12 +1660,13 @@ draw()
 	glEnable(GL_DEPTH_TEST);
 
 	// set linstener position 
+	/*
 	if (selectedCube >= 0)
 		alListener3f(AL_POSITION,
 			m_pTrack->points[selectedCube].pos.x,
 			m_pTrack->points[selectedCube].pos.y,
 			m_pTrack->points[selectedCube].pos.z);
-	else
+	else*/
 		alListener3f(AL_POSITION,
 			this->source_pos.x,
 			this->source_pos.y,
