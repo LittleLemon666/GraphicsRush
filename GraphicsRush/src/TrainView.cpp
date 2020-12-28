@@ -1133,6 +1133,7 @@ void TrainView::loadObjects() {
 	if (!load_game_objects)
 	{
 		Obstacle::addObstacleModel(obstacle_obj_path, obstacle_texture_path);
+		Obstacle::loadObstacleModelInHpp();
 		Money::addMoneyModel(money_obj_path, money_texture_path);
 		load_game_objects = true;
 	}

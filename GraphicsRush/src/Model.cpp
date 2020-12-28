@@ -9,8 +9,128 @@ Model()
 Model::
 Model(const std::string fileName)
 {
-	loadOBJ(fileName);
-	VBOIndex(vertices, uvs, normals);
+	if (fileName == "CUBE")
+	{
+		indexed_vertices = {
+			glm::vec3(-0.5f ,0.0f , -0.5f),
+			glm::vec3(-0.5f ,0.0f , 0.5f),
+			glm::vec3(0.5f ,0.0f ,0.5f),
+			glm::vec3(0.5f ,0.0f ,-0.5f),
+
+			glm::vec3(-0.5f, 0.0f, -0.5f),
+			glm::vec3(-0.5f, 1.0f, -0.5f),
+			glm::vec3(-0.5f, 1.0f, 0.5f),
+			glm::vec3(-0.5f, 0.0f, 0.5f),
+
+			glm::vec3(-0.5f, 1.0f, 0.5f),
+			glm::vec3(0.5f, 1.0f, 0.5f),
+			glm::vec3(0.5f, 0.0f, 0.5f),
+			glm::vec3(-0.5f, 0.0f, 0.5f),
+
+			glm::vec3(0.5f, 0.0f, -0.5f),
+			glm::vec3(0.5f, 1.0f, -0.5f),
+			glm::vec3(0.5f, 1.0f, 0.5f),
+			glm::vec3(0.5f, 0.0f, 0.5f),
+
+			glm::vec3(-0.5f, 1.0f, -0.5f),
+			glm::vec3(0.5f, 1.0f, -0.5f),
+			glm::vec3(0.5f, 0.0f, -0.5f),
+			glm::vec3(-0.5f, 0.0f, -0.5f),
+
+			glm::vec3(-0.5f ,1.0f , -0.5f),
+			glm::vec3(-0.5f ,1.0f , 0.5f),
+			glm::vec3(0.5f ,1.0f ,0.5f),
+			glm::vec3(0.5f ,1.0f ,-0.5f)
+		};
+		indexed_normals = {
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		};
+		indexed_uvs = {
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f)
+		};
+		indices = {
+			0, 1, 2,
+			0, 2, 3,
+
+			6, 7, 4,
+			6, 4, 5,
+
+			8, 9, 10,
+			8, 10, 11,
+
+			12, 13, 14,
+			12, 14, 15,
+
+			16, 17, 18,
+			16, 18, 19,
+
+			20, 21, 22,
+			20, 22, 23
+		};
+
+		VAOProcess();
+	}
+	else
+	{
+		loadOBJ(fileName);
+		VBOIndex(vertices, uvs, normals);
+	}
 }
 
 Model::
@@ -188,6 +308,12 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 		}
 	}
 
+	VAOProcess();
+}
+
+void Model::
+VAOProcess()
+{
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 	// Load it into a VBO
