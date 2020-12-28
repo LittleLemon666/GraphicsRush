@@ -148,9 +148,9 @@ class TrainView : public Fl_Gl_Window
 		Shader* water_surface_shader = nullptr;
 		Shader* shadow_shader = nullptr;
 		Shader* choose_shader = nullptr;
-		void initPath();
 		void loadObjects();
 		void loadMiniBoss();
+		void initPath();
 		void initSkybox();
 		void initDoor();
 		bool initText();
