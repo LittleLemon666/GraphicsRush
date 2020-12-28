@@ -1012,15 +1012,22 @@ drawWorld()
 	drawShop();
 
 	//use money to check if world is loaded
-	if ((int)m_pTrack->money.size() == 0 && !(m_pTrack->first_P2 && chapter == 1) && !(m_pTrack->first_P5 && chapter == 4)) {
+	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
+	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
+	
+	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && (int)m_pTrack->money.size() == 0) {
 		loadObjects();
 		m_pTrack->miniBoss = false;
 		MiniBoss::clipping = -99;
+		m_pTrack->mainBoss = false;
 	}
-	else if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 
 	drawObstacles();
 	if (m_pTrack->miniBoss) drawMiniBoss();
+	if (m_pTrack->mainBoss) {
+		drawMainBoss();
+		drawMultiBall();
+	}
 	drawMoney();
 
 	drawSkybox();
@@ -1181,7 +1188,9 @@ void TrainView::loadObjects() {
 void TrainView::loadMiniBoss() {
 	m_pTrack->miniBoss = true;
 }
-
+void TrainView::loadMainBoss() {
+	m_pTrack->mainBoss = true;
+}
 void TrainView::
 drawObstacles(bool doShadow) {
 	if (!doShadow)
@@ -1279,6 +1288,41 @@ void TrainView::drawMiniBoss() {
 	glVertex3f(miniBossPos.x + miniBossCross.x, miniBossPos.y + miniBossCross.y, miniBossPos.z + miniBossCross.z);
 	glVertex3f(miniBossPos.x - miniBossUp.x, miniBossPos.y - miniBossUp.y, miniBossPos.z - miniBossUp.z);
 	glVertex3f(miniBossPos.x - miniBossCross.x, miniBossPos.y - miniBossCross.y, miniBossPos.z - miniBossCross.z);
+	glEnd();
+}
+
+void TrainView::drawMainBoss() {
+	vec3 mainBossPos, mainBossForward, mainBossUp, mainBossCross;
+	gmt.calculateAll(m_pTrack->trainU + 0.4, mainBossPos, mainBossForward, mainBossUp, mainBossCross);
+	mainBossForward = normalize(mainBossForward);
+	mainBossUp = normalize(mainBossUp);
+	mainBossCross = normalize(mainBossCross);
+	mainBossPos += mainBossUp * 10.0f;
+
+	glBegin(GL_QUADS);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	glVertex3f(mainBossPos.x + mainBossUp.x, mainBossPos.y + mainBossUp.y, mainBossPos.z + mainBossUp.z);
+	glVertex3f(mainBossPos.x + mainBossCross.x, mainBossPos.y + mainBossCross.y, mainBossPos.z + mainBossCross.z);
+	glVertex3f(mainBossPos.x - mainBossUp.x, mainBossPos.y - mainBossUp.y, mainBossPos.z - mainBossUp.z);
+	glVertex3f(mainBossPos.x - mainBossCross.x, mainBossPos.y - mainBossCross.y, mainBossPos.z - mainBossCross.z);
+	glEnd();
+}
+
+void TrainView::drawMultiBall() {
+	vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
+	gmt.calculateAll(m_pTrack->trainU + MainBoss::multiBallForward, multiBallPos, multiBallForward, multiBallUp, multiBallCross);
+	multiBallForward = normalize(multiBallForward);
+	multiBallUp = normalize(multiBallUp);
+	multiBallCross = normalize(multiBallCross);
+	multiBallPos += multiBallUp * MainBoss::multiBallUp;
+	multiBallPos += multiBallCross * MainBoss::multiBallCross * 5.0f;
+
+	glBegin(GL_QUADS);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(multiBallPos.x + multiBallUp.x, multiBallPos.y + multiBallUp.y, multiBallPos.z + multiBallUp.z);
+	glVertex3f(multiBallPos.x + multiBallCross.x, multiBallPos.y + multiBallCross.y, multiBallPos.z + multiBallCross.z);
+	glVertex3f(multiBallPos.x - multiBallUp.x, multiBallPos.y - multiBallUp.y, multiBallPos.z - multiBallUp.z);
+	glVertex3f(multiBallPos.x - multiBallCross.x, multiBallPos.y - multiBallCross.y, multiBallPos.z - multiBallCross.z);
 	glEnd();
 }
 
