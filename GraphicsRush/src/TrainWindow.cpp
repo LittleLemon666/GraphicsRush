@@ -35,7 +35,7 @@
 #include "TrainView.H"
 #include "CallBacks.H"
 
-
+#include "Object.h"
 
 //************************************************************************
 //
@@ -215,8 +215,11 @@ advanceTrain(float dir)
 		if (m_Track.trainU < 1 && trainView->screen_brightness < 1.0f) trainView->screen_brightness += 0.1f;
 		if ((int)m_Track.trainU >= (int)m_Track.points.size())
 		{
+			if (objectChapter == 1) m_Track.first_P2 = false;
+			if (objectChapter == 4) m_Track.first_P5 = false;
 			m_Track.trainU -= (int)m_Track.points.size();
 			trainView->switchChapter(trainView->chapter + 1);
+			objectChapter = trainView->chapter;
 		}
 	}
 	//#####################################################################

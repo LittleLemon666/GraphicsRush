@@ -1,4 +1,5 @@
 #include "Object.H"
+#include <time.h>
 
 std::vector<Model*> Object::obstacle_obj;
 std::vector<Texture2D> Object::obstacle_texture;
@@ -13,7 +14,7 @@ Object::Object(float pos, int _lane, int _height) {
 
 Obstacle::
 Obstacle(float pos, int _lane, int _height) : Object(pos, _lane, _height) {
-
+	
 }
 
 void Obstacle::
@@ -22,7 +23,11 @@ addObstacleModel(std::string obj_path, std::string texture_path)
 	if (gladLoadGL())
 	{
 		obstacle_obj.push_back(new Model(obj_path));
-		obstacle_texture.push_back(Texture2D(texture_path.c_str()));
+		for (int _chapter = 0; _chapter < 4; _chapter++) {
+			for (int error = 0; error < 4; error++) {
+				obstacle_texture.push_back(Texture2D(obstacleTextures[_chapter][error].c_str()));
+			}
+		}
 	}
 }
 
