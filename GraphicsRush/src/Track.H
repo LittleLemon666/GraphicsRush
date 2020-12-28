@@ -26,6 +26,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 using std::vector; // avoid having to say std::vector all of the time
 
@@ -34,6 +35,7 @@ using std::vector; // avoid having to say std::vector all of the time
 
 #include "Object.H"
 #include "Player.H"
+#include "RenderUtilities/Texture.h"
 
 class CTrack {
 	public:		
@@ -77,4 +79,12 @@ class CTrack {
 		int score = 0;
 		int money_collected = 0;
 		Player player;
+		bool first_P2 = true;
+		bool first_P5 = true;
+		bool miniBoss = false;
+		Texture2D *defaultTrack = nullptr;
+		Texture2D* leftTrack = nullptr;
+		Texture2D* middleTrack = nullptr;
+		Texture2D* rightTrack = nullptr;
+
 };

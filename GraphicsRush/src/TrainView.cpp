@@ -38,6 +38,7 @@
 #include <stb/stb_image.h>
 
 using namespace glm;
+static unsigned int clipTime = 0;
 
 #ifdef EXAMPLE_SOLUTION
 #	include "TrainExample/TrainExample.H"
@@ -237,6 +238,12 @@ handle(int event)
 /*********************NEW ADDITIONS*********************/
 void TrainView::
 initPath() {
+	if (!m_pTrack->defaultTrack) {
+		m_pTrack->defaultTrack = new Texture2D("../GraphicsRush/Images/tracks/default.png");
+		m_pTrack->leftTrack = new Texture2D("../GraphicsRush/Images/tracks/left_clip.png");
+		m_pTrack->middleTrack = new Texture2D("../GraphicsRush/Images/tracks/middle_clip.png");
+		m_pTrack->rightTrack = new Texture2D("../GraphicsRush/Images/tracks/right_clip.png");
+	}
 	path->vertices = {};
 	path->normal = {};
 	path->texture_coordinate = {};
@@ -846,9 +853,15 @@ drawWorld()
 	drawDoor();
 
 	//use money to check if world is loaded
-	if ((int)m_pTrack->money.size() == 0) loadObjects();
+	if ((int)m_pTrack->money.size() == 0 && !(m_pTrack->first_P2 && chapter == 1) && !(m_pTrack->first_P5 && chapter == 4)) {
+		loadObjects();
+		m_pTrack->miniBoss = false;
+		MiniBoss::clipping = -99;
+	}
+	else if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 
 	drawObstacles();
+	if (m_pTrack->miniBoss) drawMiniBoss();
 	drawMoney();
 
 	drawSkybox();
@@ -976,6 +989,10 @@ void TrainView::loadObjects() {
 	}
 };
 
+void TrainView::loadMiniBoss() {
+	m_pTrack->miniBoss = true;
+}
+
 void TrainView::
 drawObstacles() {
 	this->basic_shader->Use();
@@ -1042,6 +1059,22 @@ void TrainView::drawMoney() {
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 };
+
+void TrainView::drawMiniBoss() {
+	vec3 miniBossPos, miniBossForward, miniBossUp, miniBossCross;
+	gmt.calculateAll(m_pTrack->trainU + 0.4, miniBossPos, miniBossForward, miniBossUp, miniBossCross);
+	miniBossForward = normalize(miniBossForward);
+	miniBossUp = normalize(miniBossUp);
+	miniBossCross = normalize(miniBossCross);
+	miniBossPos += miniBossUp * 10.0f;
+	glBegin(GL_QUADS);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glVertex3f(miniBossPos.x + miniBossUp.x, miniBossPos.y + miniBossUp.y, miniBossPos.z + miniBossUp.z);
+	glVertex3f(miniBossPos.x + miniBossCross.x, miniBossPos.y + miniBossCross.y, miniBossPos.z + miniBossCross.z);
+	glVertex3f(miniBossPos.x - miniBossUp.x, miniBossPos.y - miniBossUp.y, miniBossPos.z - miniBossUp.z);
+	glVertex3f(miniBossPos.x - miniBossCross.x, miniBossPos.y - miniBossCross.y, miniBossPos.z - miniBossCross.z);
+	glEnd();
+}
 
 void TrainView::
 drawSkybox()
@@ -1242,10 +1275,32 @@ draw()
 			load_chapter = true;
 		}
 
+		static std::vector<std::string> tracks = {
+			"../GraphicsRush/Images/tracks/default.png"
+			, "../GraphicsRush/Images/tracks/left_clip.png"
+			, "../GraphicsRush/Images/tracks/middle_clip.png"
+			, "../GraphicsRush/Images/tracks/right_clip.png" };
+		
 		initPath();
 
-		if (!this->path_texture)
-			this->path_texture = new Texture2D("../GraphicsRush/Images/tracks/default.png");
+		if (MiniBoss::clipping == -1) {
+			this->path_texture = m_pTrack->leftTrack;
+		}
+		else if (MiniBoss::clipping == 0) {
+			this->path_texture = m_pTrack->middleTrack;
+		}
+		else if (MiniBoss::clipping == 1) {
+			this->path_texture = m_pTrack->rightTrack;
+		}
+		else if (MiniBoss::clipping == -99) {
+			this->path_texture = m_pTrack->defaultTrack;
+		}
+
+		if (m_pTrack->miniBoss == true && clock() - clipTime > CLOCKS_PER_SEC * 3) {
+			if (MiniBoss::clipping != -99) MiniBoss::clipping = -99;
+			else MiniBoss::clipping = (rand() % 3) - 1;
+			clipTime = clock();
+		}
 
 		if (!this->player_texture)
 			this->player_texture = new Texture2D(player_texture_path.c_str());
