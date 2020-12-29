@@ -117,6 +117,8 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P5.txt");
 	for (auto it = chapter_path_file.begin(); it != chapter_path_file.end(); it++)
 		chapter_path_file_name.push_back(getFileName(*it));
+
+	point_light.light_position = sun_pos;
 }
 
 //************************************************************************
@@ -1013,6 +1015,8 @@ drawWorld()
 
 	drawEarth();
 
+	drawSun();
+
 	//use money to check if world is loaded
 	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
@@ -1071,6 +1075,7 @@ drawPath(bool doShadow) {
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 		}
 		else
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1127,6 +1132,7 @@ drawPlayer(bool doShadow) {
 		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 1);
 		this->shadow->bind(2);
 		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 2);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	}
 	else
 		glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1223,6 +1229,7 @@ drawObstacles(bool doShadow) {
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 		}
 		else	
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1264,6 +1271,7 @@ void TrainView::drawMoney(bool doShadow) {
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 		}
 		else
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1393,6 +1401,7 @@ drawEarth()
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, vec3(-75, 5, 200));
+	model_matrix = rotate(model_matrix, money_rotate / 20.0f, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(130, 130, 130));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
@@ -1401,7 +1410,31 @@ drawEarth()
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 	this->shadow->bind(1);
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	earth_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawSun()
+{
+	if (chapter != 4) return; // don't draw the door after beginning camera movement
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, sun_pos);
+	model_matrix = rotate(model_matrix, money_rotate / 40.0f, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(450, 450, 450));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	sun_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	sun_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -1538,6 +1571,16 @@ draw()
 		glBufferData(GL_UNIFORM_BUFFER, this->dir_light_properties->size, NULL, GL_STATIC_DRAW);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+		if (!this->point_light_properties)
+		{
+			this->point_light_properties = new UBO();
+			glGenBuffers(1, &this->point_light_properties->ubo);
+		}
+		this->point_light_properties->size = 128; // 16bytes * 8
+		glBindBuffer(GL_UNIFORM_BUFFER, this->point_light_properties->ubo);
+		glBufferData(GL_UNIFORM_BUFFER, this->point_light_properties->size, NULL, GL_STATIC_DRAW);
+		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 		/*********************NEW ADDITIONS*********************/
 		if (!this->path) this->path = new ShaderInfo;
 		//add info for each track between control points
@@ -1586,6 +1629,9 @@ draw()
 
 		if (!this->earth_texture)
 			this->earth_texture = new Texture2D(earth_texture_path.c_str());
+
+		if (!this->sun_texture)
+			this->sun_texture = new Texture2D(sun_texture_path.c_str());
 
 		if (!this->shop)
 			this->shop = new Shop;
@@ -1675,6 +1721,9 @@ draw()
 
 		if (!earth_obj)
 			earth_obj = new Model(earth_obj_path);
+
+		if (!sun_obj)
+			sun_obj = new Model(sun_obj_path);
 
 		if (!door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
@@ -1769,6 +1818,12 @@ draw()
 	glBindBufferRange(
 		GL_UNIFORM_BUFFER, /*binding point*/3, this->dir_light_properties->ubo, 0, this->dir_light_properties->size);
 
+	setPointLightUBO();
+	glBindBufferRange(
+		GL_UNIFORM_BUFFER, /*binding point*/4, this->point_light_properties->ubo, 0, this->point_light_properties->size);
+
+	switchLightMode();
+	
 	//renderDepthMapBegin();
 
 	//for render depth map
@@ -2117,6 +2172,34 @@ setDirLightUBO() // need to behide setViewerUBO()
 	glBufferSubData(GL_UNIFORM_BUFFER, 48, sizeof(vec3), &dir_light.light_diffuse[0]);
 	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(vec3), &dir_light.light_specular[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void TrainView::
+setPointLightUBO() // need to behide setViewerUBO()
+{
+	glBindBuffer(GL_UNIFORM_BUFFER, this->point_light_properties->ubo); // all data with 16 bytes in GLSL
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &point_light.shininess);
+	glBufferSubData(GL_UNIFORM_BUFFER, 16, sizeof(vec3), &point_light.light_position[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 32, sizeof(vec3), &point_light.light_ambient[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 48, sizeof(vec3), &point_light.light_diffuse[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 64, sizeof(vec3), &point_light.light_specular[0]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 80, sizeof(float), &point_light.constant);
+	glBufferSubData(GL_UNIFORM_BUFFER, 96, sizeof(float), &point_light.linear);
+	glBufferSubData(GL_UNIFORM_BUFFER, 112, sizeof(float), &point_light.quadratic);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void TrainView::
+switchLightMode()
+{
+	if (chapter == 4)
+	{
+		light_mode = Lighting::LPOINT;
+	}
+	else
+	{
+		light_mode = Lighting::LDIR;
+	}
 }
 
 void TrainView::

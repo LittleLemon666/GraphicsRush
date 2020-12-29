@@ -13,6 +13,7 @@ uniform vec3 u_color;
 
 uniform sampler2D u_texture;
 uniform sampler2D shadowMap;
+uniform int light_mode;
 
 layout (std140, binding = 2) uniform Viewer
 {
@@ -28,42 +29,58 @@ layout (std140, binding = 3) uniform Dir_light
     vec3 specular;      //16
 }dir_light;
 
-//vec3 CalcDirLight(vec3 normal, vec3 viewDir)
-//{
-//    vec3 color = vec3(texture(u_texture, f_in.texture_coordinate));
-//
-//    vec3 lightDir = normalize(-dir_light.direction);
-//    // diffuse shading
-//    float diff = max(dot(normal, lightDir), 0.0);
-//    // specular shading
-//    vec3 reflectDir = reflect(-lightDir, normal);
-//    float spec = pow(max(dot(viewDir, reflectDir), 0.0), dir_light.shininess);
-//    // combine results
-//    vec3 ambient  = dir_light.ambient  * vec3(texture(u_texture, f_in.texture_coordinate));
-//    vec3 diffuse  = dir_light.diffuse  * diff;
-//    vec3 specular = dir_light.specular * spec;
-//    return (ambient + diffuse + specular) * color;
-//}
+layout (std140, binding = 4) uniform Point_light
+{
+    float shininess;    //16
+    vec3 position;      //16
+    vec3 ambient;       //16
+    vec3 diffuse;       //16
+    vec3 specular;      //16
+    float constant;     //16
+    float linear;       //16
+    float quadratic;    //16
+}point_light;
 
 vec3 CalcDirLight(vec3 normal, vec3 viewDir)
 {
     vec3 color = texture(u_texture, f_in.texture_coordinate).rgb;
     normal = normalize(normal);
-    vec3 lightColor = vec3(0.7);
     // ambient
-    vec3 ambient = 0.7 * color;
+    vec3 ambient = dir_light.ambient * color;
     // diffuse
     vec3 lightDir = normalize(dir_light.direction);
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuse = diff * dir_light.diffuse;
     // specular
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  
-    spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * lightColor;    
-    // calculate shadow                    
+    spec = pow(max(dot(normal, halfwayDir), 0.0), dir_light.shininess);
+    vec3 specular = spec * dir_light.specular;              
     return (ambient + diffuse + specular) * color;
+}
+
+vec3 CalcPointLight(vec3 normal, vec3 viewDir)
+{
+    vec3 color = texture(u_texture, f_in.texture_coordinate).rgb;
+    normal = normalize(normal);
+    // ambient
+    vec3 ambient = point_light.ambient;
+    // diffuse
+    vec3 lightDir = normalize(point_light.position - f_in.position);
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * point_light.diffuse;
+    // specular
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(normal, reflectDir), 0.0), point_light.shininess);
+    vec3 specular = spec * point_light.specular;
+
+    // attenuation
+    float dist = length(point_light.position - f_in.position) / 2000.0f; //scaling all world
+    float attenuation = 1.0 / (1.0 + point_light.linear * dist + point_light.quadratic * (dist * dist));
+    // combine results
+                   
+    return (ambient + diffuse + specular) * color * attenuation;
 }
 
 //float ShadowCalculation(vec4 fragPosLightSpace)
@@ -105,6 +122,10 @@ void main()
 {   
     vec3 viewDir = normalize(viewer.view_pos - f_in.position);
 //    float shadow = ShadowCalculation(f_in.frag_pos_light_space);
-    vec3 color = CalcDirLight(f_in.normal, viewDir);
+    vec3 color = vec3(0.0f);
+    if (light_mode == 0)
+        color += CalcDirLight(f_in.normal, viewDir);
+    else if (light_mode == 1)
+        color += CalcPointLight(f_in.normal, viewDir);
     f_color = vec4(color, 1.0f);
 }

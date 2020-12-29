@@ -84,6 +84,12 @@ enum Chooser
 	CGAME
 };
 
+enum Lighting
+{
+	LDIR,	// only directional light
+	LPOINT	// only point light
+};
+
 class TrainView : public Fl_Gl_Window
 {
 	public:
@@ -126,6 +132,7 @@ class TrainView : public Fl_Gl_Window
 		UBO* skybox_matrices = nullptr; // bind 1
 		UBO* camera_properties = nullptr; // bind 2
 		UBO* dir_light_properties = nullptr; // bind 3
+		UBO* point_light_properties = nullptr; // bind 4
 
 		//OpenAL
 		glm::vec3 source_pos;
@@ -165,6 +172,8 @@ class TrainView : public Fl_Gl_Window
 		void setLightSpaceMatrix();
 		void initScreenQuad();
 		void setDirLightUBO();
+		void setPointLightUBO();
+		void switchLightMode();
 		void setCameraUBO();
 		void renderChooseBegin();
 		void renderChooseEnd();
@@ -183,6 +192,7 @@ class TrainView : public Fl_Gl_Window
 		void drawSkybox();
 		void drawDoor();
 		void drawEarth();
+		void drawSun();
 		void drawScreenQuad();
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
@@ -239,12 +249,24 @@ class TrainView : public Fl_Gl_Window
 
 		struct DirLight
 		{
-			float shininess = 32.0f;
+			float shininess = 64.0f;
 			vec3 light_direction = vec3(1.0, -1.0, 1.0);
-			vec3 light_ambient = vec3(0.5, 0.5, 0.5);
+			vec3 light_ambient = vec3(0.8, 0.8, 0.8);
 			vec3 light_diffuse = vec3(0.95, 0.95, 0.95);
 			vec3 light_specular = vec3(1.0, 1.0, 1.0);
 		}dir_light;
+
+		struct PointLight
+		{
+			float shininess = 64.0f;
+			float constant = 1.0f;
+			float linear = 0.09f;
+			float quadratic = 0.0032f;
+			vec3 light_position;
+			vec3 light_ambient = vec3(0.8f, 0.8f, 0.8f);
+			vec3 light_diffuse = vec3(0.95f, 0.95f, 0.95f);
+			vec3 light_specular = vec3(1.0f, 1.0f, 1.0f);
+		}point_light;
 
 		vec3 camera_pos;
 
@@ -261,4 +283,12 @@ class TrainView : public Fl_Gl_Window
 		std::string earth_obj_path = "SPHERE";
 		Texture2D* earth_texture = nullptr;
 		std::string earth_texture_path = "../GraphicsRush/Objects/earth.bmp";
+
+		Model* sun_obj = nullptr;
+		std::string sun_obj_path = "SPHERE";
+		Texture2D* sun_texture = nullptr;
+		std::string sun_texture_path = "../GraphicsRush/Objects/sun.jpg";
+
+		vec3 sun_pos = vec3(-580.0f, 50.0f, 530.0f);
+		int light_mode = Lighting::LDIR;
 };
