@@ -40,7 +40,7 @@ class CTrack;
 #include "ShaderInfo.h"
 #include "GMTPipeline.h"
 #include "Model.H"
-#include "MiniBoss.H"
+#include "Boss.H"
 #include "Shop.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
@@ -150,6 +150,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* choose_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
+		void loadMainBoss();
 		void initPath();
 		void initSkybox();
 		void initDoor();
@@ -177,6 +178,8 @@ class TrainView : public Fl_Gl_Window
 		void drawObstacles(bool doShadow = false);
 		void drawMoney(bool doShadow = false);
 		void drawMiniBoss();
+		void drawMainBoss();
+		void drawMultiBall();
 		void drawSkybox();
 		void drawDoor();
 		void drawEarth();

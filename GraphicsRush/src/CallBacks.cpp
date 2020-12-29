@@ -23,7 +23,7 @@
 #include "TrainWindow.H"
 #include "TrainView.H"
 #include "CallBacks.H"
-#include "MiniBoss.H"
+#include "Boss.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -182,10 +182,50 @@ void runButtonCB(TrainWindow* tw)
 					}
 				}
 
+				//player multiball collision
+				if (MainBoss::multiBallForward < 0.01 
+					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
+					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f) {
+					Sleep(1000);
+					tw->runButton->value(0);
+					tw->speed->value(1);
+					tw->m_Track.trainU = 0.0f;
+					tw->m_Track.lane = 0;
+					tw->m_Track.switchLane = 0.0f;
+					tw->m_Track.jumpingState = -1;
+					MainBoss::multiBallForward = 0.4f;
+					tw->trainView->camera_movement_state = 0;
+					tw->trainView->camera_movement_index = 0;
+					tw->trainView->door_offset = 0.0f;
+
+					if (!tw->debug_mode->value())
+					{
+						tw->trainView->switchChapter(0);
+					}
+				}
+
 				//miniBoss movement
 				if (tw->m_Track.miniBoss) {
 					if (MiniBoss::bossTarget < MiniBoss::bossLane) MiniBoss::bossLane -= 0.05;
 					if (MiniBoss::bossTarget > MiniBoss::bossLane) MiniBoss::bossLane += 0.05;
+				}
+
+				//mainBoss projectile movement
+				float difference = 0.02;
+				if (tw->m_Track.mainBoss) {
+					if (abs(MainBoss::multiBallForward - MainBoss::targetForward) < difference * 0.15f
+						&& abs(MainBoss::multiBallUp - MainBoss::targetUp) < difference * 5.0f
+						&& abs(MainBoss::multiBallCross - MainBoss::targetCross) < difference) {
+						MainBoss::targetForward = (float)(rand() % 2) * 0.15f;
+						MainBoss::targetUp = (float)(rand() % 2) * 5.0f + 5.0f;
+						MainBoss::targetCross = (float)((rand() % 3) - 1);
+					}
+					if (MainBoss::multiBallForward > MainBoss::targetForward) MainBoss::multiBallForward -= difference * 0.15f;
+					else MainBoss::multiBallForward += difference * 0.15f;
+					if (MainBoss::multiBallUp > MainBoss::targetUp) MainBoss::multiBallUp -= difference * 5.0f;
+					else MainBoss::multiBallUp += difference * 5.0f;
+					if (MainBoss::multiBallCross > MainBoss::targetCross) MainBoss::multiBallCross -= difference;
+					else MainBoss::multiBallCross += difference;
 				}
 
 				//player obstacle collision
