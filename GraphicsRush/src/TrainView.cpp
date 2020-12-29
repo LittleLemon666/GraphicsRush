@@ -949,6 +949,55 @@ decodeChoose(vec3 uv)
 }
 
 void TrainView::
+renderEnvironment()
+{
+	if (!environment_FBO)
+		environment_FBO = new FBO;
+
+	glGenFramebuffers(1, &environment_FBO->fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, environment_FBO->fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glGenRenderbuffers(1, &environment_FBO->rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, environment_FBO->rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, environment->getSize().x, environment->getSize().y); //GL_DEPTH_COMPONENT24
+	// attach it
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, environment_FBO->rbo);
+
+	glViewport(0, 0, environment->getSize().x, environment->getSize().y);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(90, 1, .1, 1000);
+	glm::vec3 cameraPosT = viewer_pos;
+	viewer_pos = environment->getCameraPos();
+
+	for (int i = 0; i < 6; i++)
+	{
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, environment->getID(), 0); //+i
+
+		// clear
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		environment->switchToFace(i);
+
+		drawWorld();
+	}
+
+	viewer_pos = cameraPosT;
+
+	//unbind
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, w(), h());
+
+	arcball.setProjection(false);
+
+	glad_glDeleteRenderbuffers(1, &environment_FBO->rbo);
+	glad_glDeleteFramebuffers(1, &environment_FBO->fbo);
+}
+
+void TrainView::
 drawShop(bool buttom)
 {
 	if (game_state != CLOBBY) return; // don't draw the shop if not in lobby
@@ -1037,23 +1086,6 @@ drawWorld()
 	drawMoney();
 
 	drawSkybox();
-
-	if (game_state == CLOBBY)
-	{
-		char shop_info[20];
-		sprintf(shop_info, "140.118.127.125");
-		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
-	}
-	else if (game_state == CGAME)
-	{
-		char score_info[20];
-		sprintf(score_info, "Score:  %010d", m_pTrack->score);
-		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
-
-		char money_info[20];
-		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
-		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
-	}
 }
 
 void TrainView::
@@ -1319,21 +1351,18 @@ void TrainView::drawMainBoss() {
 }
 
 void TrainView::drawMultiBall() {
-	vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
-	gmt.calculateAll(m_pTrack->trainU + MainBoss::multiBallForward, multiBallPos, multiBallForward, multiBallUp, multiBallCross);
-	multiBallForward = normalize(multiBallForward);
-	multiBallUp = normalize(multiBallUp);
-	multiBallCross = normalize(multiBallCross);
-	multiBallPos += multiBallUp * MainBoss::multiBallUp;
-	multiBallPos += multiBallCross * MainBoss::multiBallCross * 5.0f;
-
-	glBegin(GL_QUADS);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(multiBallPos.x + multiBallUp.x, multiBallPos.y + multiBallUp.y, multiBallPos.z + multiBallUp.z);
-	glVertex3f(multiBallPos.x + multiBallCross.x, multiBallPos.y + multiBallCross.y, multiBallPos.z + multiBallCross.z);
-	glVertex3f(multiBallPos.x - multiBallUp.x, multiBallPos.y - multiBallUp.y, multiBallPos.z - multiBallUp.z);
-	glVertex3f(multiBallPos.x - multiBallCross.x, multiBallPos.y - multiBallCross.y, multiBallPos.z - multiBallCross.z);
-	glEnd();
+	this->environment_shader->Use();
+	mat4 model_matrix = inverse(lookAt(multiBallPos, multiBallPos + multiBallForward, multiBallUp)); // the player is in a 5.0f height position
+	model_matrix = scale(model_matrix, vec3(5.0f, 5.0f, 5.0f)); // the player is in a 5.0f height position
+	glUniformMatrix4fv(glGetUniformLocation(this->environment_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	environment->bind(0);
+	glUniform1i(glGetUniformLocation(this->environment_shader->Program, "environment_box"), 0);
+	/*glUniform3fv(glGetUniformLocation(this->environment_shader->Program, "environmentCenter"), 1, &multiBallPos[0]);
+	glUniform3fv(glGetUniformLocation(this->environment_shader->Program, "bboxMax"), 1, &(multiBallPos + multiBallForward + multiBallCross + multiBallUp)[0]);
+	glUniform3fv(glGetUniformLocation(this->environment_shader->Program, "bboxMin"), 1, &(multiBallPos - multiBallForward - multiBallCross - multiBallUp)[0]);*/
+	multiball_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 void TrainView::
@@ -1456,6 +1485,27 @@ drawScreenQuad()
 	glUseProgram(0);
 }
 
+void TrainView::
+printText()
+{
+	if (game_state == CLOBBY)
+	{
+		char shop_info[20];
+		sprintf(shop_info, "140.118.127.125");
+		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+	}
+	else if (game_state == CGAME)
+	{
+		char score_info[20];
+		sprintf(score_info, "Score:  %010d", m_pTrack->score);
+		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+		char money_info[20];
+		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
+		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+	}
+}
+
 //************************************************************************
 //
 // * this is the code that actually draws the window
@@ -1530,6 +1580,13 @@ draw()
 				"../GraphicsRush/src/shaders/choose.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/choose.frag");
+
+		if (!this->environment_shader)
+			this->environment_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/environment.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/environment.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -1725,6 +1782,9 @@ draw()
 		if (!sun_obj)
 			sun_obj = new Model(sun_obj_path);
 
+		if (!multiball_obj)
+			multiball_obj = new Model(multiball_obj_path);
+
 		if (!door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
 
@@ -1755,6 +1815,9 @@ draw()
 
 		if (!shadow)
 			shadow = new Shadow();
+
+		if (!environment)
+			environment = new Environment();
 	}
 	else
 		throw std::runtime_error("Could not initialize GLAD!");
@@ -1823,6 +1886,8 @@ draw()
 		GL_UNIFORM_BUFFER, /*binding point*/4, this->point_light_properties->ubo, 0, this->point_light_properties->size);
 
 	switchLightMode();
+
+	initMultiBall();
 	
 	//renderDepthMapBegin();
 
@@ -1838,6 +1903,8 @@ draw()
 	renderScreenBegin();
 
 	drawWorld(); //for rendering to screen
+
+	printText();
 
 	renderScreenEnd();
 
@@ -1930,7 +1997,7 @@ setProjection()
 			up = normalize(up);
 			crossed = normalize(crossed);
 			//set look at (trainPosition(viewerPosition) -> where to look at -> up)
-			vec3 viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
+			viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
 			if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
 				if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
 				else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
@@ -2160,6 +2227,20 @@ getFileName(std::string file_path)
 	std::string file_name, file_name_t;
 	while (getline(ss, file_name_t, '/')) file_name = file_name_t;
 	return file_name;
+}
+
+void TrainView::
+initMultiBall()
+{
+	gmt.calculateAll(m_pTrack->trainU + MainBoss::multiBallForward, multiBallPos, multiBallForward, multiBallUp, multiBallCross);
+	multiBallForward = normalize(multiBallForward);
+	multiBallUp = normalize(multiBallUp);
+	multiBallCross = normalize(multiBallCross);
+	multiBallPos += multiBallUp * MainBoss::multiBallUp;
+	multiBallPos += multiBallCross * MainBoss::multiBallCross * 5.0f;
+
+	environment->setCameraPos(multiBallPos);
+	renderEnvironment();
 }
 
 void TrainView::

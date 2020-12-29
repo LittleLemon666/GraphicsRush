@@ -30,6 +30,7 @@
 #include "RenderUtilities/Shader.h"
 #include "RenderUtilities/Texture.h"
 #include "RenderUtilities/Shadow.h"
+#include "RenderUtilities/Environment.h"
 
 // Preclarify for preventing the compiler error
 class TrainWindow;
@@ -155,6 +156,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* water_surface_shader = nullptr;
 		Shader* shadow_shader = nullptr;
 		Shader* choose_shader = nullptr;
+		Shader* environment_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -171,6 +173,7 @@ class TrainView : public Fl_Gl_Window
 		void renderDepthMapEnd(); //may be fault in unsetupShadows
 		void setLightSpaceMatrix();
 		void initScreenQuad();
+		void initMultiBall();
 		void setDirLightUBO();
 		void setPointLightUBO();
 		void switchLightMode();
@@ -179,6 +182,7 @@ class TrainView : public Fl_Gl_Window
 		void renderChooseEnd();
 		void choose(int x, int y);
 		int decodeChoose(vec3 uv);
+		void renderEnvironment();
 		void drawShop(bool buttom = false);
 		void drawChooser();
 		void drawWorld();
@@ -194,12 +198,14 @@ class TrainView : public Fl_Gl_Window
 		void drawEarth();
 		void drawSun();
 		void drawScreenQuad();
+		void printText();
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;
 
 		vec3 train_pos, forward, up;
 		vec3 player_pos, player_forward, player_up;
+		vec3 viewer_pos;
 
 		Model* player_obj = nullptr;
 		std::string player_obj_path = "../GraphicsRush/Objects/pikachu_blender.obj";
@@ -291,4 +297,11 @@ class TrainView : public Fl_Gl_Window
 
 		vec3 sun_pos = vec3(-580.0f, 50.0f, 530.0f);
 		int light_mode = Lighting::LDIR;
+
+		Environment* environment = nullptr;
+		FBO* environment_FBO = nullptr;
+
+		vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
+		Model* multiball_obj = nullptr;
+		std::string multiball_obj_path = "SPHERE";
 };
