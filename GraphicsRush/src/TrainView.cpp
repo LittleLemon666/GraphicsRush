@@ -1011,6 +1011,8 @@ drawWorld()
 
 	drawShop();
 
+	drawEarth();
+
 	//use money to check if world is loaded
 	if ((int)m_pTrack->money.size() == 0 && !(m_pTrack->first_P2 && chapter == 1) && !(m_pTrack->first_P5 && chapter == 4)) {
 		loadObjects();
@@ -1340,6 +1342,27 @@ drawDoor()
 }
 
 void TrainView::
+drawEarth()
+{
+	if (chapter != 4) return; // don't draw the door after beginning camera movement
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, vec3(-75, 5, 200));
+	model_matrix = scale(model_matrix, vec3(130, 130, 130));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	earth_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	earth_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
 drawScreenQuad()
 {
 	this->screen_shader->Use();
@@ -1517,6 +1540,9 @@ draw()
 		if (!this->player_texture)
 			this->player_texture = new Texture2D(player_texture_path.c_str());
 
+		if (!this->earth_texture)
+			this->earth_texture = new Texture2D(earth_texture_path.c_str());
+
 		if (!this->shop)
 			this->shop = new Shop;
 
@@ -1602,6 +1628,9 @@ draw()
 
 		if (!player_obj)
 			player_obj = new Model(player_obj_path);
+
+		if (!earth_obj)
+			earth_obj = new Model(earth_obj_path);
 
 		if (!door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
@@ -1766,7 +1795,7 @@ setProjection()
 
 		//set perspective
 		float aspect = (float)w() / h();
-		gluPerspective(100, aspect, 1, 200);
+		gluPerspective(100, aspect, 1, 500);
 
 		//more OpenGL stuff
 		glMatrixMode(GL_MODELVIEW);

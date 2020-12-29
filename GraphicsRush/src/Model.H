@@ -42,12 +42,6 @@ public:
 
 	void draw();
 
-	void translate(const glm::vec3 move);
-
-	void scaling(const glm::vec3 scale);
-
-	void rotate(const glm::vec3 rotate);
-
 	~Model();
 
 	std::vector<glm::vec3> vertices;

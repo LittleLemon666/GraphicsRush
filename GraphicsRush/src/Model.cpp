@@ -12,35 +12,35 @@ Model(const std::string fileName)
 	if (fileName == "CUBE")
 	{
 		indexed_vertices = {
-			glm::vec3(-0.5f ,0.0f , -0.5f),
-			glm::vec3(-0.5f ,0.0f , 0.5f),
-			glm::vec3(0.5f ,0.0f ,0.5f),
-			glm::vec3(0.5f ,0.0f ,-0.5f),
+			glm::vec3( -0.5f,  0.0f, -0.5f),
+			glm::vec3( -0.5f,  0.0f,  0.5f),
+			glm::vec3(  0.5f,  0.0f,  0.5f),
+			glm::vec3(  0.5f,  0.0f, -0.5f),
 
-			glm::vec3(-0.5f, 0.0f, -0.5f),
-			glm::vec3(-0.5f, 1.0f, -0.5f),
-			glm::vec3(-0.5f, 1.0f, 0.5f),
-			glm::vec3(-0.5f, 0.0f, 0.5f),
+			glm::vec3( -0.5f,  0.0f, -0.5f),
+			glm::vec3( -0.5f,  0.0f,  0.5f),
+			glm::vec3( -0.5f,  1.0f,  0.5f),
+			glm::vec3( -0.5f,  1.0f, -0.5f),
 
-			glm::vec3(-0.5f, 1.0f, 0.5f),
-			glm::vec3(0.5f, 1.0f, 0.5f),
-			glm::vec3(0.5f, 0.0f, 0.5f),
-			glm::vec3(-0.5f, 0.0f, 0.5f),
+			glm::vec3(  0.5f,  0.0f,  0.5f),
+			glm::vec3( -0.5f,  0.0f,  0.5f),
+			glm::vec3( -0.5f,  1.0f,  0.5f),
+			glm::vec3(  0.5f,  1.0f,  0.5f),
 
-			glm::vec3(0.5f, 0.0f, -0.5f),
-			glm::vec3(0.5f, 1.0f, -0.5f),
-			glm::vec3(0.5f, 1.0f, 0.5f),
-			glm::vec3(0.5f, 0.0f, 0.5f),
+			glm::vec3(  0.5f,  0.0f, -0.5f),
+			glm::vec3(  0.5f,  0.0f,  0.5f),
+			glm::vec3(  0.5f,  1.0f,  0.5f),
+			glm::vec3(  0.5f,  1.0f, -0.5f),
 
-			glm::vec3(-0.5f, 1.0f, -0.5f),
-			glm::vec3(0.5f, 1.0f, -0.5f),
-			glm::vec3(0.5f, 0.0f, -0.5f),
-			glm::vec3(-0.5f, 0.0f, -0.5f),
+			glm::vec3(  0.5f,  0.0f, -0.5f),
+			glm::vec3( -0.5f,  0.0f, -0.5f),
+			glm::vec3( -0.5f,  1.0f, -0.5f),
+			glm::vec3(  0.5f,  1.0f, -0.5f),
 
-			glm::vec3(-0.5f ,1.0f , -0.5f),
-			glm::vec3(-0.5f ,1.0f , 0.5f),
-			glm::vec3(0.5f ,1.0f ,0.5f),
-			glm::vec3(0.5f ,1.0f ,-0.5f)
+			glm::vec3(  0.5f,  1.0f,  0.5f),
+			glm::vec3(  0.5f,  1.0f, -0.5f),
+			glm::vec3( -0.5f,  1.0f, -0.5f),
+			glm::vec3( -0.5f,  1.0f,  0.5f),
 		};
 		indexed_normals = {
 			glm::vec3(0.0f, -1.0f, 0.0f),
@@ -123,6 +123,56 @@ Model(const std::string fileName)
 			20, 21, 22,
 			20, 22, 23
 		};
+
+		VAOProcess();
+	}
+	else if (fileName == "SPHERE") // Under construction
+	{
+		int d_angle = 6;
+		unsigned short indices_index = 0;
+		float r = 0.5f;
+		float shpere_x, shpere_y, shpere_z;
+		for (int phi = -90; phi < 90; phi += d_angle)
+		{
+			for (int theta = 0; theta < 360; theta += d_angle)
+			{
+				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
+				shpere_y = r * glm::sin(glm::radians((float)phi));
+				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
+				shpere_y = r * glm::sin(glm::radians((float)phi));
+				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
+				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
+				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+				indices.push_back(indices_index);
+				indices.push_back(indices_index + 1);
+				indices.push_back(indices_index + 2);
+				indices.push_back(indices_index);
+				indices.push_back(indices_index + 2);
+				indices.push_back(indices_index + 3);
+				indices_index += 4;
+			}
+		}
 
 		VAOProcess();
 	}
@@ -376,42 +426,6 @@ getSimilarVertexIndex_fast(PackedVertex& packed, std::map<PackedVertex, unsigned
 		result = it->second;
 		return true;
 	}
-}
-
-void Model::
-translate(const glm::vec3 move)
-{
-    for (int i = 0; i < vertices.size(); ++i)
-        vertices[i] = vertices[i] + move;
-
-    pos = pos + move;
-}
-
-void Model::
-scaling(const glm::vec3 scale)
-{
-    for (int i = 0; i < vertices.size(); ++i)
-    {
-        vertices[i].x *= scale.x;
-        vertices[i].y *= scale.y;
-        vertices[i].z *= scale.z;
-    }
-}
-
-void Model::
-rotate(const glm::vec3 rotate)
-{
-    glm::vec3 eulerAngles(glm::radians(rotate));
-    glm::quat quaternion = glm::quat(eulerAngles);
-    glm::mat4 rotationMatrix = glm::toMat4(quaternion);
-	glm::vec4 vertex, normal;
-    for (int i = 0; i < vertices.size(); ++i)
-    {
-		vertex = glm::vec4(vertices[i], 1);
-		vertices[i] = rotationMatrix * vertex;
-		normal = glm::vec4(normals[i], 1);
-		normals[i] = rotationMatrix * normal;
-    }
 }
 
 Model::

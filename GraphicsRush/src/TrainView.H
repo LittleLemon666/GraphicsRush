@@ -179,6 +179,7 @@ class TrainView : public Fl_Gl_Window
 		void drawMiniBoss();
 		void drawSkybox();
 		void drawDoor();
+		void drawEarth();
 		void drawScreenQuad();
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
@@ -252,4 +253,9 @@ class TrainView : public Fl_Gl_Window
 
 		FBO* chooser_FBO = nullptr;
 		int game_state = CLOBBY;
+
+		Model* earth_obj = nullptr;
+		std::string earth_obj_path = "SPHERE";
+		Texture2D* earth_texture = nullptr;
+		std::string earth_texture_path = "../GraphicsRush/Objects/earth.bmp";
 };

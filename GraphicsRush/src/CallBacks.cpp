@@ -242,7 +242,7 @@ void loadCB(Fl_Widget*, TrainWindow* tw)
 //===========================================================================
 {
 	const char* fname =
-		fl_file_chooser("Pick a Track File", "*.txt", "../GraphicsRush/TrackFiles/default.txt");
+		fl_file_chooser("Pick a Path File", "*.txt", "../GraphicsRush/TrackFiles/default.txt");
 	if (fname) {
 		tw->m_Track.readPoints(fname);
 		std::string file_name = tw->trainView->getFileName(fname);
