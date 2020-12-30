@@ -136,6 +136,11 @@ void runButtonCB(TrainWindow* tw)
 //===========================================================================
 {
 	if (tw->runButton->value()) {	// only advance time if appropriate
+
+		//put away boss
+		if (tw->trainView->chapter != 1 && tw->m_Track.miniBoss) tw->m_Track.miniBoss = false;
+		if (tw->trainView->chapter != 4 && tw->m_Track.mainBoss) tw->m_Track.mainBoss = false;
+
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
 			
 
@@ -163,45 +168,17 @@ void runButtonCB(TrainWindow* tw)
 
 				//player clipping collision
 				if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.1 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.05) {
-					Sleep(1000);
-					tw->runButton->value(0);
-					tw->speed->value(1);
-					tw->m_Track.trainU = 0.0f;
-					tw->m_Track.lane = 0;
-					tw->m_Track.switchLane = 0.0f;
-					tw->m_Track.jumpingState = -1;
+					endReset(tw);
 					MiniBoss::bossLane = 5;
 					MiniBoss::clipping = -99;
-					tw->trainView->camera_movement_state = 0;
-					tw->trainView->camera_movement_index = 0;
-					tw->trainView->door_offset = 0.0f;
-
-					if (!tw->debug_mode->value())
-					{
-						tw->trainView->switchChapter(0);
-					}
 				}
 
 				//player multiball collision
 				if (MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f) {
-					Sleep(1000);
-					tw->runButton->value(0);
-					tw->speed->value(1);
-					tw->m_Track.trainU = 0.0f;
-					tw->m_Track.lane = 0;
-					tw->m_Track.switchLane = 0.0f;
-					tw->m_Track.jumpingState = -1;
+					endReset(tw);
 					MainBoss::multiBallForward = 0.4f;
-					tw->trainView->camera_movement_state = 0;
-					tw->trainView->camera_movement_index = 0;
-					tw->trainView->door_offset = 0.0f;
-
-					if (!tw->debug_mode->value())
-					{
-						tw->trainView->switchChapter(0);
-					}
 				}
 
 				//miniBoss movement
@@ -231,21 +208,7 @@ void runButtonCB(TrainWindow* tw)
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 					if (tw->m_Track.collision(obstacle)) {
-						Sleep(1000);
-						tw->runButton->value(0);
-						tw->speed->value(1);
-						tw->m_Track.trainU = 0.0f;
-						tw->m_Track.lane = 0;
-						tw->m_Track.switchLane = 0.0f;
-						tw->m_Track.jumpingState = -1;
-						tw->trainView->camera_movement_state = 0;
-						tw->trainView->camera_movement_index = 0;
-						tw->trainView->door_offset = 0.0f;
-
-						if (!tw->debug_mode->value())
-						{
-							tw->trainView->switchChapter(0);
-						}
+						endReset(tw);
 						break;
 					}
 				}
@@ -385,4 +348,31 @@ void rmzCB(Fl_Widget*, TrainWindow* tw)
 //===========================================================================
 {
 	rollz(tw, -1);
+}
+
+void endReset(TrainWindow* tw) {
+
+	//let player see how they died
+	Sleep(1000);
+
+	//save score
+	if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
+	tw->m_Track.player.money_total += tw->m_Track.money_collected;
+	tw->m_Track.player.saveFile();
+
+	//reset variables
+	tw->runButton->value(0);
+	tw->speed->value(1);
+	tw->m_Track.trainU = 0.0f;
+	tw->m_Track.lane = 0;
+	tw->m_Track.switchLane = 0.0f;
+	tw->m_Track.jumpingState = -1;
+	tw->trainView->camera_movement_state = 0;
+	tw->trainView->camera_movement_index = 0;
+	tw->trainView->door_offset = 0.0f;
+
+	if (!tw->debug_mode->value())
+	{
+		tw->trainView->switchChapter(0);
+	}
 }
