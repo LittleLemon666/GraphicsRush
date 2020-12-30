@@ -308,5 +308,5 @@ class TrainView : public Fl_Gl_Window
 
 		vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
 		Model* multiball_obj = nullptr;
-		std::string multiball_obj_path = "SPHERE";
+		std::string multiball_obj_path = "CUBEMAPSPHERE";
 };
