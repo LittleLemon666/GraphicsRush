@@ -266,8 +266,7 @@ void runButtonCB(TrainWindow* tw)
 				if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
-			tw->trainView->money_rotate += 0.1f;
-			if (tw->trainView->money_rotate > 360) tw->trainView->money_rotate -= 360;
+			tw->trainView->rotate_objects();
 			lastRedraw = clock();
 			tw->damageMe();
 		}

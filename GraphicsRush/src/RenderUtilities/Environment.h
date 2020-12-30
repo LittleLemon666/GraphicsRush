@@ -11,14 +11,14 @@
 class Environment
 {
 public:
-	Environment() : size(256, 256)
+	Environment() : size(1024, 1024)
 	{
-		GeneratingDynamicCubemap(256, 256, glm::vec3(0, 0, 0));
+		GeneratingDynamicCubemap(1024, 1024);
 	}
 
 	Environment(int w, int h, glm::vec3 _center) : center(_center), size(w, h)
 	{
-		GeneratingDynamicCubemap(w, h, _center);
+		GeneratingDynamicCubemap(w, h);
 	}
 
 	~Environment() {}
@@ -65,7 +65,7 @@ public:
 private:
 	GLuint id;
 
-	void GeneratingDynamicCubemap(int width, int height, glm::vec3 cameraCenter)
+	void GeneratingDynamicCubemap(int width, int height)
 	{
 		//************************************************************************
 		//
@@ -85,5 +85,5 @@ private:
 	}
 
 	glm::vec2 size;
-	glm::vec3 center = glm::vec3();
+	glm::vec3 center = glm::vec3(0.0f);
 };
