@@ -1116,6 +1116,7 @@ drawWorld()
 	drawMoney();
 
 	drawSkybox();
+
 }
 
 void TrainView::
@@ -1205,6 +1206,22 @@ drawPlayer(bool doShadow) {
 	if (!doShadow)
 		glUseProgram(0);
 };
+
+void TrainView::drawIcon() {
+	glBegin(GL_QUADS);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	/*
+	glVertex2f(-290.0f, 300.0f);
+	glVertex2f(-290.0f, 290.0f);
+	glVertex2f(-300.0f, 290.0f);
+	glVertex2f(-300.0f, 300.0f);
+	*/
+	glVertex2f(1000.0f, 1000.0f);
+	glVertex2f(1000.0f, -1000.0f);
+	glVertex2f(-1000.0f, -1000.0f);
+	glVertex2f(-1000.0f, 1000.0f);
+	glEnd();
+}
 
 void TrainView::loadObjects() {
 	if (!load_game_objects)
@@ -1533,6 +1550,13 @@ printText()
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+		//power-ups
+		if (tw->thighButton->value()) {
+			char thigh_info[20];
+			sprintf(thigh_info, "thigh: ON");
+			RenderText(thigh_info, 455.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		}
 	}
 }
 
@@ -1939,6 +1963,7 @@ draw()
 	renderScreenEnd();
 
 	drawScreenQuad();
+
 }
 
 //************************************************************************

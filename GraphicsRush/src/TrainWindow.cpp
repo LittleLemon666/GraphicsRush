@@ -147,6 +147,17 @@ TrainWindow(const int x, const int y)
 		pty+=30;
 
 		// TODO: add widgets for all of your fancier features here
+
+		//大腿 (可碰撞一次)
+		thighButton = new Fl_Button(605, pty, 60, 20, "Thigh");
+		togglify(thighButton, 0);
+		//revive once
+		ver2Button = new Fl_Button(670, pty, 60, 20, "Ver2");
+		togglify(ver2Button, 0);
+		//revive second time
+		ver3Button = new Fl_Button(735, pty, 60, 20, "Ver3");
+		togglify(ver3Button, 0);
+
 #ifdef EXAMPLE_SOLUTION
 		makeExampleWidgets(this,pty);
 #endif

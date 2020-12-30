@@ -120,10 +120,12 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 }
 
 
-
 static unsigned long lastRedraw = 0;
 static unsigned long buttonBuffer = 0;
 static unsigned long buffer = 10;
+
+static unsigned long invincibleStart = 0;
+
 //***************************************************************************
 //
 // * Callback for idling - if things are sitting, this gets called
@@ -142,7 +144,7 @@ void runButtonCB(TrainWindow* tw)
 		if (tw->trainView->chapter != 4 && tw->m_Track.mainBoss) tw->m_Track.mainBoss = false;
 
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
-			
+			if (clock() - invincibleStart > CLOCKS_PER_SEC) tw->m_Track.player.invincible = false;
 
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
@@ -169,8 +171,6 @@ void runButtonCB(TrainWindow* tw)
 				//player clipping collision
 				if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.1 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.05) {
 					endReset(tw);
-					MiniBoss::bossLane = 5;
-					MiniBoss::clipping = -99;
 				}
 
 				//player multiball collision
@@ -178,7 +178,6 @@ void runButtonCB(TrainWindow* tw)
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f) {
 					endReset(tw);
-					MainBoss::multiBallForward = 0.4f;
 				}
 
 				//miniBoss movement
@@ -351,7 +350,13 @@ void rmzCB(Fl_Widget*, TrainWindow* tw)
 }
 
 void endReset(TrainWindow* tw) {
-
+	if (tw->thighButton->value()) {
+		tw->thighButton->value(0);
+		tw->m_Track.player.invincible = true;
+		invincibleStart = clock();
+		return;
+	}
+	if (tw->m_Track.player.invincible) return;
 	//let player see how they died
 	Sleep(1000);
 
@@ -367,6 +372,14 @@ void endReset(TrainWindow* tw) {
 	tw->m_Track.lane = 0;
 	tw->m_Track.switchLane = 0.0f;
 	tw->m_Track.jumpingState = -1;
+
+	//miniboss
+	MiniBoss::bossLane = 5;
+	MiniBoss::clipping = -99;
+
+	//mainboss
+	MainBoss::multiBallForward = 0.4f;
+
 	tw->trainView->camera_movement_state = 0;
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
