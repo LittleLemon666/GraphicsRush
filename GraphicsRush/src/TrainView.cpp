@@ -985,17 +985,9 @@ renderEnvironment()
 
 	glViewport(0, 0, environment->getSize().x, environment->getSize().y);
 
-	mat4 original_view_matrix;
-	glGetFloatv(GL_MODELVIEW_MATRIX, &original_view_matrix[0][0]);
-	mat4 original_projection_matrix;
-	glGetFloatv(GL_PROJECTION_MATRIX, &original_projection_matrix[0][0]);
-
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(90, 1, .1, 1000);
-	//glm::vec3 cameraPosT = viewer_pos;
-	//viewer_pos = environment->getCameraPos();
-	//printf("%lf %lf %lf\n", environment->getCameraPos().x, environment->getCameraPos().y, environment->getCameraPos().z);
 
 	getting_environment = true;
 
@@ -1013,19 +1005,14 @@ renderEnvironment()
 
 	getting_environment = false;
 
-	//viewer_pos = cameraPosT;
-
 	//unbind
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, w(), h());
 
-	arcball.setProjection(false);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(&original_view_matrix[0][0]);
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(&original_projection_matrix[0][0]);
+	glLoadIdentity();
+	setProjection();
 
 	glad_glDeleteRenderbuffers(1, &environment_FBO->rbo);
 	glad_glDeleteFramebuffers(1, &environment_FBO->fbo);

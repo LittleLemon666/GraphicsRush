@@ -23,7 +23,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/choose.vert
     ${SRC_DIR}shaders/choose.frag
     ${SRC_DIR}shaders/environment.vert
-    ${SRC_DIR}shaders/environment.frag)
+    ${SRC_DIR}shaders/environment.frag
+    ${SRC_DIR}shaders/blending.vert
+    ${SRC_DIR}shaders/blending.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
