@@ -466,8 +466,11 @@ loadCubemap(std::vector<std::string> chapters_skybox_textures_faces)
 void TrainView::
 switchChapter(const int& chapter_index)
 {
+	int old_chapter = chapter;
 	chapter = chapter_index;
-	if (chapter >= chapter_path_file.size()) chapter = rand() % chapter_path_file.size();
+	if (chapter >= chapter_path_file.size()) {
+		while (chapter == old_chapter) chapter = rand() % chapter_path_file.size();
+	}
 	load_chapter = false;
 }
 
@@ -1122,6 +1125,7 @@ drawWorld()
 	drawMoney();
 
 	drawSkybox();
+
 }
 
 void TrainView::
@@ -1211,6 +1215,22 @@ drawPlayer(bool doShadow) {
 	if (!doShadow)
 		glUseProgram(0);
 };
+
+void TrainView::drawIcon() {
+	glBegin(GL_QUADS);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	/*
+	glVertex2f(-290.0f, 300.0f);
+	glVertex2f(-290.0f, 290.0f);
+	glVertex2f(-300.0f, 290.0f);
+	glVertex2f(-300.0f, 300.0f);
+	*/
+	glVertex2f(1000.0f, 1000.0f);
+	glVertex2f(1000.0f, -1000.0f);
+	glVertex2f(-1000.0f, -1000.0f);
+	glVertex2f(-1000.0f, 1000.0f);
+	glEnd();
+}
 
 void TrainView::loadObjects() {
 	if (!load_game_objects)
@@ -1540,6 +1560,23 @@ printText()
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+		//power-ups
+		if (tw->thighButton->value()) {
+			char thigh_info[20];
+			sprintf(thigh_info, "thigh: ON");
+			RenderText(thigh_info, 455.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		}
+		if (tw->ver2Button->value()) {
+			char ver2_info[20];
+			sprintf(ver2_info, "ver2: ON");
+			RenderText(ver2_info, 455.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		}
+		if (tw->ver3Button->value()) {
+			char ver3_info[20];
+			sprintf(ver3_info, "ver3: ON");
+			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		}
 	}
 }
 
@@ -1694,7 +1731,7 @@ draw()
 		
 		initPath();
 
-		if (MiniBoss::clipping == -1) {
+		/*if (MiniBoss::clipping == -1) {
 			this->path_texture = m_pTrack->leftTrack;
 		}
 		else if (MiniBoss::clipping == 0) {
@@ -1703,7 +1740,7 @@ draw()
 		else if (MiniBoss::clipping == 1) {
 			this->path_texture = m_pTrack->rightTrack;
 		}
-		else if (MiniBoss::clipping == -99) {
+		else if (MiniBoss::clipping == -99)*/ {
 			this->path_texture = m_pTrack->defaultTrack;
 		}
 
@@ -1946,6 +1983,7 @@ draw()
 	renderScreenEnd();
 
 	drawScreenQuad();
+
 }
 
 //************************************************************************
