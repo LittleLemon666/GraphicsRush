@@ -24,6 +24,8 @@
 #include "TrainView.H"
 #include "CallBacks.H"
 #include "Boss.H"
+#include "Shop.H"
+#include "Object.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -120,10 +122,12 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 }
 
 
-
 static unsigned long lastRedraw = 0;
 static unsigned long buttonBuffer = 0;
 static unsigned long buffer = 10;
+
+static unsigned long invincibleStart = 0;
+
 //***************************************************************************
 //
 // * Callback for idling - if things are sitting, this gets called
@@ -142,7 +146,7 @@ void runButtonCB(TrainWindow* tw)
 		if (tw->trainView->chapter != 4 && tw->m_Track.mainBoss) tw->m_Track.mainBoss = false;
 
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
-			
+			if (clock() - invincibleStart > CLOCKS_PER_SEC) tw->m_Track.player.invincible = false;
 
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
@@ -168,9 +172,11 @@ void runButtonCB(TrainWindow* tw)
 
 				//player clipping collision
 				if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.1 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.05) {
-					endReset(tw);
-					MiniBoss::bossLane = 5;
-					MiniBoss::clipping = -99;
+					//endReset(tw);
+				}
+				//clipping spawn
+				if (tw->m_Track.miniBoss && MiniBoss::bossLane <= 1.2f) {
+					tw->m_Track.obstacles.push_back(Obstacle(tw->m_Track.trainU + 0.4, (int)MiniBoss::bossTarget, 0));
 				}
 
 				//player multiball collision
@@ -178,7 +184,6 @@ void runButtonCB(TrainWindow* tw)
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f) {
 					endReset(tw);
-					MainBoss::multiBallForward = 0.4f;
 				}
 
 				//miniBoss movement
@@ -351,7 +356,14 @@ void rmzCB(Fl_Widget*, TrainWindow* tw)
 }
 
 void endReset(TrainWindow* tw) {
-
+	if (tw->thighButton->value() && tw->m_Track.player.items[THIGH] > 0) {
+		tw->m_Track.player.items[THIGH]--;
+		tw->thighButton->value(0);
+		tw->m_Track.player.invincible = true;
+		invincibleStart = clock();
+		return;
+	}
+	if (tw->m_Track.player.invincible) return;
 	//let player see how they died
 	Sleep(1000);
 
@@ -361,18 +373,46 @@ void endReset(TrainWindow* tw) {
 	tw->m_Track.player.saveFile();
 
 	//reset variables
-	tw->runButton->value(0);
-	tw->speed->value(1);
 	tw->m_Track.trainU = 0.0f;
 	tw->m_Track.lane = 0;
 	tw->m_Track.switchLane = 0.0f;
 	tw->m_Track.jumpingState = -1;
+
+	//miniboss
+	MiniBoss::bossLane = 5;
+	MiniBoss::clipping = -99;
+
+	//mainboss
+	MainBoss::multiBallForward = 0.4f;
+
 	tw->trainView->camera_movement_state = 0;
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
 
-	if (!tw->debug_mode->value())
+	if (tw->debug_mode->value()) { tw->runButton->value(0); }
+	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) { 
+		tw->m_Track.player.items[VER2]--;
+		tw->ver2Button->value(0);
+		verState = 2;
+	}
+	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) { 
+		tw->m_Track.player.items[VER3]--; 
+		tw->ver3Button->value(0);
+		verState = 3;
+	}
+	else
 	{
+		verState = 1;
+		tw->m_Track.first_P2 = true;
+		tw->m_Track.first_P5 = true;
+		tw->m_Track.miniBoss = false;
+		tw->m_Track.mainBoss = false;
+		tw->m_Track.score = 0;
+		tw->m_Track.money_collected = 0;
+		tw->runButton->value(0);
+		tw->speed->value(1);
 		tw->trainView->switchChapter(0);
 	}
+	tw->m_Track.obstacles = {};
+	tw->m_Track.money = {};
 }

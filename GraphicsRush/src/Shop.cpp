@@ -18,3 +18,10 @@ loadItemsModel()
 		items_texture.push_back(Texture2D(shop_items_textures[i].c_str()));
 	}
 }
+
+void Shop::buy(TrainWindow* tw, int item_id) {
+	if (tw->m_Track.player.money_total >= item_price[item_id]) {
+		tw->m_Track.player.money_total -= item_price[item_id];
+		tw->m_Track.player.items[item_id]++;
+	}
+};

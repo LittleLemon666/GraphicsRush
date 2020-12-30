@@ -60,3 +60,5 @@ void rpzCB(Fl_Widget*, TrainWindow* tw);
 void rmzCB(Fl_Widget*, TrainWindow* tw);
 
 void endReset(TrainWindow* tw);
+
+static int verState = 1;

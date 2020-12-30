@@ -77,7 +77,7 @@ TrainWindow(const int x, const int y)
   
 		pty+=25;
 		speed = new Fl_Value_Slider(655,pty,140,20,"speed");
-		speed->range(1,4);
+		speed->range(1,10);
 		speed->value(1);
 		speed->align(FL_ALIGN_LEFT);
 		speed->type(FL_HORIZONTAL);
@@ -147,6 +147,17 @@ TrainWindow(const int x, const int y)
 		pty+=30;
 
 		// TODO: add widgets for all of your fancier features here
+
+		//大腿 (可碰撞一次)
+		thighButton = new Fl_Button(605, pty, 60, 20, "Thigh");
+		togglify(thighButton, 0);
+		//revive once
+		ver2Button = new Fl_Button(670, pty, 60, 20, "Ver2");
+		togglify(ver2Button, 0);
+		//revive second time
+		ver3Button = new Fl_Button(735, pty, 60, 20, "Ver3");
+		togglify(ver3Button, 0);
+
 #ifdef EXAMPLE_SOLUTION
 		makeExampleWidgets(this,pty);
 #endif
@@ -215,11 +226,10 @@ advanceTrain(float dir)
 		if (m_Track.trainU < 1 && trainView->screen_brightness < 1.0f) trainView->screen_brightness += 0.1f;
 		if ((int)m_Track.trainU >= (int)m_Track.points.size())
 		{
-			if (objectChapter == 1) m_Track.first_P2 = false;
-			if (objectChapter == 4) m_Track.first_P5 = false;
+			if (trainView->chapter == 1) m_Track.first_P2 = false;
+			if (trainView->chapter == 4) m_Track.first_P5 = false;
 			m_Track.trainU -= (int)m_Track.points.size();
 			trainView->switchChapter(trainView->chapter + 1);
-			objectChapter = trainView->chapter;
 		}
 	}
 	//#####################################################################
