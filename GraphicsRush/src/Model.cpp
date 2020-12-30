@@ -176,6 +176,59 @@ Model(const std::string fileName)
 
 		VAOProcess();
 	}
+	else if (fileName == "CUBEMAPSPHERE") // Under construction
+	{
+		int d_angle = 6;
+		unsigned short indices_index = 0;
+		float r = 0.5f;
+		float shpere_x, shpere_y, shpere_z;
+		float cube_x, cube_y, cube_z;
+		for (int phi = -90; phi < 90; phi += d_angle)
+		{
+			for (int theta = 0; theta < 360; theta += d_angle)
+			{
+				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
+				shpere_y = r * glm::sin(glm::radians((float)phi));
+				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
+				/*if (theta >= 45 && theta <= 135)
+				cube_x = */
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
+				shpere_y = r * glm::sin(glm::radians((float)phi));
+				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
+				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
+				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
+				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+
+				indices.push_back(indices_index);
+				indices.push_back(indices_index + 1);
+				indices.push_back(indices_index + 2);
+				indices.push_back(indices_index);
+				indices.push_back(indices_index + 2);
+				indices.push_back(indices_index + 3);
+				indices_index += 4;
+			}
+		}
+
+		VAOProcess();
+	}
 	else
 	{
 		loadOBJ(fileName);

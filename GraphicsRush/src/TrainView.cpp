@@ -1593,7 +1593,7 @@ draw()
 		if (!this->water_surface_shader)
 			this->water_surface_shader = new
 			Shader(
-				"../GraphicsRush/src/shaders/simple.vert",
+				"../GraphicsRush/src/shaders/water_surface.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/water_surface.frag");
 

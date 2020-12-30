@@ -16,6 +16,7 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/screen.frag
     ${SRC_DIR}shaders/door.vert
     ${SRC_DIR}shaders/door.frag
+    ${SRC_DIR}shaders/water_surface.vert
     ${SRC_DIR}shaders/water_surface.frag
     ${SRC_DIR}shaders/shadow.vert
     ${SRC_DIR}shaders/shadow.frag

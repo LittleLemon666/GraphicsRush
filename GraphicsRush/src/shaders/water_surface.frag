@@ -8,7 +8,6 @@ in V_OUT
 {
    vec3 position;
    vec3 normal;
-   vec2 texture_coordinate;
 } f_in;
 
 uniform samplerCube skybox;
