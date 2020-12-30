@@ -176,6 +176,33 @@ Model(const std::string fileName)
 
 		VAOProcess();
 	}
+	else if (fileName == "QUAD")
+	{
+		indexed_vertices = {
+			glm::vec3( -1.0f, -1.0f,  0.0f),
+			glm::vec3(  1.0f, -1.0f,  0.0f),
+			glm::vec3(  1.0f,  1.0f,  0.0f),
+			glm::vec3( -1.0f,  1.0f,  0.0f)
+		};
+		indexed_normals = {
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+		};
+		indexed_uvs = {
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+		};
+		indices = {
+			0, 1, 2,
+			0, 2, 3,
+		};
+
+		VAOProcess();
+	}
 	else if (fileName == "CUBEMAPSPHERE") // Under construction
 	{
 		unsigned short indices_index = 0;

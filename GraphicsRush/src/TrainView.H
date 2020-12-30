@@ -311,4 +311,9 @@ class TrainView : public Fl_Gl_Window
 		vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
 		Model* multiball_obj = nullptr;
 		std::string multiball_obj_path = "SPHERE";
+
+		Model* mini_boss_obj = nullptr;
+		std::string mini_boss_obj_path = "QUAD";
+		Texture2D* mini_boss_obj_texture = nullptr;
+		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 };

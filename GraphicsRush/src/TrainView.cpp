@@ -1104,7 +1104,7 @@ drawWorld()
 	}
 
 	drawObstacles();
-	if (m_pTrack->miniBoss) drawMiniBoss();
+	
 	if (m_pTrack->mainBoss) {
 		drawMainBoss();
 		drawMultiBall();
@@ -1113,6 +1113,8 @@ drawWorld()
 
 	drawSkybox();
 
+	// Draw all the transparent objects after drawing all opaque objects
+	if (m_pTrack->miniBoss) drawMiniBoss();
 }
 
 void TrainView::
@@ -1270,6 +1272,12 @@ void TrainView::loadObjects() {
 
 void TrainView::loadMiniBoss() {
 	m_pTrack->miniBoss = true;
+
+	if (!mini_boss_obj)
+		mini_boss_obj = new Model(mini_boss_obj_path);
+
+	if (!this->mini_boss_obj_texture)
+		this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
 }
 void TrainView::loadMainBoss() {
 	m_pTrack->mainBoss = true;
@@ -1367,13 +1375,27 @@ void TrainView::drawMiniBoss() {
 	miniBossPos += miniBossUp * MiniBoss::bossHeight;
 	miniBossPos += miniBossCross * MiniBoss::bossLane * 10.0f;
 
-	glBegin(GL_QUADS);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	this->blending_shader->Use();
+	mat4 model_matrix = inverse(lookAt(miniBossPos, miniBossPos + miniBossForward, miniBossUp)); // the player is in a 5.0f height position
+	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f)); // the player is in a 5.0f height position
+	glUniformMatrix4fv(glGetUniformLocation(this->blending_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	this->mini_boss_obj_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->blending_shader->Program, "u_texture"), 0);
+	mini_boss_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+	glDisable(GL_BLEND);
+
+	/*glBegin(GL_QUADS);
 	glColor3f(1.0f, 0.0f, 0.0f);
 	glVertex3f(miniBossPos.x + miniBossUp.x, miniBossPos.y + miniBossUp.y, miniBossPos.z + miniBossUp.z);
 	glVertex3f(miniBossPos.x + miniBossCross.x, miniBossPos.y + miniBossCross.y, miniBossPos.z + miniBossCross.z);
 	glVertex3f(miniBossPos.x - miniBossUp.x, miniBossPos.y - miniBossUp.y, miniBossPos.z - miniBossUp.z);
 	glVertex3f(miniBossPos.x - miniBossCross.x, miniBossPos.y - miniBossCross.y, miniBossPos.z - miniBossCross.z);
-	glEnd();
+	glEnd();*/
 }
 
 void TrainView::drawMainBoss() {
@@ -1648,6 +1670,13 @@ draw()
 				"../GraphicsRush/src/shaders/environment.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/environment.frag");
+
+		if (!this->blending_shader)
+			this->blending_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/blending.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/blending.frag");
 
 		if (!this->commom_matrices)
 		{
