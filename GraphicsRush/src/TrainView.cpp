@@ -889,6 +889,22 @@ initScreenQuad()
 }
 
 void TrainView::
+initMultiBall()
+{
+	if (!m_pTrack->mainBoss) return;
+
+	gmt.calculateAll(m_pTrack->trainU + MainBoss::multiBallForward, multiBallPos, multiBallForward, multiBallUp, multiBallCross);
+	multiBallForward = normalize(multiBallForward);
+	multiBallUp = normalize(multiBallUp);
+	multiBallCross = normalize(multiBallCross);
+	multiBallPos += multiBallUp * MainBoss::multiBallUp;
+	multiBallPos += multiBallCross * MainBoss::multiBallCross * 5.0f;
+
+	environment->setCameraPos(multiBallPos);
+	renderEnvironment();
+}
+
+void TrainView::
 renderChooseBegin()
 {
 	if (!chooser_FBO)
@@ -966,11 +982,17 @@ renderEnvironment()
 
 	glViewport(0, 0, environment->getSize().x, environment->getSize().y);
 
+	mat4 original_view_matrix;
+	glGetFloatv(GL_MODELVIEW_MATRIX, &original_view_matrix[0][0]);
+	mat4 original_projection_matrix;
+	glGetFloatv(GL_PROJECTION_MATRIX, &original_projection_matrix[0][0]);
+
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(90, 1, .1, 1000);
-	glm::vec3 cameraPosT = viewer_pos;
-	viewer_pos = environment->getCameraPos();
+	//glm::vec3 cameraPosT = viewer_pos;
+	//viewer_pos = environment->getCameraPos();
+	//printf("%lf %lf %lf\n", environment->getCameraPos().x, environment->getCameraPos().y, environment->getCameraPos().z);
 
 	for (int i = 0; i < 6; i++)
 	{
@@ -984,14 +1006,17 @@ renderEnvironment()
 		drawWorld();
 	}
 
-	viewer_pos = cameraPosT;
+	//viewer_pos = cameraPosT;
 
 	//unbind
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, w(), h());
 
-	arcball.setProjection(false);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(&original_view_matrix[0][0]);
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(&original_projection_matrix[0][0]);
 
 	glad_glDeleteRenderbuffers(1, &environment_FBO->rbo);
 	glad_glDeleteFramebuffers(1, &environment_FBO->fbo);
@@ -1045,6 +1070,11 @@ drawChooser()
 void TrainView::
 drawWorld()
 {
+	setUBO();
+	setCameraUBO();
+	setDirLightUBO();
+	setPointLightUBO();
+
 	drawStuff();
 
 	// this time drawing is for shadows (except for top view)
@@ -1397,7 +1427,7 @@ drawSkybox()
 void TrainView::
 drawDoor()
 {
-	if (camera_movement_state == 1) return; // don't draw the door after beginning camera movement
+	if (camera_movement_state == 1 || chapter != 0) return; // don't draw the door after beginning camera movement
 	if (!load_door_position) // maintain the position in front of the player (setting in the beginning)
 	{
 		load_door_position = true;
@@ -1888,7 +1918,7 @@ draw()
 	switchLightMode();
 
 	initMultiBall();
-	
+
 	//renderDepthMapBegin();
 
 	//for render depth map
@@ -2227,20 +2257,6 @@ getFileName(std::string file_path)
 	std::string file_name, file_name_t;
 	while (getline(ss, file_name_t, '/')) file_name = file_name_t;
 	return file_name;
-}
-
-void TrainView::
-initMultiBall()
-{
-	gmt.calculateAll(m_pTrack->trainU + MainBoss::multiBallForward, multiBallPos, multiBallForward, multiBallUp, multiBallCross);
-	multiBallForward = normalize(multiBallForward);
-	multiBallUp = normalize(multiBallUp);
-	multiBallCross = normalize(multiBallCross);
-	multiBallPos += multiBallUp * MainBoss::multiBallUp;
-	multiBallPos += multiBallCross * MainBoss::multiBallCross * 5.0f;
-
-	environment->setCameraPos(multiBallPos);
-	renderEnvironment();
 }
 
 void TrainView::
