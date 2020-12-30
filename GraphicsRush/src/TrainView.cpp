@@ -1251,13 +1251,13 @@ drawObstacles(bool doShadow) {
 
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
-		
+		int chapter_5_rand = rand() % 4;
 		if (!doShadow)
 		{
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4) ? chapter : rand() % 4) * 4 + m_pTrack->obstacles[obstacle].type].bind(0);
+			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1].bind(0);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
@@ -1266,7 +1266,7 @@ drawObstacles(bool doShadow) {
 		else	
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 
-		m_pTrack->obstacles[obstacle].obstacle_obj[0]->draw();
+		m_pTrack->obstacles[obstacle].obstacle_obj[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1]->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
 	if (!doShadow)
