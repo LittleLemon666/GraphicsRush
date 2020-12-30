@@ -1039,7 +1039,7 @@ drawShop(bool buttom)
 	shop_pos += 4.0f * shop_cross;
 	
 	mat4 model_matrix = inverse(lookAt(shop_pos, shop_pos + shop_forward, shop_up)); // the player is in a 5.0f height position
-	model_matrix = rotate(model_matrix, money_rotate, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(2.5f, 2.5f, 2.5f));
 	if (buttom)
 	{
@@ -1460,7 +1460,7 @@ drawEarth()
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, vec3(-75, 5, 200));
-	model_matrix = rotate(model_matrix, money_rotate / 20.0f, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, earth_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(130, 130, 130));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
@@ -1483,7 +1483,7 @@ drawSun()
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, sun_pos);
-	model_matrix = rotate(model_matrix, money_rotate / 40.0f, vec3(0, 1, 0));
+	model_matrix = rotate(model_matrix, sun_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(450, 450, 450));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
@@ -2311,4 +2311,20 @@ setCameraUBO()
 	glBindBuffer(GL_UNIFORM_BUFFER, this->camera_properties->ubo); // all data with 16 bytes in GLSL
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(vec3), &camera_pos[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void TrainView::
+rotate_objects()
+{
+	money_rotate += 0.1f;
+	if (money_rotate > 360) money_rotate -= 360;
+
+	shop_rotate += 0.1f;
+	if (shop_rotate > 360) shop_rotate -= 360;
+	
+	earth_rotate += 0.005f;
+	if (earth_rotate > 360) earth_rotate -= 360;
+
+	sun_rotate += 0.0025f;
+	if (sun_rotate > 360) sun_rotate -= 360;
 }

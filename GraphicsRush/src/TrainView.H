@@ -281,6 +281,7 @@ class TrainView : public Fl_Gl_Window
 		mat4 lightSpaceMatrix;
 
 		Shop* shop = nullptr;
+		float shop_rotate = 0;
 
 		FBO* chooser_FBO = nullptr;
 		int game_state = CLOBBY;
@@ -289,11 +290,14 @@ class TrainView : public Fl_Gl_Window
 		std::string earth_obj_path = "SPHERE";
 		Texture2D* earth_texture = nullptr;
 		std::string earth_texture_path = "../GraphicsRush/Objects/earth.bmp";
+		float earth_rotate = 0;
 
 		Model* sun_obj = nullptr;
 		std::string sun_obj_path = "SPHERE";
 		Texture2D* sun_texture = nullptr;
 		std::string sun_texture_path = "../GraphicsRush/Objects/sun.jpg";
+		float sun_rotate = 0;
+		void rotate_objects();
 
 		vec3 sun_pos = vec3(-580.0f, 50.0f, 530.0f);
 		int light_mode = Lighting::LDIR;
