@@ -1124,7 +1124,12 @@ drawWorld()
 	drawSkybox();
 
 	// Draw all the transparent objects after drawing all opaque objects
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (m_pTrack->miniBoss) drawMiniBoss();
+	glDisable(GL_BLEND);
 }
 
 void TrainView::
@@ -1391,9 +1396,6 @@ void TrainView::drawMiniBoss() {
 	miniBossPos += miniBossUp * MiniBoss::bossHeight;
 	miniBossPos += miniBossCross * MiniBoss::bossLane * 10.0f;
 
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	this->blending_shader->Use();
 	mat4 model_matrix = inverse(lookAt(miniBossPos, miniBossPos + miniBossForward, miniBossUp)); // the player is in a 5.0f height position
 	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f)); // the player is in a 5.0f height position
@@ -1403,15 +1405,6 @@ void TrainView::drawMiniBoss() {
 	mini_boss_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
-	glDisable(GL_BLEND);
-
-	/*glBegin(GL_QUADS);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	glVertex3f(miniBossPos.x + miniBossUp.x, miniBossPos.y + miniBossUp.y, miniBossPos.z + miniBossUp.z);
-	glVertex3f(miniBossPos.x + miniBossCross.x, miniBossPos.y + miniBossCross.y, miniBossPos.z + miniBossCross.z);
-	glVertex3f(miniBossPos.x - miniBossUp.x, miniBossPos.y - miniBossUp.y, miniBossPos.z - miniBossUp.z);
-	glVertex3f(miniBossPos.x - miniBossCross.x, miniBossPos.y - miniBossCross.y, miniBossPos.z - miniBossCross.z);
-	glEnd();*/
 }
 
 void TrainView::drawMainBoss() {
@@ -1509,7 +1502,7 @@ drawDoor()
 	this->door_shader->Use();
 	mat4 model_matrix = inverse(lookAt(door_pos, door_pos + door_forward, door_up)); // the player is in a 5.0f height position
 	model_matrix = scale(model_matrix, vec3(25, 25, 25));
-	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->door_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	door_scene_texture->bind(0);
 	glUniform1i(glGetUniformLocation(this->door_shader->Program, "door_scene_texture"), 0); //a picture within green on the door
 	door_texture->bind(1);
