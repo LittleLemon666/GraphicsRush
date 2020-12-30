@@ -157,6 +157,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* shadow_shader = nullptr;
 		Shader* choose_shader = nullptr;
 		Shader* environment_shader = nullptr;
+		Shader* blending_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -305,8 +306,14 @@ class TrainView : public Fl_Gl_Window
 
 		Environment* environment = nullptr;
 		FBO* environment_FBO = nullptr;
+		bool getting_environment = false;
 
 		vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
 		Model* multiball_obj = nullptr;
-		std::string multiball_obj_path = "CUBEMAPSPHERE";
+		std::string multiball_obj_path = "SPHERE";
+
+		Model* mini_boss_obj = nullptr;
+		std::string mini_boss_obj_path = "QUAD";
+		Texture2D* mini_boss_obj_texture = nullptr;
+		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 };

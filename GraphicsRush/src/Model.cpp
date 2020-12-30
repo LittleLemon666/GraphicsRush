@@ -131,37 +131,37 @@ Model(const std::string fileName)
 		int d_angle = 6;
 		unsigned short indices_index = 0;
 		float r = 0.5f;
-		float shpere_x, shpere_y, shpere_z;
+		float sphere_x, sphere_y, sphere_z;
 		for (int phi = -90; phi < 90; phi += d_angle)
 		{
 			for (int theta = 0; theta < 360; theta += d_angle)
 			{
-				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
-				shpere_y = r * glm::sin(glm::radians((float)phi));
-				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				sphere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
+				sphere_y = r * glm::sin(glm::radians((float)phi));
+				sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
+				indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
 				indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
-				shpere_y = r * glm::sin(glm::radians((float)phi));
-				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				sphere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
+				sphere_y = r * glm::sin(glm::radians((float)phi));
+				sphere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
 				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
-				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
-				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
+				sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
+				indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
 				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
-				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
-				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
+				sphere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
+				sphere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
+				sphere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
+				indexed_vertices.push_back(glm::vec3(sphere_x, sphere_y, sphere_z));
+				indexed_normals.push_back(glm::normalize(glm::vec3(sphere_x, sphere_y, sphere_z)));
 				indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
 
 				indices.push_back(indices_index);
@@ -176,54 +176,196 @@ Model(const std::string fileName)
 
 		VAOProcess();
 	}
+	else if (fileName == "QUAD")
+	{
+		indexed_vertices = {
+			glm::vec3( -1.0f, -1.0f,  0.0f),
+			glm::vec3(  1.0f, -1.0f,  0.0f),
+			glm::vec3(  1.0f,  1.0f,  0.0f),
+			glm::vec3( -1.0f,  1.0f,  0.0f)
+		};
+		indexed_normals = {
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+		};
+		indexed_uvs = {
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+		};
+		indices = {
+			0, 1, 2,
+			0, 2, 3,
+		};
+
+		VAOProcess();
+	}
 	else if (fileName == "CUBEMAPSPHERE") // Under construction
 	{
-		int d_angle = 6;
 		unsigned short indices_index = 0;
-		float r = 0.5f;
-		float shpere_x, shpere_y, shpere_z;
-		float cube_x, cube_y, cube_z;
-		for (int phi = -90; phi < 90; phi += d_angle)
+		int boundary = 5;
+		int cube_x, cube_y, cube_z;
+		glm::vec3 new_sphere;
+
+		for (cube_z = -boundary; cube_z <= boundary; cube_z += 2 * boundary)
 		{
-			for (int theta = 0; theta < 360; theta += d_angle)
+			for (cube_x = -boundary; cube_x < boundary; cube_x++)
 			{
-				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)theta));
-				shpere_y = r * glm::sin(glm::radians((float)phi));
-				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)theta));
-				/*if (theta >= 45 && theta <= 135)
-				cube_x = */
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
-				indexed_uvs.push_back(glm::vec2(theta / 360.0f, phi / 180.0f + 0.5f));
+				for (cube_y = -boundary; cube_y < boundary; cube_y++)
+				{
+					new_sphere = glm::vec3(
+						cube_x / 10.0f * glm::sqrt(1.0f - cube_y / 10.0f * cube_y / 10.0f * 0.5f),
+						cube_y / 10.0f * glm::sqrt(1.0f - cube_x / 10.0f * cube_x / 10.0f * 0.5f),
+						cube_z / 10.0f);
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_x / 10.0f + 0.5f, cube_y / 10.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)phi)) * glm::cos(glm::radians((float)(theta + d_angle)));
-				shpere_y = r * glm::sin(glm::radians((float)phi));
-				shpere_z = r * glm::cos(glm::radians((float)phi)) * glm::sin(glm::radians((float)(theta + d_angle)));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
-				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, phi / 180.0f + 0.5f));
+					new_sphere = glm::vec3(
+						(cube_x + 1) / 10.0f * glm::sqrt(1.0f - cube_y / 10.0f * cube_y / 10.0f * 0.5f),
+						cube_y / 10.0f * glm::sqrt(1.0f - (cube_x + 1) / 10.0f * (cube_x + 1) / 10.0f * 0.5f),
+						cube_z / 10.0f);
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_x + 1) / 10.0f + 0.5f, cube_y / 10.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)(theta + d_angle)));
-				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
-				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)(theta + d_angle)));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
-				indexed_uvs.push_back(glm::vec2((theta + d_angle) / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+					new_sphere = glm::vec3(
+						(cube_x + 1) / 10.0f * glm::sqrt(1.0f - (cube_y + 1) / 10.0f * (cube_y + 1) / 10.0f * 0.5f),
+						(cube_y + 1) / 10.0f * glm::sqrt(1.0f - (cube_x + 1) / 10.0f * (cube_x + 1) / 10.0f * 0.5f),
+						cube_z / 10.0f);
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_x + 1) / 10.0f + 0.5f, (cube_y + 1) / 10.0f + 0.5f));
 
-				shpere_x = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::cos(glm::radians((float)theta));
-				shpere_y = r * glm::sin(glm::radians((float)(phi + d_angle)));
-				shpere_z = r * glm::cos(glm::radians((float)(phi + d_angle))) * glm::sin(glm::radians((float)theta));
-				indexed_vertices.push_back(glm::vec3(shpere_x, shpere_y, shpere_z));
-				indexed_normals.push_back(glm::normalize(glm::vec3(shpere_x, shpere_y, shpere_z)));
-				indexed_uvs.push_back(glm::vec2(theta / 360.0f, (phi + d_angle) / 180.0f + 0.5f));
+					new_sphere = glm::vec3(
+						cube_x / 10.0f * glm::sqrt(1.0f - (cube_y + 1) / 10.0f * (cube_y + 1) / 10.0f * 0.5f),
+						(cube_y + 1) / 10.0f * glm::sqrt(1.0f - cube_x / 10.0f * cube_x / 10.0f * 0.5f),
+						cube_z / 10.0f);
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_x / 10.0f + 0.5f, (cube_y + 1) / 10.0f + 0.5f));
 
-				indices.push_back(indices_index);
-				indices.push_back(indices_index + 1);
-				indices.push_back(indices_index + 2);
-				indices.push_back(indices_index);
-				indices.push_back(indices_index + 2);
-				indices.push_back(indices_index + 3);
-				indices_index += 4;
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 1);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index + 3);
+					indices_index += 4;
+				}
+			}
+		}
+		
+		for (cube_x = -boundary; cube_x <= boundary; cube_x += 2 * boundary)
+		{
+			for (cube_z = -boundary; cube_z < boundary; cube_z++)
+			{
+				for (cube_y = -boundary; cube_y < boundary; cube_y++)
+				{
+					new_sphere = glm::vec3(
+						cube_x / 10.0f,
+						cube_y / 10.0f * glm::sqrt(1.0f - cube_z / 10.0f * cube_z / 10.0f * 0.5f),
+						cube_z / 10.0f * glm::sqrt(1.0f - cube_y / 10.0f * cube_y / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_z / 10.0f + 0.5f, cube_y / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						cube_x / 10.0f,
+						cube_y / 10.0f * glm::sqrt(1.0f - (cube_z + 1) / 10.0f * (cube_z + 1) / 10.0f * 0.5f),
+						(cube_z + 1) / 10.0f * glm::sqrt(1.0f - cube_y / 10.0f * cube_y / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_z + 1) / 10.0f + 0.5f, cube_y / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						cube_x / 10.0f,
+						(cube_y + 1) / 10.0f * glm::sqrt(1.0f - (cube_z + 1) / 10.0f * (cube_z + 1) / 10.0f * 0.5f),
+						(cube_z + 1) / 10.0f * glm::sqrt(1.0f - (cube_y + 1) / 10.0f * (cube_y + 1) / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_z + 1) / 10.0f + 0.5f, (cube_y + 1) / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						cube_x / 10.0f,
+						(cube_y + 1) / 10.0f * glm::sqrt(1.0f - cube_z / 10.0f * cube_z / 10.0f * 0.5f),
+						cube_z / 10.0f * glm::sqrt(1.0f - (cube_y + 1) / 10.0f * (cube_y + 1) / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_z / 10.0f + 0.5f, (cube_y + 1) / 10.0f + 0.5f));
+
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 1);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index + 3);
+					indices_index += 4;
+				}
+			}
+		}
+
+		for (cube_y = -boundary; cube_y <= boundary; cube_y += 2 * boundary)
+		{
+			for (cube_z = -boundary; cube_z < boundary; cube_z++)
+			{
+				for (cube_x = -boundary; cube_x < boundary; cube_x++)
+				{
+					new_sphere = glm::vec3(
+						cube_x / 10.0f * glm::sqrt(1.0f - cube_z / 10.0f * cube_z / 10.0f * 0.5f),
+						cube_y / 10.0f,
+						cube_z / 10.0f * glm::sqrt(1.0f - cube_x / 10.0f * cube_x / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_x / 10.0f + 0.5f, cube_z / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						(cube_x + 1) / 10.0f * glm::sqrt(1.0f - cube_z / 10.0f * cube_z / 10.0f * 0.5f),
+						cube_y / 10.0f,
+						cube_z / 10.0f * glm::sqrt(1.0f - (cube_x + 1) / 10.0f * (cube_x + 1) / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_x + 1) / 10.0f + 0.5f, cube_z / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						(cube_x + 1) / 10.0f * glm::sqrt(1.0f - (cube_z + 1) / 10.0f * (cube_z + 1) / 10.0f * 0.5f),
+						cube_y / 10.0f,
+						(cube_z + 1) / 10.0f * glm::sqrt(1.0f - (cube_x + 1) / 10.0f * (cube_x + 1) / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2((cube_x + 1) / 10.0f + 0.5f, (cube_z + 1) / 10.0f + 0.5f));
+
+					new_sphere = glm::vec3(
+						cube_x / 10.0f * glm::sqrt(1.0f - (cube_z + 1) / 10.0f * (cube_z + 1) / 10.0f * 0.5f),
+						cube_y / 10.0f,
+						(cube_z + 1) / 10.0f * glm::sqrt(1.0f - cube_x / 10.0f * cube_x / 10.0f * 0.5f));
+					new_sphere = glm::normalize(new_sphere);
+					indexed_vertices.push_back(new_sphere);
+					indexed_normals.push_back(glm::normalize(new_sphere));
+					indexed_uvs.push_back(glm::vec2(cube_x / 10.0f + 0.5f, (cube_z + 1) / 10.0f + 0.5f));
+
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 1);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index);
+					indices.push_back(indices_index + 2);
+					indices.push_back(indices_index + 3);
+					indices_index += 4;
+				}
 			}
 		}
 
