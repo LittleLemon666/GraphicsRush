@@ -15,3 +15,7 @@ static class MainBoss {
 		static float targetUp;
 		static float targetCross;
 };
+static class ExtraBoss {
+	public:
+		static int health;
+};

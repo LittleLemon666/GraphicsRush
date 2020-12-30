@@ -407,6 +407,7 @@ void endReset(TrainWindow* tw) {
 		tw->m_Track.first_P5 = true;
 		tw->m_Track.miniBoss = false;
 		tw->m_Track.mainBoss = false;
+		tw->m_Track.extraBoss = false;
 		tw->m_Track.score = 0;
 		tw->m_Track.money_collected = 0;
 		tw->runButton->value(0);

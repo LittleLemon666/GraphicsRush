@@ -161,6 +161,7 @@ class TrainView : public Fl_Gl_Window
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
+		void loadExtraBoss();
 		void initPath();
 		void initSkybox();
 		void initDoor();
@@ -195,6 +196,7 @@ class TrainView : public Fl_Gl_Window
 		void drawMiniBoss();
 		void drawMainBoss();
 		void drawMultiBall();
+		void drawExtraBoss();
 		void drawSkybox();
 		void drawDoor();
 		void drawEarth();
@@ -225,6 +227,7 @@ class TrainView : public Fl_Gl_Window
 		int camera_movement_index = 0;
 		std::vector<std::vector<vec3>> camera_movement;
 		int chapter = 0;
+		const int NUMBER_OF_PROJECTS = 5;
 		bool load_game_objects = false;
 		std::vector<std::string> chapter_path_file;
 		std::vector<std::string> chapter_path_file_name;

@@ -94,6 +94,7 @@ class CTrack {
 		bool first_P5 = true;
 		bool miniBoss = false;
 		bool mainBoss = false;
+		bool extraBoss = false;
 
 		//track Textures
 		Texture2D *defaultTrack = nullptr;

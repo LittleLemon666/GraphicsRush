@@ -110,11 +110,20 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/space/back.bmp");
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/space/front.bmp");
 
+	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P1.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P2.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P3.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P4.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P5.txt");
+	chapter_path_file.push_back("../GraphicsRush/TrackFiles/reversi.txt");
 	for (auto it = chapter_path_file.begin(); it != chapter_path_file.end(); it++)
 		chapter_path_file_name.push_back(getFileName(*it));
 
@@ -468,8 +477,8 @@ switchChapter(const int& chapter_index)
 {
 	int old_chapter = chapter;
 	chapter = chapter_index;
-	if (chapter >= chapter_path_file.size()) {
-		while (chapter == old_chapter) chapter = rand() % chapter_path_file.size();
+	if (chapter >= NUMBER_OF_PROJECTS) {
+		while (chapter == old_chapter) chapter = rand() % NUMBER_OF_PROJECTS;
 	}
 	load_chapter = false;
 }
@@ -1095,8 +1104,9 @@ drawWorld()
 	//use money to check if world is loaded
 	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
+	else if (!m_pTrack->extraBoss && chapter == 5) loadExtraBoss();
 	
-	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && (int)m_pTrack->money.size() == 0) {
+	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && !m_pTrack->extraBoss && (int)m_pTrack->money.size() == 0) {
 		loadObjects();
 		m_pTrack->miniBoss = false;
 		MiniBoss::clipping = -99;
@@ -1279,9 +1289,15 @@ void TrainView::loadMiniBoss() {
 	if (!this->mini_boss_obj_texture)
 		this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
 }
+
 void TrainView::loadMainBoss() {
 	m_pTrack->mainBoss = true;
 }
+
+void TrainView::loadExtraBoss() {
+	m_pTrack->mainBoss = true;
+}
+
 void TrainView::
 drawObstacles(bool doShadow) {
 	if (!doShadow)
@@ -1308,7 +1324,7 @@ drawObstacles(bool doShadow) {
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1].bind(0);
+			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4 && chapter != 5) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1].bind(0);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
@@ -1317,7 +1333,7 @@ drawObstacles(bool doShadow) {
 		else	
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 
-		m_pTrack->obstacles[obstacle].obstacle_obj[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1]->draw();
+		m_pTrack->obstacles[obstacle].obstacle_obj[((chapter != 4 && chapter != 5) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1]->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
 	if (!doShadow)
@@ -1430,6 +1446,24 @@ void TrainView::drawMultiBall() {
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
+
+void TrainView::drawExtraBoss() {
+	vec3 extraBossPos, extraBossForward, extraBossUp, extraBossCross;
+	gmt.calculateAll(m_pTrack->trainU + 0.4, extraBossPos, extraBossForward, extraBossUp, extraBossCross);
+	extraBossForward = normalize(extraBossForward);
+	extraBossUp = normalize(extraBossUp);
+	extraBossCross = normalize(extraBossCross);
+	extraBossPos += extraBossUp * 10.0f;
+
+	glBegin(GL_QUADS);
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(extraBossPos.x + extraBossUp.x, extraBossPos.y + extraBossUp.y, extraBossPos.z + extraBossUp.z);
+	glVertex3f(extraBossPos.x + extraBossCross.x, extraBossPos.y + extraBossCross.y, extraBossPos.z + extraBossCross.z);
+	glVertex3f(extraBossPos.x - extraBossUp.x, extraBossPos.y - extraBossUp.y, extraBossPos.z - extraBossUp.z);
+	glVertex3f(extraBossPos.x - extraBossCross.x, extraBossPos.y - extraBossCross.y, extraBossPos.z - extraBossCross.z);
+	glEnd();
+}
+
 
 void TrainView::
 drawSkybox()
@@ -1891,6 +1925,7 @@ draw()
 			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[2])); // chapter 3
 			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[3])); // chapter 4
 			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[4])); // chapter 5
+			cubemap_texture.push_back(loadCubemap(chapters_skybox_textures_faces[5])); // reversi
 		}
 
 		if (!this->skybox) this->skybox = new ShaderInfo;
