@@ -9,6 +9,7 @@
 using namespace glm;
 const static std::vector<std::string> shop_items_models = { };
 const static std::vector<std::string> shop_items_textures = { };
+static enum { VER2, VER3, THIGH, SHADER, CUDA, REVERSI } item_name;
 
 class Shop {
 	public:
@@ -19,7 +20,6 @@ class Shop {
 		std::vector<Model*> items_obj;
 		std::vector<Texture2D> items_texture;
 
-		enum { VER2, VER3, THIGH, SHADER, CUDA, REVERSI } item_name;
 		std::vector<int> item_price = { 100, 100, 100, 100, 100, 100 };
 		void buy(TrainWindow* tw, int item_id);
 };

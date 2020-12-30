@@ -24,6 +24,7 @@
 #include "TrainView.H"
 #include "CallBacks.H"
 #include "Boss.H"
+#include "Shop.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -350,7 +351,8 @@ void rmzCB(Fl_Widget*, TrainWindow* tw)
 }
 
 void endReset(TrainWindow* tw) {
-	if (tw->thighButton->value()) {
+	if (tw->thighButton->value() && tw->m_Track.player.items[THIGH] > 0) {
+		tw->m_Track.player.items[THIGH]--;
 		tw->thighButton->value(0);
 		tw->m_Track.player.invincible = true;
 		invincibleStart = clock();
@@ -384,8 +386,15 @@ void endReset(TrainWindow* tw) {
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
 
-	if (!tw->debug_mode->value())
+	if (tw->debug_mode->value()) {}
+	else if (verState == 1 && tw->ver2Button->value()) {}
+	else if (verState == 2 && tw->ver3Button->value()) {}
+	else
 	{
+		tw->m_Track.first_P2 = true;
+		tw->m_Track.first_P5 = true;
+		tw->m_Track.miniBoss = false;
+		tw->m_Track.mainBoss = false;
 		tw->trainView->switchChapter(0);
 	}
 }
