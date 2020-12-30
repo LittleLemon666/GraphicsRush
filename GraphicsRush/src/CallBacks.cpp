@@ -25,6 +25,7 @@
 #include "CallBacks.H"
 #include "Boss.H"
 #include "Shop.H"
+#include "Object.H"
 
 #pragma warning(push)
 #pragma warning(disable:4312)
@@ -171,7 +172,11 @@ void runButtonCB(TrainWindow* tw)
 
 				//player clipping collision
 				if (tw->m_Track.miniBoss && abs(tw->m_Track.switchLane - MiniBoss::bossLane) < 0.1 && abs(MiniBoss::bossLane - MiniBoss::bossTarget) < 0.05) {
-					endReset(tw);
+					//endReset(tw);
+				}
+				//clipping spawn
+				if (tw->m_Track.miniBoss && MiniBoss::bossLane <= 1.2f) {
+					tw->m_Track.obstacles.push_back(Obstacle(tw->m_Track.trainU + 0.4, (int)MiniBoss::bossTarget, 0));
 				}
 
 				//player multiball collision
@@ -368,8 +373,6 @@ void endReset(TrainWindow* tw) {
 	tw->m_Track.player.saveFile();
 
 	//reset variables
-	tw->runButton->value(0);
-	tw->speed->value(1);
 	tw->m_Track.trainU = 0.0f;
 	tw->m_Track.lane = 0;
 	tw->m_Track.switchLane = 0.0f;
@@ -386,15 +389,30 @@ void endReset(TrainWindow* tw) {
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
 
-	if (tw->debug_mode->value()) {}
-	else if (verState == 1 && tw->ver2Button->value()) {}
-	else if (verState == 2 && tw->ver3Button->value()) {}
+	if (tw->debug_mode->value()) { tw->runButton->value(0); }
+	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) { 
+		tw->m_Track.player.items[VER2]--;
+		tw->ver2Button->value(0);
+		verState = 2;
+	}
+	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) { 
+		tw->m_Track.player.items[VER3]--; 
+		tw->ver3Button->value(0);
+		verState = 3;
+	}
 	else
 	{
+		verState = 1;
 		tw->m_Track.first_P2 = true;
 		tw->m_Track.first_P5 = true;
 		tw->m_Track.miniBoss = false;
 		tw->m_Track.mainBoss = false;
+		tw->m_Track.score = 0;
+		tw->m_Track.money_collected = 0;
+		tw->runButton->value(0);
+		tw->speed->value(1);
 		tw->trainView->switchChapter(0);
 	}
+	tw->m_Track.obstacles = {};
+	tw->m_Track.money = {};
 }

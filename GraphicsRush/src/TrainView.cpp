@@ -466,8 +466,11 @@ loadCubemap(std::vector<std::string> chapters_skybox_textures_faces)
 void TrainView::
 switchChapter(const int& chapter_index)
 {
+	int old_chapter = chapter;
 	chapter = chapter_index;
-	if (chapter >= chapter_path_file.size()) chapter = rand() % chapter_path_file.size();
+	if (chapter >= chapter_path_file.size()) {
+		while (chapter == old_chapter) chapter = rand() % chapter_path_file.size();
+	}
 	load_chapter = false;
 }
 
@@ -1721,7 +1724,7 @@ draw()
 		
 		initPath();
 
-		if (MiniBoss::clipping == -1) {
+		/*if (MiniBoss::clipping == -1) {
 			this->path_texture = m_pTrack->leftTrack;
 		}
 		else if (MiniBoss::clipping == 0) {
@@ -1730,7 +1733,7 @@ draw()
 		else if (MiniBoss::clipping == 1) {
 			this->path_texture = m_pTrack->rightTrack;
 		}
-		else if (MiniBoss::clipping == -99) {
+		else if (MiniBoss::clipping == -99)*/ {
 			this->path_texture = m_pTrack->defaultTrack;
 		}
 
