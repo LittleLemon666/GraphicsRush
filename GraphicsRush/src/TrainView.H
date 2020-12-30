@@ -304,8 +304,9 @@ class TrainView : public Fl_Gl_Window
 
 		Environment* environment = nullptr;
 		FBO* environment_FBO = nullptr;
+		bool getting_environment = false;
 
 		vec3 multiBallPos, multiBallForward, multiBallUp, multiBallCross;
 		Model* multiball_obj = nullptr;
-		std::string multiball_obj_path = "CUBEMAPSPHERE";
+		std::string multiball_obj_path = "SPHERE";
 };

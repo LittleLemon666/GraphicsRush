@@ -994,6 +994,8 @@ renderEnvironment()
 	//viewer_pos = environment->getCameraPos();
 	//printf("%lf %lf %lf\n", environment->getCameraPos().x, environment->getCameraPos().y, environment->getCameraPos().z);
 
+	getting_environment = true;
+
 	for (int i = 0; i < 6; i++)
 	{
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, environment->getID(), 0); //+i
@@ -1006,12 +1008,16 @@ renderEnvironment()
 		drawWorld();
 	}
 
+	getting_environment = false;
+
 	//viewer_pos = cameraPosT;
 
 	//unbind
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, w(), h());
+
+	arcball.setProjection(false);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(&original_view_matrix[0][0]);
@@ -1381,6 +1387,7 @@ void TrainView::drawMainBoss() {
 }
 
 void TrainView::drawMultiBall() {
+	if (getting_environment) return;
 	this->environment_shader->Use();
 	mat4 model_matrix = inverse(lookAt(multiBallPos, multiBallPos + multiBallForward, multiBallUp)); // the player is in a 5.0f height position
 	model_matrix = scale(model_matrix, vec3(5.0f, 5.0f, 5.0f)); // the player is in a 5.0f height position
