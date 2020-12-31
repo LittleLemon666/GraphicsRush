@@ -19,6 +19,7 @@
 #include <time.h>
 #include <math.h>
 #include <sstream>
+#include <vector>
 
 #include "TrainWindow.H"
 #include "TrainView.H"
@@ -144,6 +145,7 @@ void runButtonCB(TrainWindow* tw)
 		//put away boss
 		if (tw->trainView->chapter != 1 && tw->m_Track.miniBoss) tw->m_Track.miniBoss = false;
 		if (tw->trainView->chapter != 4 && tw->m_Track.mainBoss) tw->m_Track.mainBoss = false;
+		if (tw->trainView->chapter != 5 && tw->m_Track.extraBoss) tw->m_Track.extraBoss = false;
 
 		if (clock() - lastRedraw > CLOCKS_PER_SEC / 30) {
 			if (clock() - invincibleStart > CLOCKS_PER_SEC) tw->m_Track.player.invincible = false;
@@ -208,6 +210,19 @@ void runButtonCB(TrainWindow* tw)
 					else MainBoss::multiBallUp += difference * 5.0f;
 					if (MainBoss::multiBallCross > MainBoss::targetCross) MainBoss::multiBallCross -= difference;
 					else MainBoss::multiBallCross += difference;
+				}
+
+				//reversi spawn
+				if (tw->m_Track.extraBoss) {
+					std::vector<Obstacle> wall = {};
+					for (int row = 0; row < 4; row++) {
+						for (int col = 0; col < 5; col++) {
+							wall.push_back(Obstacle(tw->m_Track.trainU + 0.4, col - 2, row - 1, rand() % 2));
+						}
+					}
+					for (int obstacle = 0; obstacle < (int)wall.size(); obstacle++) {
+						tw->m_Track.obstacles.push_back(wall[obstacle]);
+					}
 				}
 
 				//player obstacle collision

@@ -26,8 +26,10 @@ class Object {
 class Obstacle : public Object {
 	public:
 		Obstacle(float pos, int _lane, int _height);
+		Obstacle(float pos, int _lane, int _height, bool _black);
 		static void addObstacleModel(std::string obj_path, std::string texture_path);
 		static void loadObstacleModelInHpp();
+		bool black = true;
 };
 
 class Money : public Object {
