@@ -86,7 +86,9 @@ enum Chooser
 	CDEAD,
 	CFREE,
 	CVER2,
-	CVER3
+	CVER3,
+	CSHADER,
+	CCUDA
 };
 
 enum Lighting
@@ -210,6 +212,8 @@ class TrainView : public Fl_Gl_Window
 		void drawFree(bool buttom = false);
 		void drawVer2(bool buttom = false);
 		void drawVer3(bool buttom = false);
+		void drawShader(bool buttom = false);
+		void drawCuda(bool buttom = false);
 		void drawScreenQuad();
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);

@@ -10,12 +10,16 @@ using namespace glm;
 const static std::vector<std::string> shop_items_models = {
 			"QUAD",
 			"QUAD",
+			"QUAD",
+			"QUAD",
 			"QUAD" };
 const static std::vector<std::string> shop_items_textures = {
 			"../GraphicsRush/Images/shop/ver2.png",
 			"../GraphicsRush/Images/shop/ver3.png",
-			"../GraphicsRush/Images/shop/chicken_leg.png" };
-static enum { VER2, VER3, THIGH, SHADER, CUDA, REVERSI } item_name;
+			"../GraphicsRush/Images/shop/chicken_leg.png",
+			"../GraphicsRush/Images/shop/shader.png",
+			"../GraphicsRush/Images/shop/cuda.png" };
+static enum { VER2, VER3, THIGH, SHADER, CUDA } item_name;
 
 class Shop {
 	public:
@@ -27,6 +31,6 @@ class Shop {
 		std::vector<Texture2D> items_texture;
 		std::vector<glm::vec3> items_pos;
 
-		std::vector<int> item_price = { 100, 100, 100, 100, 100, 100 };
+		std::vector<int> item_price = { 100, 100, 100, 100, 100 };
 		void buy(TrainWindow* tw, int item_id);
 };
