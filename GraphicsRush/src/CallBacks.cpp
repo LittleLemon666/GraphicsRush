@@ -128,6 +128,8 @@ static unsigned long buttonBuffer = 0;
 static unsigned long buffer = 10;
 
 static unsigned long invincibleStart = 0;
+static unsigned long deadTimer = 0;
+static unsigned long reversiBuffer = 0;
 
 //***************************************************************************
 //
@@ -213,16 +215,22 @@ void runButtonCB(TrainWindow* tw)
 				}
 
 				//reversi spawn
-				if (tw->m_Track.extraBoss) {
+				if (tw->m_Track.extraBoss && clock() - reversiBuffer > CLOCKS_PER_SEC * 5) {
 					std::vector<Obstacle> wall = {};
+					int first_hole = rand() % 6;
+					int second_hole = rand() % 6;
+					while (second_hole == first_hole) second_hole = rand() % 6;
 					for (int row = 0; row < 4; row++) {
 						for (int col = 0; col < 5; col++) {
-							wall.push_back(Obstacle(tw->m_Track.trainU + 0.4, col - 2, row - 1, rand() % 2));
+							if (!((row - 1 == first_hole / 3 && col - 1 == first_hole % 3) || (row - 1 == second_hole / 3 && col - 1 == second_hole % 3)) && !(rand() % 6 == 0)) {
+								wall.push_back(Obstacle(tw->m_Track.trainU + 0.4, col - 2, row - 1, rand() % 2));
+							}
 						}
 					}
 					for (int obstacle = 0; obstacle < (int)wall.size(); obstacle++) {
 						tw->m_Track.obstacles.push_back(wall[obstacle]);
 					}
+					reversiBuffer = clock();
 				}
 
 				//player obstacle collision
@@ -379,63 +387,63 @@ void endReset(TrainWindow* tw) {
 		return;
 	}
 	if (tw->m_Track.player.invincible) return;
-	//let player see how they died
-	Sleep(1000);
+	if (tw->trainView->game_state == CGAME) deadTimer = clock();
 	tw->trainView->game_state = CDEAD; //***need to design***
+	if (clock() - deadTimer > CLOCKS_PER_SEC * 5) {
+		//save score
+		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
+		tw->m_Track.player.money_total += tw->m_Track.money_collected;
+		tw->m_Track.player.saveFile();
 
-	//save score
-	if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
-	tw->m_Track.player.money_total += tw->m_Track.money_collected;
-	tw->m_Track.player.saveFile();
+		//reset variables
+		tw->m_Track.trainU = 0.0f;
+		tw->m_Track.lane = 0;
+		tw->m_Track.switchLane = 0.0f;
+		tw->m_Track.jumpingState = -1;
 
-	//reset variables
-	tw->m_Track.trainU = 0.0f;
-	tw->m_Track.lane = 0;
-	tw->m_Track.switchLane = 0.0f;
-	tw->m_Track.jumpingState = -1;
+		//miniboss
+		MiniBoss::bossLane = 5;
+		MiniBoss::clipping = -99;
 
-	//miniboss
-	MiniBoss::bossLane = 5;
-	MiniBoss::clipping = -99;
+		//mainboss
+		MainBoss::multiBallForward = 0.4f;
 
-	//mainboss
-	MainBoss::multiBallForward = 0.4f;
+		tw->trainView->camera_movement_state = 0;
+		tw->trainView->camera_movement_index = 0;
+		tw->trainView->door_offset = 0.0f;
 
-	tw->trainView->camera_movement_state = 0;
-	tw->trainView->camera_movement_index = 0;
-	tw->trainView->door_offset = 0.0f;
-
-	if (tw->debug_mode->value()) {
-		tw->runButton->value(0);
-		tw->trainView->game_state = CGAME;
+		if (tw->debug_mode->value()) {
+			tw->runButton->value(0);
+			tw->trainView->game_state = CGAME;
+		}
+		else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) {
+			tw->m_Track.player.items[VER2]--;
+			tw->ver2Button->value(0);
+			verState = 2;
+			tw->trainView->game_state = CGAME;
+		}
+		else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
+			tw->m_Track.player.items[VER3]--;
+			tw->ver3Button->value(0);
+			verState = 3;
+			tw->trainView->game_state = CGAME;
+		}
+		else
+		{
+			verState = 1;
+			tw->m_Track.first_P2 = true;
+			tw->m_Track.first_P5 = true;
+			tw->m_Track.miniBoss = false;
+			tw->m_Track.mainBoss = false;
+			tw->m_Track.extraBoss = false;
+			tw->m_Track.score = 0;
+			tw->m_Track.money_collected = 0;
+			tw->runButton->value(0);
+			tw->speed->value(1);
+			tw->trainView->switchChapter(0);
+			tw->trainView->game_state = CLOBBY;
+		}
+		tw->m_Track.obstacles = {};
+		tw->m_Track.money = {};
 	}
-	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) { 
-		tw->m_Track.player.items[VER2]--;
-		tw->ver2Button->value(0);
-		verState = 2;
-		tw->trainView->game_state = CGAME;
-	}
-	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) { 
-		tw->m_Track.player.items[VER3]--; 
-		tw->ver3Button->value(0);
-		verState = 3;
-		tw->trainView->game_state = CGAME;
-	}
-	else
-	{
-		verState = 1;
-		tw->m_Track.first_P2 = true;
-		tw->m_Track.first_P5 = true;
-		tw->m_Track.miniBoss = false;
-		tw->m_Track.mainBoss = false;
-		tw->m_Track.extraBoss = false;
-		tw->m_Track.score = 0;
-		tw->m_Track.money_collected = 0;
-		tw->runButton->value(0);
-		tw->speed->value(1);
-		tw->trainView->switchChapter(0);
-		tw->trainView->game_state = CLOBBY;
-	}
-	tw->m_Track.obstacles = {};
-	tw->m_Track.money = {};
 }

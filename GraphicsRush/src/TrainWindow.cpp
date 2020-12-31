@@ -222,14 +222,26 @@ advanceTrain(float dir)
 		}
 		else m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
 		walked += difference;
-		if (m_Track.trainU >= m_Track.points.size() - 0.15f) trainView->screen_brightness -= 0.1f;
-		if (m_Track.trainU < 1 && trainView->screen_brightness < 1.0f) trainView->screen_brightness += 0.1f;
-		if ((int)m_Track.trainU >= (int)m_Track.points.size())
-		{
-			if (trainView->chapter == 1) m_Track.first_P2 = false;
-			if (trainView->chapter == 4) m_Track.first_P5 = false;
-			m_Track.trainU -= (int)m_Track.points.size();
-			trainView->switchChapter(trainView->chapter + 1);
+		//infinite reversi
+		if (trainView->chapter == 5) {
+			if (ExtraBoss::health <= 0) {
+				if (trainView->screen_brightness < 0.1f) {
+					trainView->switchChapter(trainView->chapter + 1);
+					m_Track.trainU = 0.0f;
+				}
+				trainView->screen_brightness -= 0.1f;
+			}
+		}
+		else {
+			if (m_Track.trainU >= m_Track.points.size() - 0.15f) trainView->screen_brightness -= 0.1f;
+			if (m_Track.trainU < 1 && trainView->screen_brightness < 1.0f) trainView->screen_brightness += 0.1f;
+			if ((int)m_Track.trainU >= (int)m_Track.points.size())
+			{
+				if (trainView->chapter == 1) m_Track.first_P2 = false;
+				if (trainView->chapter == 4) m_Track.first_P5 = false;
+				m_Track.trainU -= (int)m_Track.points.size();
+				trainView->switchChapter(trainView->chapter + 1);
+			}
 		}
 	}
 	//#####################################################################

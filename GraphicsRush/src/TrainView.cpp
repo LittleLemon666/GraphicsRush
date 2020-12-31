@@ -1132,6 +1132,11 @@ drawWorld()
 		drawMainBoss();
 		drawMultiBall();
 	}
+
+	if (m_pTrack->extraBoss) {
+		drawExtraBoss();
+	}
+
 	drawMoney();
 
 	drawSkybox();
