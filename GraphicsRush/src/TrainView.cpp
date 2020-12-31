@@ -111,12 +111,12 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/space/front.bmp");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
 
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P1.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P2.txt");
@@ -964,12 +964,18 @@ choose(int x, int y)
 
 		break;
 	case CFREE:
-
+		shop->buy(tw, THIGH);
+		game_state = CSHOP;
 		break;
 	case CVER2:
-
+		shop->buy(tw, VER2);
+		game_state = CSHOP;
 		break;
 	case CVER3:
+		shop->buy(tw, VER3);
+		game_state = CSHOP;
+		break;
+	case CDEAD:
 
 		break;
 	default:
@@ -1740,15 +1746,30 @@ printText()
 		vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
 		RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
+		char free_money[10];
+		sprintf(free_money, "$%d", shop->item_price[THIGH]);
+		vec2 free_money_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.4f, 0.0f));
+		RenderText(free_money, free_money_pos.x, free_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
 		char ver2_info[10];
 		sprintf(ver2_info, "ver2");
 		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
 		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
+		char ver2_money[10];
+		sprintf(ver2_money, "$%d", shop->item_price[VER2]);
+		vec2 ver2_money_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.4f, 0.0f));
+		RenderText(ver2_money, ver2_money_pos.x, ver2_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
 		char ver3_info[10];
 		sprintf(ver3_info, "ver3");
 		vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
 		RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char ver3_money[10];
+		sprintf(ver3_money, "$%d", shop->item_price[VER3]);
+		vec2 ver3_money_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.4, 0.0f));
+		RenderText(ver3_money, ver3_money_pos.x, ver3_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 	}
 	else if (game_state == CGAME)
 	{
@@ -1776,6 +1797,23 @@ printText()
 			sprintf(ver3_info, "ver3: ON");
 			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 		}
+	}
+	else if (game_state == CDEAD)
+	{
+		char free_info[10];
+		sprintf(free_info, "thigh");
+		vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char ver2_info[10];
+		sprintf(ver2_info, "ver2");
+		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
+		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char ver3_info[10];
+		sprintf(ver3_info, "ver3");
+		vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 	}
 }
 
