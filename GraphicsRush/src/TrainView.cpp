@@ -111,12 +111,12 @@ TrainView(int x, int y, int w, int h, const char* l)
 	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/space/front.bmp");
 
 	chapters_skybox_textures_faces.push_back(std::vector<std::string>());
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
-	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.bmp");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
+	chapters_skybox_textures_faces.back().push_back("../GraphicsRush/Images/board/board.jpg");
 
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P1.txt");
 	chapter_path_file.push_back("../GraphicsRush/TrackFiles/P2.txt");
