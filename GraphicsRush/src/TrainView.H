@@ -88,7 +88,12 @@ enum Chooser
 	CVER2,
 	CVER3,
 	CSHADER,
-	CCUDA
+	CCUDA,
+	CCHECKPOINT1,
+	CCHECKPOINT2,
+	CCHECKPOINT3,
+	CCHECKPOINT4,
+	CCHECKPOINT5
 };
 
 enum Lighting
@@ -166,6 +171,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* environment_shader = nullptr;
 		Shader* blending_shader = nullptr;
 		Shader* blending_flat_shader = nullptr;
+		Shader* blending_flat_gray_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -214,6 +220,7 @@ class TrainView : public Fl_Gl_Window
 		void drawVer3(bool buttom = false);
 		void drawShader(bool buttom = false);
 		void drawCuda(bool buttom = false);
+		void drawCheckpoint(bool buttom = false);
 		void drawScreenQuad();
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);
