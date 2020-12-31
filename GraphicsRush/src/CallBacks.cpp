@@ -366,6 +366,7 @@ void endReset(TrainWindow* tw) {
 	if (tw->m_Track.player.invincible) return;
 	//let player see how they died
 	Sleep(1000);
+	tw->trainView->game_state = CDEAD; //***need to design***
 
 	//save score
 	if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
@@ -389,16 +390,21 @@ void endReset(TrainWindow* tw) {
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
 
-	if (tw->debug_mode->value()) { tw->runButton->value(0); }
+	if (tw->debug_mode->value()) {
+		tw->runButton->value(0);
+		tw->trainView->game_state = CGAME;
+	}
 	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) { 
 		tw->m_Track.player.items[VER2]--;
 		tw->ver2Button->value(0);
 		verState = 2;
+		tw->trainView->game_state = CGAME;
 	}
 	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) { 
 		tw->m_Track.player.items[VER3]--; 
 		tw->ver3Button->value(0);
 		verState = 3;
+		tw->trainView->game_state = CGAME;
 	}
 	else
 	{
@@ -413,6 +419,7 @@ void endReset(TrainWindow* tw) {
 		tw->runButton->value(0);
 		tw->speed->value(1);
 		tw->trainView->switchChapter(0);
+		tw->trainView->game_state = CLOBBY;
 	}
 	tw->m_Track.obstacles = {};
 	tw->m_Track.money = {};

@@ -16,6 +16,7 @@ loadItemsModel()
 	{
 		items_obj.push_back(new Model(shop_items_models[i]));
 		items_texture.push_back(Texture2D(shop_items_textures[i].c_str()));
+		items_pos.push_back(glm::vec3());
 	}
 }
 

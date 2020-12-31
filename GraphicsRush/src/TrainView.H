@@ -82,7 +82,11 @@ enum Chooser
 {
 	CLOBBY, // 0 is back ground in chooser
 	CSHOP,
-	CGAME
+	CGAME,
+	CDEAD,
+	CFREE,
+	CVER2,
+	CVER3
 };
 
 enum Lighting
@@ -156,8 +160,10 @@ class TrainView : public Fl_Gl_Window
 		Shader* water_surface_shader = nullptr;
 		Shader* shadow_shader = nullptr;
 		Shader* choose_shader = nullptr;
+		Shader* choose_flat_shader = nullptr;
 		Shader* environment_shader = nullptr;
 		Shader* blending_shader = nullptr;
+		Shader* blending_flat_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -201,8 +207,12 @@ class TrainView : public Fl_Gl_Window
 		void drawDoor();
 		void drawEarth();
 		void drawSun();
+		void drawFree(bool buttom = false);
+		void drawVer2(bool buttom = false);
+		void drawVer3(bool buttom = false);
 		void drawScreenQuad();
 		void printText();
+		vec2 ndcToViewport(const vec3& ndc);
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
 		const int PATH_DIVIDE = 50;
 		GMTPipeline gmt;

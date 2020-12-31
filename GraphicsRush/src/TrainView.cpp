@@ -963,6 +963,15 @@ choose(int x, int y)
 	case CSHOP:
 
 		break;
+	case CFREE:
+
+		break;
+	case CVER2:
+
+		break;
+	case CVER3:
+
+		break;
 	default:
 		game_state = CGAME;
 		break;
@@ -1030,7 +1039,7 @@ renderEnvironment()
 void TrainView::
 drawShop(bool buttom)
 {
-	if (game_state != CLOBBY) return; // don't draw the shop if not in lobby
+	if (game_state != CLOBBY || chapter != 0) return; // don't draw the shop if not in lobby
 
 	if (buttom)
 		this->choose_shader->Use();
@@ -1070,6 +1079,10 @@ void TrainView::
 drawChooser()
 {
 	drawShop(true);
+
+	drawFree(true);
+	drawVer2(true);
+	drawVer3(true);
 }
 
 void TrainView::
@@ -1128,7 +1141,13 @@ drawWorld()
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (m_pTrack->miniBoss) drawMiniBoss();
+
+	drawFree();
+	drawVer2();
+	drawVer3();
+
 	glDisable(GL_BLEND);
 }
 
@@ -1562,6 +1581,117 @@ drawSun()
 }
 
 void TrainView::
+drawFree(bool buttom)
+{
+	if (game_state != CDEAD && game_state != CSHOP) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else
+		this->blending_flat_shader->Use();
+
+	if (game_state == CSHOP)
+		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.7f, 0.0f);
+	else if (game_state == CDEAD)
+		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.0f, 0.0f);
+
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, this->shop->items_pos[THIGH]);
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CFREE);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->shop->items_texture[THIGH].bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->shop->items_obj[THIGH]->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawVer2(bool buttom)
+{
+	if (game_state != CDEAD && game_state != CSHOP) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else
+		this->blending_flat_shader->Use();
+
+	if (game_state == CSHOP)
+		this->shop->items_pos[VER2] = vec3(0.0f, 0.7f, 0.0f);
+	else if (game_state == CDEAD)
+		this->shop->items_pos[VER2] = vec3(0.0f, 0.0f, 0.0f);
+
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, this->shop->items_pos[VER2]);
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CVER2);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->shop->items_texture[VER2].bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->shop->items_obj[VER2]->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawVer3(bool buttom)
+{
+	if (game_state != CDEAD && game_state != CSHOP) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else
+		this->blending_flat_shader->Use();
+
+	if (game_state == CSHOP)
+		this->shop->items_pos[VER3] = vec3(0.65f, 0.7f, 0.0f);
+	else if (game_state == CDEAD)
+		this->shop->items_pos[VER3] = vec3(0.65f, 0.0f, 0.0f);
+
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, this->shop->items_pos[VER3]);
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CVER3);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->shop->items_texture[VER3].bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->shop->items_obj[VER3]->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
 drawScreenQuad()
 {
 	this->screen_shader->Use();
@@ -1586,6 +1716,23 @@ printText()
 		char shop_info[20];
 		sprintf(shop_info, "140.118.127.125");
 		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+	}
+	else if (game_state == CSHOP)
+	{
+		char free_info[10];
+		sprintf(free_info, "thigh");
+		vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char ver2_info[10];
+		sprintf(ver2_info, "ver2");
+		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
+		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char ver3_info[10];
+		sprintf(ver3_info, "ver3");
+		vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 	}
 	else if (game_state == CGAME)
 	{
@@ -1614,6 +1761,12 @@ printText()
 			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 		}
 	}
+}
+
+vec2 TrainView::
+ndcToViewport(const vec3& ndc)
+{
+	return vec2(w() * (ndc.x / 2.0f + 0.5f), h() * (ndc.y / 2.0f + 0.5f));
 }
 
 //************************************************************************
@@ -1691,6 +1844,13 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/choose.frag");
 
+		if (!this->choose_flat_shader)
+			this->choose_flat_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/choose_flat.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/choose_flat.frag");
+
 		if (!this->environment_shader)
 			this->environment_shader = new
 			Shader(
@@ -1704,6 +1864,13 @@ draw()
 				"../GraphicsRush/src/shaders/blending.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/blending.frag");
+
+		if (!this->blending_flat_shader)
+			this->blending_flat_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/blending_flat.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/blending_flat.frag");
 
 		if (!this->commom_matrices)
 		{
