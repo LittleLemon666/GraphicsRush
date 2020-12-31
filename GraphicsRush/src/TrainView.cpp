@@ -1102,7 +1102,7 @@ drawWorld()
 		unsetupShadows();
 	}
 
-	drawPath();
+	if (chapter != 5) drawPath();
 
 	drawPlayer();
 
@@ -1319,7 +1319,7 @@ void TrainView::loadMainBoss() {
 }
 
 void TrainView::loadExtraBoss() {
-	m_pTrack->mainBoss = true;
+	m_pTrack->extraBoss = true;
 }
 
 void TrainView::
@@ -1338,7 +1338,7 @@ drawObstacles(bool doShadow) {
 		float forwardSize = 2.0f;
 		float upSize = 2.0f;
 		float heightSize = 10.0f;
-		if (m_pTrack->obstacles[obstacle].height) obstaclePosition += obstacleUp * heightSize;
+		obstaclePosition += obstacleUp * heightSize * (float)m_pTrack->obstacles[obstacle].height;
 
 		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
 		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
@@ -1348,7 +1348,13 @@ drawObstacles(bool doShadow) {
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			(m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4 && chapter != 5) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1].bind(0);
+			if (chapter == 5) {
+				if (m_pTrack->obstacles[obstacle].black) {
+					(m_pTrack->obstacles[obstacle]).obstacle_texture[17].bind(0);
+				}
+				else (m_pTrack->obstacles[obstacle]).obstacle_texture[18].bind(0);
+			}
+			else (m_pTrack->obstacles[obstacle]).obstacle_texture[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1].bind(0);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
@@ -1356,8 +1362,13 @@ drawObstacles(bool doShadow) {
 		}
 		else	
 			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
-
-		m_pTrack->obstacles[obstacle].obstacle_obj[((chapter != 4 && chapter != 5) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1]->draw();
+		if (chapter == 5) {
+			if (m_pTrack->obstacles[obstacle].black) {
+				(m_pTrack->obstacles[obstacle]).obstacle_obj[17]->draw();
+			}
+			else (m_pTrack->obstacles[obstacle]).obstacle_obj[18]->draw();
+		}
+		else m_pTrack->obstacles[obstacle].obstacle_obj[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->obstacles[obstacle].type + 1]->draw();
 	}
 	//unbind shader(switch to fixed pipeline)
 	if (!doShadow)

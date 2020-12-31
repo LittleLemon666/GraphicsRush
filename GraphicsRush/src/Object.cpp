@@ -17,6 +17,14 @@ Obstacle(float pos, int _lane, int _height) : Object(pos, _lane, _height) {
 	
 }
 
+Obstacle::
+Obstacle(float pos, int _lane, int _height, bool _black) : Object(pos, _lane, _height) {
+	position = pos;
+	lane = _lane;
+	height = _height;
+	black = _black;
+}
+
 void Obstacle::
 addObstacleModel(std::string obj_path, std::string texture_path)
 {
@@ -33,6 +41,12 @@ loadObstacleModelInHpp()
 			obstacle_texture.push_back(Texture2D(obstacleTextures[_chapter][error].c_str()));
 		}
 	}
+	//reversi blocks
+	obstacle_obj.push_back(new Model("CUBE"));
+	obstacle_texture.push_back(Texture2D("../GraphicsRush/Images/reversi/black.png"));
+	obstacle_obj.push_back(new Model("CUBE"));
+	obstacle_texture.push_back(Texture2D("../GraphicsRush/Images/reversi/white.png"));
+
 }
 
 Money::Money(float pos, int _lane, int _height) : Object(pos, _lane, _height) {
