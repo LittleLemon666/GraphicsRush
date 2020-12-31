@@ -10,3 +10,5 @@ float MainBoss::multiBallCross = 0.0f;
 float MainBoss::targetForward = 0.0f;
 float MainBoss::targetUp = 10.0f;
 float MainBoss::targetCross = 0.0f;
+
+int ExtraBoss::health = 10;
