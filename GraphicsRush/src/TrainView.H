@@ -172,6 +172,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* blending_shader = nullptr;
 		Shader* blending_flat_shader = nullptr;
 		Shader* blending_flat_gray_shader = nullptr;
+		Shader* firework_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();

@@ -970,7 +970,11 @@ choose(int x, int y)
 			shop->buy(tw, THIGH);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->thighButton->value(!tw->thighButton->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CVER2:
 		if (origin_game_state == CSHOP)
@@ -994,7 +998,11 @@ choose(int x, int y)
 			shop->buy(tw, SHADER);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->shaderButton->value(!tw->shaderButton->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCUDA:
 		if (origin_game_state == CSHOP)
@@ -1002,7 +1010,11 @@ choose(int x, int y)
 			shop->buy(tw, CUDA);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cudaButton->value(!tw->cudaButton->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCHECKPOINT1:
 		if (origin_game_state == CSHOP)
@@ -1010,7 +1022,11 @@ choose(int x, int y)
 			shop->buy(tw, CHECKPOINT1);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cp1Button->value(!tw->cp1Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCHECKPOINT2:
 		if (origin_game_state == CSHOP)
@@ -1018,7 +1034,11 @@ choose(int x, int y)
 			shop->buy(tw, CHECKPOINT2);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cp2Button->value(!tw->cp2Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCHECKPOINT3:
 		if (origin_game_state == CSHOP)
@@ -1026,7 +1046,11 @@ choose(int x, int y)
 			shop->buy(tw, CHECKPOINT3);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cp3Button->value(!tw->cp3Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCHECKPOINT4:
 		if (origin_game_state == CSHOP)
@@ -1034,7 +1058,11 @@ choose(int x, int y)
 			shop->buy(tw, CHECKPOINT4);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cp4Button->value(!tw->cp4Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CCHECKPOINT5:
 		if (origin_game_state == CSHOP)
@@ -1042,7 +1070,11 @@ choose(int x, int y)
 			shop->buy(tw, CHECKPOINT5);
 			game_state = CSHOP;
 		}
-		//else 030
+		else
+		{
+			tw->cp5Button->value(!tw->cp5Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CDEAD:
 
@@ -1680,22 +1712,26 @@ drawSun()
 void TrainView::
 drawFree(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP && !(game_state == CDEAD && tw->thighButton->value())) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->thighButton->value())
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.7f, 0.0f);
 	else if (game_state == CLOBBY)
 		this->shop->items_pos[THIGH] = vec3(0.2f, -0.5f, 0.0f);
+	else if (game_state == CDEAD)
+		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.0f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[THIGH]);
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	if (game_state == CSHOP)
+	if (game_state == CSHOP || game_state == CDEAD)
 		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	else if (game_state == CLOBBY)
 		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
@@ -1720,7 +1756,7 @@ drawFree(bool buttom)
 void TrainView::
 drawVer2(bool buttom)
 {
-	if (game_state != CDEAD && game_state != CSHOP) return;
+	if (!(game_state == CDEAD && tw->ver2Button->value()) && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -1757,7 +1793,7 @@ drawVer2(bool buttom)
 void TrainView::
 drawVer3(bool buttom)
 {
-	if (game_state != CDEAD && game_state != CSHOP) return;
+	if (!(game_state == CDEAD && tw->ver3Button->value()) && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -1798,8 +1834,10 @@ drawShader(bool buttom)
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->shaderButton->value())
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[SHADER] = vec3(-0.65f, -0.05f, 0.0f);
@@ -1838,8 +1876,10 @@ drawCuda(bool buttom)
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->cudaButton->value())
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[CUDA] = vec3(0.0f, -0.05f, 0.0f);
@@ -1875,17 +1915,24 @@ void TrainView::drawCheckpoint(bool buttom)
 {
 	if (game_state != CLOBBY && game_state != CSHOP) return;
 
-	if (buttom)
-		this->choose_flat_shader->Use();
-	else
-		this->blending_flat_shader->Use();
 
 	for (int checkpoint_i = 0; checkpoint_i < NUMBER_OF_PROJECTS; checkpoint_i++)
 	{
+		if (buttom)
+			this->choose_flat_shader->Use();
+		else if ((checkpoint_i == 0 && tw->cp1Button->value()) ||
+			(checkpoint_i == 1 && tw->cp2Button->value()) ||
+			(checkpoint_i == 2 && tw->cp3Button->value()) ||
+			(checkpoint_i == 3 && tw->cp4Button->value()) ||
+			(checkpoint_i == 4 && tw->cp5Button->value()))
+			this->blending_flat_shader->Use();
+		else
+			this->blending_flat_gray_shader->Use();
+
 		if (game_state == CSHOP)
 			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3(-0.6 + checkpoint_i * 0.3, -0.6f, 0.0f);
 		else if (game_state == CLOBBY)
-			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3( 0.2 + checkpoint_i * 0.15, -0.7f, 0.0f);
+			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3(0.2 + checkpoint_i * 0.15, -0.7f, 0.0f);
 
 		mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 		model_matrix = translate(model_matrix, this->shop->items_pos[CHECKPOINT1 + checkpoint_i]);
@@ -1907,10 +1954,10 @@ void TrainView::drawCheckpoint(bool buttom)
 		}
 
 		this->shop->items_obj[CHECKPOINT1 + checkpoint_i]->draw();
-	}
 
-	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+		//unbind shader(switch to fixed pipeline)
+		glUseProgram(0);
+	}
 }
 
 void TrainView::
@@ -1937,7 +1984,7 @@ printText()
 	{
 		char shop_info[20];
 		sprintf(shop_info, "140.118.127.125");
-		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+		RenderText(shop_info, w() / 2.0f - 245.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
 	}
 	else if (game_state == CSHOP)
 	{
@@ -2033,20 +2080,29 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		char free_info[10];
-		sprintf(free_info, "thigh");
-		vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
-		RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->thighButton->value())
+		{
+			char free_info[10];
+			sprintf(free_info, "thigh");
+			vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
+			RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 
-		char ver2_info[10];
-		sprintf(ver2_info, "ver2");
-		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
-		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->ver2Button->value())
+		{
+			char ver2_info[10];
+			sprintf(ver2_info, "ver2");
+			vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
+			RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 
-		char ver3_info[10];
-		sprintf(ver3_info, "ver3");
-		vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
-		RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->ver3Button->value())
+		{
+			char ver3_info[10];
+			sprintf(ver3_info, "ver3");
+			vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
+			RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 	}
 }
 
@@ -2165,6 +2221,13 @@ draw()
 				"../GraphicsRush/src/shaders/blending_flat.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/blending_flat_gray.frag");
+
+		if (!this->firework_shader)
+			this->firework_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/firework.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/firework.frag");
 
 		if (!this->commom_matrices)
 		{

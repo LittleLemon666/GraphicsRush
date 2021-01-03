@@ -158,6 +158,33 @@ TrainWindow(const int x, const int y)
 		ver3Button = new Fl_Button(735, pty, 60, 20, "Ver3");
 		togglify(ver3Button, 0);
 
+		pty += 30;
+
+		//
+		shaderButton = new Fl_Button(605, pty, 60, 20, "Shader");
+		togglify(shaderButton, 0);
+		//
+		cudaButton = new Fl_Button(670, pty, 60, 20, "Cuda");
+		togglify(cudaButton, 0);
+
+		pty += 30;
+		//checkpoint1
+		cp1Button = new Fl_Button(605, pty, 60, 20, "CP1");
+		togglify(cp1Button, 0);
+		//checkpoint2
+		cp2Button = new Fl_Button(670, pty, 60, 20, "CP2");
+		togglify(cp2Button, 0);
+		//checkpoint3
+		cp3Button = new Fl_Button(735, pty, 60, 20, "CP3");
+		togglify(cp3Button, 0);
+		pty += 30;
+		//checkpoint4
+		cp4Button = new Fl_Button(605, pty, 60, 20, "CP4");
+		togglify(cp4Button, 0);
+		//checkpoint5
+		cp5Button = new Fl_Button(670, pty, 60, 20, "CP5");
+		togglify(cp5Button, 0);
+
 #ifdef EXAMPLE_SOLUTION
 		makeExampleWidgets(this,pty);
 #endif
