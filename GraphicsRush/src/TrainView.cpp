@@ -2352,7 +2352,7 @@ draw()
 		}
 
 		if (!player_obj)
-			player_obj = new Model(player_obj_path);
+			player_obj = new Model(player_obj_path, true);
 
 		if (!earth_obj)
 			earth_obj = new Model(earth_obj_path);
