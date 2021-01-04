@@ -43,6 +43,7 @@ class CTrack;
 #include "Model.H"
 #include "Boss.H"
 #include "Shop.H"
+#include "Firework.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -344,8 +345,6 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* mini_boss_obj_texture = nullptr;
 		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 
-		Model* firework_obj = nullptr;
-		std::string firework_obj_path = "CUBE";
-		float firework_time = 0.0;
-		float firework_time_begin = 0.0;
+		Firework** firework = nullptr;
+		int num_firework = 3;
 };

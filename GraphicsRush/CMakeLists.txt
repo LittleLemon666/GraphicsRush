@@ -60,6 +60,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}ShaderInfo.h
     ${SRC_DIR}Boss.h
     ${SRC_DIR}Shop.h
+    ${SRC_DIR}Firework.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
