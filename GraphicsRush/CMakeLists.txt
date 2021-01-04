@@ -29,7 +29,10 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/blending.vert
     ${SRC_DIR}shaders/blending.frag
     ${SRC_DIR}shaders/blending_flat.vert
-    ${SRC_DIR}shaders/blending_flat.frag)
+    ${SRC_DIR}shaders/blending_flat.frag
+    ${SRC_DIR}shaders/blending_flat_gray.frag
+    ${SRC_DIR}shaders/firework.vert
+    ${SRC_DIR}shaders/firework.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h

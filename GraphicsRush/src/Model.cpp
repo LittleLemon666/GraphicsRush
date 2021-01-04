@@ -7,7 +7,7 @@ Model()
 }
 
 Model::
-Model(const std::string fileName)
+Model(const std::string fileName, bool uv_reflect)
 {
 	if (fileName == "CUBE")
 	{
@@ -374,7 +374,7 @@ Model(const std::string fileName)
 	else
 	{
 		loadOBJ(fileName);
-		VBOIndex(vertices, uvs, normals);
+		VBOIndex(vertices, uvs, normals, uv_reflect);
 	}
 }
 
@@ -526,7 +526,7 @@ draw()
 }
 
 void Model::
-VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals)
+VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals, bool uv_reflect)
 {
 	std::map<PackedVertex, unsigned short> VertexToOutIndex;
 
@@ -546,6 +546,7 @@ VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, st
 		else { // If not, it needs to be added in the output data.
 			indexed_vertices.push_back(in_vertices[i]);
 			indexed_uvs.push_back(in_uvs[i]);
+			if (uv_reflect) indexed_uvs.back().y = 1 - indexed_uvs.back().y;
 			indexed_normals.push_back(in_normals[i]);
 			unsigned short newindex = (unsigned short)indexed_vertices.size() - 1;
 			indices.push_back(newindex);

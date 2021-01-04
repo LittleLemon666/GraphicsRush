@@ -95,6 +95,13 @@ class TrainWindow : public Fl_Double_Window {
 		Fl_Button* thighButton;
 		Fl_Button* ver2Button;
 		Fl_Button* ver3Button;
+		Fl_Button* shaderButton;
+		Fl_Button* cudaButton;
+		Fl_Button* cp1Button;
+		Fl_Button* cp2Button;
+		Fl_Button* cp3Button;
+		Fl_Button* cp4Button;
+		Fl_Button* cp5Button;
 #ifdef EXAMPLE_SOLUTION
 	ExampleWidgets ew;
 #endif

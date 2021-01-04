@@ -33,7 +33,7 @@ class Model
 {
 public:
 	Model();
-	Model(const std::string);
+	Model(const std::string, bool uv_reflect = false);
 	Model(const Model& model);
 
 	Model operator=(const Model& model);
@@ -61,7 +61,7 @@ private:
 	GLuint uvbuffer;
 	GLuint normalbuffer;
 	GLuint elementbuffer;
-	void VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals);
+	void VBOIndex(std::vector<glm::vec3>& in_vertices, std::vector<glm::vec2>& in_uvs, std::vector<glm::vec3>& in_normals, bool uv_reflect);
 	void VAOProcess();
 	bool getSimilarVertexIndex_fast(PackedVertex& packed, std::map<PackedVertex, unsigned short>& VertexToOutIndex, unsigned short& result);
 };
