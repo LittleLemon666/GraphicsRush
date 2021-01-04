@@ -163,10 +163,10 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.lane++;
 					buttonBuffer = buffer;
 				}
-				if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
-					tw->m_Track.jumpingState = 0;
-					buttonBuffer = buffer;
-				}
+			}
+			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
+				tw->m_Track.jumpingState = 0;
+				//buttonBuffer = buffer;
 			}
 			
 			if (tw->trainView->game_state == CGAME)
