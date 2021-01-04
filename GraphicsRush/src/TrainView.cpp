@@ -32,6 +32,7 @@
 #include "TrainView.H"
 #include "TrainWindow.H"
 #include "Utilities/3DUtils.H"
+#include "CallBacks.H"
 
 /*********************NEW ADDITIONS*********************/
 #define STB_IMAGE_IMPLEMENTATION
@@ -477,8 +478,14 @@ switchChapter(const int& chapter_index)
 {
 	int old_chapter = chapter;
 	chapter = chapter_index;
-	if (chapter >= NUMBER_OF_PROJECTS) {
-		while (chapter == old_chapter) chapter = rand() % NUMBER_OF_PROJECTS;
+	if (chapter == 5) {
+		tw->m_Track.first_P2 = false;
+		tw->m_Track.first_P5 = false;
+	}
+	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
+		do {
+			chapter = rand() % (NUMBER_OF_PROJECTS + 1);
+		} while (chapter == old_chapter);
 	}
 	load_chapter = false;
 }
@@ -1237,6 +1244,7 @@ drawWorld()
 	}
 
 	drawObstacles();
+	drawReversiPiece();
 	
 	if (m_pTrack->mainBoss) {
 		drawMainBoss();
@@ -1607,6 +1615,65 @@ void TrainView::drawExtraBoss() {
 	glEnd();
 }
 
+void TrainView::drawReversiPiece(bool doShadow) {
+	if (!doShadow)
+		this->basic_shader->Use();
+
+	for (int obstacle = 0; obstacle < (int)m_pTrack->throwingPosition.size(); obstacle++) {
+		vec3 obstaclePosition(0.0f, 0.0f, 0.0f), obstacleForward(0.0f, 0.0f, 0.0f), obstacleUp(0.0f, 0.0f, 0.0f), obstacleCross(0.0f, 0.0f, 0.0f);
+		gmt.calculateAll(m_pTrack->throwingPosition[obstacle].position + m_pTrack->trainU, obstaclePosition, obstacleForward, obstacleUp, obstacleCross);
+		obstacleForward = normalize(obstacleForward);
+		obstacleUp = normalize(obstacleUp);
+		obstacleCross = normalize(obstacleCross);
+		obstaclePosition += obstacleUp * 2.0f;
+		obstaclePosition += obstacleCross * ((float)m_pTrack->throwingPosition[obstacle].lane - 2) * 5.0f;
+		float forwardSize = 2.0f;
+		float upSize = 2.0f;
+		float heightSize = 10.0f;
+		obstaclePosition += obstacleUp * heightSize * ((float)m_pTrack->throwingPosition[obstacle].height - 1.0f);
+
+		mat4 model_matrix = inverse(lookAt(obstaclePosition, obstaclePosition + obstacleForward * forwardSize, obstacleUp * upSize)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(4.5, 4.5, 4.5));
+		int chapter_5_rand = rand() % 4;
+		if (!doShadow)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+			if (chapter == 5) {
+				if (m_pTrack->throwingPosition[obstacle].black) {
+					(m_pTrack->throwingPosition[obstacle]).obstacle_texture[17].bind(0);
+				}
+				else (m_pTrack->throwingPosition[obstacle]).obstacle_texture[18].bind(0);
+			}
+			else (m_pTrack->throwingPosition[obstacle]).obstacle_texture[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->throwingPosition[obstacle].type + 1].bind(0);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+			this->shadow->bind(1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+		}
+		else
+			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
+		if (chapter == 5) {
+			if (m_pTrack->throwingPosition[obstacle].black) {
+				(m_pTrack->throwingPosition[obstacle]).obstacle_obj[17]->draw();
+			}
+			else (m_pTrack->throwingPosition[obstacle]).obstacle_obj[18]->draw();
+		}
+		else m_pTrack->throwingPosition[obstacle].obstacle_obj[((chapter != 4) ? chapter : (chapter_5_rand % 4)) * 4 + m_pTrack->throwingPosition[obstacle].type + 1]->draw();
+		
+		//make reversi pieces collide with extra boss
+		m_pTrack->throwingPosition[obstacle].position += 0.01;
+		if (m_pTrack->throwingPosition[obstacle].position > 0.4) {
+			m_pTrack->throwingPosition.erase(m_pTrack->throwingPosition.begin() + obstacle);
+			ExtraBoss::health -= 1;
+			obstacle--;
+		}
+	}
+	//unbind shader(switch to fixed pipeline)
+	if (!doShadow)
+		glUseProgram(0);
+}
 
 void TrainView::
 drawSkybox()

@@ -212,6 +212,7 @@ class TrainView : public Fl_Gl_Window
 		void drawMainBoss();
 		void drawMultiBall();
 		void drawExtraBoss();
+		void drawReversiPiece(bool doShadow = false);
 		void drawSkybox();
 		void drawDoor();
 		void drawEarth();

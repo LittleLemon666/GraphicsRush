@@ -129,7 +129,7 @@ static unsigned long buffer = 10;
 
 static unsigned long invincibleStart = 0;
 static unsigned long deadTimer = 0;
-static unsigned long reversiBuffer = 0;
+unsigned long reversiBuffer = 0;
 
 //***************************************************************************
 //
@@ -142,6 +142,33 @@ static unsigned long reversiBuffer = 0;
 void runButtonCB(TrainWindow* tw)
 //===========================================================================
 {
+	if (tw->cp5Button->value()) tw->startingChapter = 4;
+	else if (tw->cp4Button->value()) tw->startingChapter = 3;
+	else if (tw->cp3Button->value()) tw->startingChapter = 2;
+	else if (tw->cp2Button->value()) tw->startingChapter = 1;
+	else if (tw->cp1Button->value()) tw->startingChapter = 0;
+	int chapter = tw->startingChapter;
+	switch (tw->startingChapter) {
+		case -1:
+			chapter = 0;
+			break;
+		case 0:
+			tw->m_Track.first_P2 = false;
+			tw->m_Track.first_P5 = false;
+			break;
+		case 1:
+			break;
+		case 2:
+			tw->m_Track.first_P2 = false;
+			break;
+		case 3:
+			tw->m_Track.first_P2 = false;
+			break;
+		case 4:
+			tw->m_Track.first_P2 = false;
+			break;
+	}
+	tw->trainView->switchChapter(chapter);
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
 		//put away boss
@@ -163,10 +190,10 @@ void runButtonCB(TrainWindow* tw)
 					tw->m_Track.lane++;
 					buttonBuffer = buffer;
 				}
-				if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
-					tw->m_Track.jumpingState = 0;
-					buttonBuffer = buffer;
-				}
+			}
+			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
+				tw->m_Track.jumpingState = 0;
+				//buttonBuffer = buffer;
 			}
 			
 			if (tw->trainView->game_state == CGAME)
@@ -215,22 +242,49 @@ void runButtonCB(TrainWindow* tw)
 				}
 
 				//reversi spawn
-				if (tw->m_Track.extraBoss && clock() - reversiBuffer > CLOCKS_PER_SEC * 5) {
-					std::vector<Obstacle> wall = {};
-					int first_hole = rand() % 6;
-					int second_hole = rand() % 6;
-					while (second_hole == first_hole) second_hole = rand() % 6;
-					for (int row = 0; row < 4; row++) {
-						for (int col = 0; col < 5; col++) {
-							if (!((row - 1 == first_hole / 3 && col - 1 == first_hole % 3) || (row - 1 == second_hole / 3 && col - 1 == second_hole % 3)) && !(rand() % 6 == 0)) {
-								wall.push_back(Obstacle(tw->m_Track.trainU + 0.4, col - 2, row - 1, rand() % 2));
+				if (tw->m_Track.extraBoss) {
+					if (reversiBuffer == 0) reversiBuffer = clock();
+					if (clock() - reversiBuffer > CLOCKS_PER_SEC * 5) {
+
+						//reset
+						for (int obstacle = 0; obstacle < (int)tw->m_Track.wall.size(); obstacle++) {
+							tw->m_Track.obstacles.erase(tw->m_Track.obstacles.begin() + (int)tw->m_Track.obstacles.size() - 1);
+						}
+						tw->m_Track.wall = {};
+						tw->m_Track.wallLocation = { {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} };
+
+						//poke holes
+						int first_hole = rand() % 6;
+						int second_hole = rand() % 6;
+						while (second_hole == first_hole) second_hole = rand() % 6;
+						for (int row = 0; row < 4; row++) {
+							for (int col = 0; col < 5; col++) {
+								if (!((row - 1 == first_hole / 3 && col - 1 == first_hole % 3) || (row - 1 == second_hole / 3 && col - 1 == second_hole % 3)) && !(rand() % 6 == 0)) {
+									int color = rand() % 2;
+									tw->m_Track.wall.push_back(Obstacle(tw->m_Track.trainU + 0.4, col - 2, row - 1, color));
+									tw->m_Track.wallLocation[row][col] = color + 1;
+								}
 							}
 						}
+
+						//make obstacles real
+						for (int obstacle = 0; obstacle < (int)tw->m_Track.wall.size(); obstacle++) {
+							tw->m_Track.obstacles.push_back(tw->m_Track.wall[obstacle]);
+						}
+						reversiBuffer = clock();
 					}
-					for (int obstacle = 0; obstacle < (int)wall.size(); obstacle++) {
-						tw->m_Track.obstacles.push_back(wall[obstacle]);
+				}
+				if (tw->trainView->chapter == 5) {
+					//printf("%d 1\n", tw->m_Track.throwableObstacles.size());
+					if (abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
+						loadThrowableObstacles(tw, getPlayerReversiGridLocation(tw));
+						for (int obstacle = 0; obstacle < (int)tw->m_Track.throwableObstacles.size(); obstacle++) {
+							tw->m_Track.throwingPosition.push_back(Obstacle(0.0f, tw->m_Track.throwableObstacles[obstacle][1], tw->m_Track.throwableObstacles[obstacle][0], 0));
+							tw->m_Track.throwableObstacles.erase(tw->m_Track.throwableObstacles.begin() + obstacle);
+							obstacle--;
+						}
 					}
-					reversiBuffer = clock();
+					//printf("%d 2\n", tw->m_Track.throwableObstacles.size());
 				}
 
 				//player obstacle collision
@@ -448,3 +502,40 @@ void endReset(TrainWindow* tw) {
 		tw->m_Track.money = {};
 	}
 }
+
+int getPlayerReversiGridLocation(TrainWindow* tw) {
+	int lane = 0, height = 0;
+	if (tw->m_Track.switchLane < -0.33f) lane = -1;
+	else if (tw->m_Track.switchLane > 0.33f) lane = 1;
+	if (tw->m_Track.airbornePosition[tw->m_Track.jumpingState] > 0.5) height = 1;
+	return (height + 1) * 5 + lane + 2;
+};
+
+void loadThrowableObstacles(TrainWindow* tw, int playerPosition) {
+	int player_x = playerPosition % 5, player_y = playerPosition / 5;
+	for (int row = -1; row < 2; row++) {
+		for (int col = -1; col < 2; col++) {
+			if (row == 0 && col == 0) col++;
+			vector<vector<int>> result = {};
+			reversiRecursion(player_x, player_y, row, col, tw, result);
+		}
+	}
+};
+
+void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow* tw, vector<vector<int>> result) {
+
+	//check if in range
+	if (player_x + col < 0 || player_x + col > 4) return;
+	if (player_y + row < 0 || player_y + row > 3) return;
+
+	if (tw->m_Track.wallLocation[player_y + row][player_x + col] == 2) {
+		result.push_back({ player_y + row, player_x + col });
+		reversiRecursion(player_x + col, player_y + row, row, col, tw, result);
+	}
+	else if (tw->m_Track.wallLocation[player_y + row][player_x + col] == 1) {
+		for (int hole = 0; hole < (int)result.size(); hole++) {
+			tw->m_Track.wallLocation[result[hole][0]][result[hole][1]] = 1;
+			tw->m_Track.throwableObstacles.push_back(result[hole]);
+		}
+	}
+};
