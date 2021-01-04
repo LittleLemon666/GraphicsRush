@@ -223,6 +223,7 @@ class TrainView : public Fl_Gl_Window
 		void drawCuda(bool buttom = false);
 		void drawCheckpoint(bool buttom = false);
 		void drawScreenQuad();
+		void drawFireworks();
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
@@ -341,4 +342,9 @@ class TrainView : public Fl_Gl_Window
 		std::string mini_boss_obj_path = "QUAD";
 		Texture2D* mini_boss_obj_texture = nullptr;
 		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
+
+		Model* firework_obj = nullptr;
+		std::string firework_obj_path = "CUBE";
+		float firework_time = 0.0;
+		float firework_time_begin = 0.0;
 };

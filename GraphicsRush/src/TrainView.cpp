@@ -1266,6 +1266,8 @@ drawWorld()
 	drawCuda();
 	drawCheckpoint();
 
+	//drawFireworks();
+
 	glDisable(GL_BLEND);
 }
 
@@ -1716,7 +1718,7 @@ drawFree(bool buttom)
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else if (tw->thighButton->value())
+	else if (tw->thighButton->value() || game_state == CSHOP)
 		this->blending_flat_shader->Use();
 	else
 		this->blending_flat_gray_shader->Use();
@@ -1834,7 +1836,7 @@ drawShader(bool buttom)
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else if (tw->shaderButton->value())
+	else if (tw->shaderButton->value() || game_state == CSHOP)
 		this->blending_flat_shader->Use();
 	else
 		this->blending_flat_gray_shader->Use();
@@ -1876,7 +1878,7 @@ drawCuda(bool buttom)
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else if (tw->cudaButton->value())
+	else if (tw->cudaButton->value() || game_state == CSHOP)
 		this->blending_flat_shader->Use();
 	else
 		this->blending_flat_gray_shader->Use();
@@ -1915,7 +1917,6 @@ void TrainView::drawCheckpoint(bool buttom)
 {
 	if (game_state != CLOBBY && game_state != CSHOP) return;
 
-
 	for (int checkpoint_i = 0; checkpoint_i < NUMBER_OF_PROJECTS; checkpoint_i++)
 	{
 		if (buttom)
@@ -1924,7 +1925,8 @@ void TrainView::drawCheckpoint(bool buttom)
 			(checkpoint_i == 1 && tw->cp2Button->value()) ||
 			(checkpoint_i == 2 && tw->cp3Button->value()) ||
 			(checkpoint_i == 3 && tw->cp4Button->value()) ||
-			(checkpoint_i == 4 && tw->cp5Button->value()))
+			(checkpoint_i == 4 && tw->cp5Button->value()) || 
+			game_state == CSHOP)
 			this->blending_flat_shader->Use();
 		else
 			this->blending_flat_gray_shader->Use();
@@ -1973,6 +1975,25 @@ drawScreenQuad()
 	glBindVertexArray(this->screen_quad->vao);
 	glDrawArrays(GL_QUADS, 0, 4);
 	glBindVertexArray(0);
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawFireworks()
+{
+	this->firework_shader->Use();
+
+	mat4 model_matrix = mat4();
+	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f)); // the player is in a 5.0f height position
+	glUniformMatrix4fv(glGetUniformLocation(this->firework_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform1f(glGetUniformLocation(this->firework_shader->Program, "time"), firework_time - firework_time_begin);
+	glUniform1f(glGetUniformLocation(this->firework_shader->Program, "seed"), 1.0);
+	glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "center"), 1, &vec3(0.0)[0]);
+	glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "u_color"), 1, &vec3(1.0, 0.0, 0.0)[0]);
+
+	this->firework_obj->draw();
+
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2425,6 +2446,9 @@ draw()
 
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
+
+		if (!firework_obj)
+			firework_obj = new Model(firework_obj_path);
 
 		if (!door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
