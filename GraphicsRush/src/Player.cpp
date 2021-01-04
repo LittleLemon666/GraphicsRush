@@ -6,6 +6,9 @@ Player::Player() {
 	for (int item = 0; item < (int)items.size(); item++) {
 		in >> items[item];
 	}
+	for (int cp = 0; cp < (int)cps.size(); cp++) {
+		in >> cps[cp];
+	}
 	in.close();
 }
 void Player::saveFile() {
@@ -14,6 +17,10 @@ void Player::saveFile() {
 	out << highscore << std::endl << money_total << std:: endl;
 	for (int item = 0; item < (int)items.size(); item++) {
 		out << items[item] << " ";
+	}
+	out << std::endl;
+	for (int cp = 0; cp < (int)cps.size(); cp++) {
+		out << cps[cp] << " ";
 	}
 	out.close();
 }

@@ -142,6 +142,33 @@ unsigned long reversiBuffer = 0;
 void runButtonCB(TrainWindow* tw)
 //===========================================================================
 {
+	if (tw->cp5Button->value()) tw->startingChapter = 4;
+	else if (tw->cp4Button->value()) tw->startingChapter = 3;
+	else if (tw->cp3Button->value()) tw->startingChapter = 2;
+	else if (tw->cp2Button->value()) tw->startingChapter = 1;
+	else if (tw->cp1Button->value()) tw->startingChapter = 0;
+	int chapter = tw->startingChapter;
+	switch (tw->startingChapter) {
+		case -1:
+			chapter = 0;
+			break;
+		case 0:
+			tw->m_Track.first_P2 = false;
+			tw->m_Track.first_P5 = false;
+			break;
+		case 1:
+			break;
+		case 2:
+			tw->m_Track.first_P2 = false;
+			break;
+		case 3:
+			tw->m_Track.first_P2 = false;
+			break;
+		case 4:
+			tw->m_Track.first_P2 = false;
+			break;
+	}
+	tw->trainView->switchChapter(chapter);
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
 		//put away boss

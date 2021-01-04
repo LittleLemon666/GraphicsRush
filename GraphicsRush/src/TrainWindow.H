@@ -102,6 +102,8 @@ class TrainWindow : public Fl_Double_Window {
 		Fl_Button* cp3Button;
 		Fl_Button* cp4Button;
 		Fl_Button* cp5Button;
+		
+		int startingChapter = -1;
 #ifdef EXAMPLE_SOLUTION
 	ExampleWidgets ew;
 #endif
