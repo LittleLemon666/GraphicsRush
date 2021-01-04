@@ -147,10 +147,10 @@ void runButtonCB(TrainWindow* tw)
 	else if (tw->cp3Button->value()) tw->startingChapter = 2;
 	else if (tw->cp2Button->value()) tw->startingChapter = 1;
 	else if (tw->cp1Button->value()) tw->startingChapter = 0;
-	int chapter = tw->startingChapter;
+	tw->trainView->chapter = tw->startingChapter;
 	switch (tw->startingChapter) {
 		case -1:
-			chapter = 0;
+			tw->trainView->chapter = 0;
 			break;
 		case 0:
 			tw->m_Track.first_P2 = false;
@@ -167,8 +167,10 @@ void runButtonCB(TrainWindow* tw)
 		case 4:
 			tw->m_Track.first_P2 = false;
 			break;
+		default:
+			tw->trainView->chapter = 0;
 	}
-	tw->trainView->switchChapter(chapter);
+
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
 		//put away boss
@@ -499,6 +501,7 @@ void endReset(TrainWindow* tw) {
 		}
 		tw->m_Track.obstacles = {};
 		tw->m_Track.money = {};
+		tw->startingChapter = -1;
 	}
 }
 
