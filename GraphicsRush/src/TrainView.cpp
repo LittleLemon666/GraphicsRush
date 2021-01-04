@@ -957,6 +957,7 @@ choose(int x, int y)
 
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 
+	int origin_game_state = game_state;
 	game_state = decodeChoose(uv);
 	//printf("%d\n", game_state);
 	switch (game_state)
@@ -965,16 +966,116 @@ choose(int x, int y)
 
 		break;
 	case CFREE:
-		shop->buy(tw, THIGH);
-		game_state = CSHOP;
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, THIGH);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->thighButton->value(!tw->thighButton->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CVER2:
-		shop->buy(tw, VER2);
-		game_state = CSHOP;
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, VER2);
+			game_state = CSHOP;
+		}
+		else game_state = CGAME;
 		break;
 	case CVER3:
-		shop->buy(tw, VER3);
-		game_state = CSHOP;
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, VER3);
+			game_state = CSHOP;
+		}
+		else game_state = CGAME;
+		break;
+	case CSHADER:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, SHADER);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->shaderButton->value(!tw->shaderButton->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCUDA:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CUDA);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cudaButton->value(!tw->cudaButton->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCHECKPOINT1:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CHECKPOINT1);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cp1Button->value(!tw->cp1Button->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCHECKPOINT2:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CHECKPOINT2);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cp2Button->value(!tw->cp2Button->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCHECKPOINT3:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CHECKPOINT3);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cp3Button->value(!tw->cp3Button->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCHECKPOINT4:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CHECKPOINT4);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cp4Button->value(!tw->cp4Button->value());
+			game_state = origin_game_state;
+		}
+		break;
+	case CCHECKPOINT5:
+		if (origin_game_state == CSHOP)
+		{
+			shop->buy(tw, CHECKPOINT5);
+			game_state = CSHOP;
+		}
+		else
+		{
+			tw->cp5Button->value(!tw->cp5Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CDEAD:
 
@@ -1090,6 +1191,9 @@ drawChooser()
 	drawFree(true);
 	drawVer2(true);
 	drawVer3(true);
+	drawShader(true);
+	drawCuda(true);
+	drawCheckpoint(true);
 }
 
 void TrainView::
@@ -1159,6 +1263,9 @@ drawWorld()
 	drawFree();
 	drawVer2();
 	drawVer3();
+	drawShader();
+	drawCuda();
+	drawCheckpoint();
 
 	glDisable(GL_BLEND);
 }
@@ -1606,22 +1713,29 @@ drawSun()
 void TrainView::
 drawFree(bool buttom)
 {
-	if (game_state != CDEAD && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP && !(game_state == CDEAD && tw->thighButton->value())) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->thighButton->value())
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.7f, 0.0f);
+	else if (game_state == CLOBBY)
+		this->shop->items_pos[THIGH] = vec3(0.2f, -0.5f, 0.0f);
 	else if (game_state == CDEAD)
 		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.0f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[THIGH]);
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	if (game_state == CSHOP || game_state == CDEAD)
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+	else if (game_state == CLOBBY)
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1643,7 +1757,7 @@ drawFree(bool buttom)
 void TrainView::
 drawVer2(bool buttom)
 {
-	if (game_state != CDEAD && game_state != CSHOP) return;
+	if (!(game_state == CDEAD && tw->ver2Button->value()) && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -1658,7 +1772,7 @@ drawVer2(bool buttom)
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[VER2]);
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1680,7 +1794,7 @@ drawVer2(bool buttom)
 void TrainView::
 drawVer3(bool buttom)
 {
-	if (game_state != CDEAD && game_state != CSHOP) return;
+	if (!(game_state == CDEAD && tw->ver3Button->value()) && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -1695,7 +1809,7 @@ drawVer3(bool buttom)
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[VER3]);
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f)); // the player is in a 5.0f height position
+	model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1712,6 +1826,139 @@ drawVer3(bool buttom)
 
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
+}
+
+void TrainView::
+drawShader(bool buttom)
+{
+	if (game_state != CLOBBY && game_state != CSHOP) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else if (tw->shaderButton->value())
+		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
+
+	if (game_state == CSHOP)
+		this->shop->items_pos[SHADER] = vec3(-0.65f, -0.05f, 0.0f);
+	else if (game_state == CLOBBY)
+		this->shop->items_pos[SHADER] = vec3(0.5f, -0.5f, 0.0f);
+
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, this->shop->items_pos[SHADER]);
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (game_state == CSHOP)
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+	else if (game_state == CLOBBY)
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CSHADER);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->shop->items_texture[SHADER].bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->shop->items_obj[SHADER]->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawCuda(bool buttom)
+{
+	if (game_state != CLOBBY && game_state != CSHOP) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else if (tw->cudaButton->value())
+		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
+
+	if (game_state == CSHOP)
+		this->shop->items_pos[CUDA] = vec3(0.0f, -0.05f, 0.0f);
+	else if (game_state == CLOBBY)
+		this->shop->items_pos[CUDA] = vec3(0.8f, -0.5f, 0.0f);
+
+	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	model_matrix = translate(model_matrix, this->shop->items_pos[CUDA]);
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (game_state == CSHOP)
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+	else if (game_state == CLOBBY)
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CCUDA);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->shop->items_texture[CUDA].bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->shop->items_obj[CUDA]->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::drawCheckpoint(bool buttom)
+{
+	if (game_state != CLOBBY && game_state != CSHOP) return;
+
+
+	for (int checkpoint_i = 0; checkpoint_i < NUMBER_OF_PROJECTS; checkpoint_i++)
+	{
+		if (buttom)
+			this->choose_flat_shader->Use();
+		else if ((checkpoint_i == 0 && tw->cp1Button->value()) ||
+			(checkpoint_i == 1 && tw->cp2Button->value()) ||
+			(checkpoint_i == 2 && tw->cp3Button->value()) ||
+			(checkpoint_i == 3 && tw->cp4Button->value()) ||
+			(checkpoint_i == 4 && tw->cp5Button->value()))
+			this->blending_flat_shader->Use();
+		else
+			this->blending_flat_gray_shader->Use();
+
+		if (game_state == CSHOP)
+			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3(-0.6 + checkpoint_i * 0.3, -0.6f, 0.0f);
+		else if (game_state == CLOBBY)
+			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3(0.2 + checkpoint_i * 0.15, -0.7f, 0.0f);
+
+		mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+		model_matrix = translate(model_matrix, this->shop->items_pos[CHECKPOINT1 + checkpoint_i]);
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+		if (game_state == CSHOP)
+			model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+		else if (game_state == CLOBBY)
+			model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f)); // the player is in a 5.0f height position
+		if (buttom)
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CCHECKPOINT1 + checkpoint_i);
+		}
+		else
+		{
+			glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			this->shop->items_texture[CHECKPOINT1 + checkpoint_i].bind(0);
+			glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+		}
+
+		this->shop->items_obj[CHECKPOINT1 + checkpoint_i]->draw();
+
+		//unbind shader(switch to fixed pipeline)
+		glUseProgram(0);
+	}
 }
 
 void TrainView::
@@ -1738,7 +1985,7 @@ printText()
 	{
 		char shop_info[20];
 		sprintf(shop_info, "140.118.127.125");
-		RenderText(shop_info, 50.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+		RenderText(shop_info, w() / 2.0f - 245.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
 	}
 	else if (game_state == CSHOP)
 	{
@@ -1754,12 +2001,12 @@ printText()
 
 		char ver2_info[10];
 		sprintf(ver2_info, "ver2");
-		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
+		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(-0.1f, -0.3f, 0.0f));
 		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
 		char ver2_money[10];
 		sprintf(ver2_money, "$%d", shop->item_price[VER2]);
-		vec2 ver2_money_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.4f, 0.0f));
+		vec2 ver2_money_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(-0.1f, -0.4f, 0.0f));
 		RenderText(ver2_money, ver2_money_pos.x, ver2_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
 		char ver3_info[10];
@@ -1769,8 +2016,41 @@ printText()
 
 		char ver3_money[10];
 		sprintf(ver3_money, "$%d", shop->item_price[VER3]);
-		vec2 ver3_money_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.4, 0.0f));
+		vec2 ver3_money_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.4f, 0.0f));
 		RenderText(ver3_money, ver3_money_pos.x, ver3_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char shader_info[10];
+		sprintf(shader_info, "shader");
+		vec2 shader_pos = ndcToViewport(this->shop->items_pos[SHADER] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(shader_info, shader_pos.x, shader_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char shader_money[10];
+		sprintf(shader_money, "$%d", shop->item_price[SHADER]);
+		vec2 shader_money_pos = ndcToViewport(this->shop->items_pos[SHADER] + vec3(-0.1f, -0.4f, 0.0f));
+		RenderText(shader_money, shader_money_pos.x, shader_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char cuda_info[10];
+		sprintf(cuda_info, "cuda");
+		vec2 cuda_pos = ndcToViewport(this->shop->items_pos[CUDA] + vec3(-0.1f, -0.3f, 0.0f));
+		RenderText(cuda_info, cuda_pos.x, cuda_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char cuda_money[10];
+		sprintf(cuda_money, "$%d", shop->item_price[CUDA]);
+		vec2 cuda_money_pos = ndcToViewport(this->shop->items_pos[CUDA] + vec3(-0.1f, -0.4f, 0.0f));
+		RenderText(cuda_money, cuda_money_pos.x, cuda_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char checkpoint_info[10];
+		sprintf(checkpoint_info, "checkpoint");
+		vec2 checkpoint_info_pos = ndcToViewport(this->shop->items_pos[CHECKPOINT3] + vec3(-0.25f, -0.2f, 0.0f));
+		RenderText(checkpoint_info, checkpoint_info_pos.x, checkpoint_info_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		for (int checkpoint_i = 0; checkpoint_i < NUMBER_OF_PROJECTS; checkpoint_i++)
+		{
+			char checkpoint_money[10];
+			sprintf(checkpoint_money, "$%d", shop->item_price[CHECKPOINT1 + checkpoint_i]);
+			vec2 checkpoint_money_pos = ndcToViewport(this->shop->items_pos[CHECKPOINT1 + checkpoint_i] + vec3(-0.1f, -0.3f, 0.0f));
+			RenderText(checkpoint_money, checkpoint_money_pos.x, checkpoint_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 	}
 	else if (game_state == CGAME)
 	{
@@ -1801,20 +2081,29 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		char free_info[10];
-		sprintf(free_info, "thigh");
-		vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
-		RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->thighButton->value())
+		{
+			char free_info[10];
+			sprintf(free_info, "thigh");
+			vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
+			RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 
-		char ver2_info[10];
-		sprintf(ver2_info, "ver2");
-		vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
-		RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->ver2Button->value())
+		{
+			char ver2_info[10];
+			sprintf(ver2_info, "ver2");
+			vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
+			RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 
-		char ver3_info[10];
-		sprintf(ver3_info, "ver3");
-		vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
-		RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		if (tw->ver3Button->value())
+		{
+			char ver3_info[10];
+			sprintf(ver3_info, "ver3");
+			vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
+			RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+		}
 	}
 }
 
@@ -1926,6 +2215,20 @@ draw()
 				"../GraphicsRush/src/shaders/blending_flat.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/blending_flat.frag");
+
+		if (!this->blending_flat_gray_shader)
+			this->blending_flat_gray_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/blending_flat.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/blending_flat_gray.frag");
+
+		if (!this->firework_shader)
+			this->firework_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/firework.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/firework.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -2113,7 +2416,7 @@ draw()
 		}
 
 		if (!player_obj)
-			player_obj = new Model(player_obj_path);
+			player_obj = new Model(player_obj_path, true);
 
 		if (!earth_obj)
 			earth_obj = new Model(earth_obj_path);
@@ -2249,7 +2552,6 @@ draw()
 	renderScreenEnd();
 
 	drawScreenQuad();
-
 }
 
 //************************************************************************
