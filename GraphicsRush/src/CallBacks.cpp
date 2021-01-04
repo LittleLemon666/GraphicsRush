@@ -148,10 +148,9 @@ void runButtonCB(TrainWindow* tw)
 		else if (tw->cp3Button->value()) tw->startingChapter = 2;
 		else if (tw->cp2Button->value()) tw->startingChapter = 1;
 		else if (tw->cp1Button->value()) tw->startingChapter = 0;
-		tw->trainView->chapter = tw->startingChapter;
+		if (tw->startingChapter != -1) tw->trainView->chapter = tw->startingChapter;
 		switch (tw->startingChapter) {
 		case -1:
-			tw->trainView->chapter = 0;
 			break;
 		case 0:
 			tw->m_Track.first_P2 = false;
@@ -338,6 +337,7 @@ void loadCB(Fl_Widget*, TrainWindow* tw)
 		{
 			if (file_name == tw->trainView->chapter_path_file_name[find_chapter_path_file])
 			{
+				tw->trainView->chapter = find_chapter_path_file;
 				tw->trainView->switchChapter(find_chapter_path_file);
 				break;
 			}
