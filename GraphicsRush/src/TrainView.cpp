@@ -1085,6 +1085,9 @@ choose(int x, int y)
 			game_state = origin_game_state;
 		}
 		break;
+	case CRETURN:
+		game_state = CLOBBY;
+		break;
 	case CDEAD:
 
 		break;
@@ -1202,6 +1205,7 @@ drawChooser()
 	drawShader(true);
 	drawCuda(true);
 	drawCheckpoint(true);
+	drawUarrow(true);
 }
 
 void TrainView::
@@ -1275,6 +1279,7 @@ drawWorld()
 	drawShader();
 	drawCuda();
 	drawCheckpoint();
+	drawUarrow();
 
 	drawFireworks();
 
@@ -1702,6 +1707,45 @@ drawSkybox()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 	glDepthFunc(GL_LESS); // set depth function back to default
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawUarrow(bool buttom)
+{
+	if (game_state != CSHOP) return; // don't draw the shop if not in lobby
+
+	if (buttom)
+		this->choose_shader->Use();
+	else
+		this->basic_shader->Use();
+
+	vec3 uarrow_pos = door_pos + 22.0f * door_forward + 5.0f * door_up;
+	vec3 uarrow_forward = door_forward;
+	vec3 uarrow_up = door_up;
+	vec3 uarrow_cross = normalize(cross(uarrow_forward, uarrow_up));
+	uarrow_pos -= 6.0f * uarrow_cross;
+
+	mat4 model_matrix = inverse(lookAt(uarrow_pos, uarrow_pos + uarrow_forward, uarrow_up)); // the player is in a 5.0f height position
+	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_shader->Program, "chooser"), CRETURN);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+		this->uarrow_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	}
+
+	uarrow_obj->draw();
+
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2419,6 +2463,9 @@ draw()
 			else MiniBoss::clipping = -99;
 		}
 
+		if (!this->uarrow_texture)
+			this->uarrow_texture = new Texture2D(uarrow_texture_path.c_str());
+
 		if (!this->player_texture)
 			this->player_texture = new Texture2D(player_texture_path.c_str());
 
@@ -2510,6 +2557,9 @@ draw()
 			//alcDestroyContext(context);
 			//alcCloseDevice(device);
 		}
+
+		if (!uarrow_obj)
+			uarrow_obj = new Model(uarrow_obj_path);
 
 		if (!player_obj)
 			player_obj = new Model(player_obj_path, true);

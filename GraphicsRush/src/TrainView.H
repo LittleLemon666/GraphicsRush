@@ -94,7 +94,8 @@ enum Chooser
 	CCHECKPOINT2,
 	CCHECKPOINT3,
 	CCHECKPOINT4,
-	CCHECKPOINT5
+	CCHECKPOINT5,
+	CRETURN
 };
 
 enum Lighting
@@ -215,6 +216,7 @@ class TrainView : public Fl_Gl_Window
 		void drawExtraBoss();
 		void drawReversiPiece(bool doShadow = false);
 		void drawSkybox();
+		void drawUarrow(bool buttom = false);
 		void drawDoor();
 		void drawEarth();
 		void drawSun();
@@ -312,6 +314,10 @@ class TrainView : public Fl_Gl_Window
 
 		Shop* shop = nullptr;
 		float shop_rotate = 0;
+		Model* uarrow_obj = nullptr;
+		std::string uarrow_obj_path = "../GraphicsRush/Objects/uarrow.obj";
+		Texture2D* uarrow_texture = nullptr;
+		std::string uarrow_texture_path = "../GraphicsRush/Objects/uarrow_texture.png";
 
 		FBO* chooser_FBO = nullptr;
 		int game_state = CLOBBY;
