@@ -249,10 +249,12 @@ void runButtonCB(TrainWindow* tw)
 				}
 				if (tw->trainView->chapter == 5) {
 					//printf("%d 1\n", tw->m_Track.throwableObstacles.size());
-					if (abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.1) {
+					if (abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
 						loadThrowableObstacles(tw, getPlayerReversiGridLocation(tw));
 						for (int obstacle = 0; obstacle < (int)tw->m_Track.throwableObstacles.size(); obstacle++) {
 							tw->m_Track.throwingPosition.push_back(Obstacle(0.0f, tw->m_Track.throwableObstacles[obstacle][1], tw->m_Track.throwableObstacles[obstacle][0], 0));
+							tw->m_Track.throwableObstacles.erase(tw->m_Track.throwableObstacles.begin() + obstacle);
+							obstacle--;
 						}
 					}
 					//printf("%d 2\n", tw->m_Track.throwableObstacles.size());
