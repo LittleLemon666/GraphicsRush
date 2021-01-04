@@ -347,4 +347,7 @@ class TrainView : public Fl_Gl_Window
 
 		Firework** firework = nullptr;
 		int num_firework = 3;
+		int firework_interval = 0;
+		bool shoot_firework = false;
+		void shootFireworks();
 };

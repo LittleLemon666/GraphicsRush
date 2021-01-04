@@ -481,6 +481,8 @@ switchChapter(const int& chapter_index)
 	if (chapter == 5) {
 		tw->m_Track.first_P2 = false;
 		tw->m_Track.first_P5 = false;
+		shoot_firework = true;
+		firework_interval = 0;
 	}
 	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
 		do {
@@ -3041,4 +3043,20 @@ rotate_objects()
 
 	sun_rotate += 0.0025f;
 	if (sun_rotate > 360) sun_rotate -= 360;
+}
+
+void TrainView::
+shootFireworks()
+{
+	if (shoot_firework)
+	{
+		gmt.setG_pos((int)(tw->m_Track.trainU + tw->speed->value() * 5));
+		float ratio = (tw->m_Track.trainU + tw->speed->value() * 5) - (int)tw->m_Track.trainU;
+		vec3 fireworkPos = gmt.calculate(ratio);
+		if (firework_interval == 10) firework[0]->fireworkBegin(fireworkPos);
+		else if (firework_interval == 20) firework[1]->fireworkBegin(fireworkPos);
+		else if (firework_interval == 30) firework[2]->fireworkBegin(fireworkPos);
+		else if (firework_interval == 50) shoot_firework = false;
+		firework_interval++;
+	}
 }
