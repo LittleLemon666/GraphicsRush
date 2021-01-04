@@ -1274,7 +1274,7 @@ drawWorld()
 	drawCuda();
 	drawCheckpoint();
 
-	//drawFireworks();
+	drawFireworks();
 
 	glDisable(GL_BLEND);
 }
@@ -2051,15 +2051,22 @@ drawFireworks()
 {
 	this->firework_shader->Use();
 
-	mat4 model_matrix = mat4();
-	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f)); // the player is in a 5.0f height position
-	glUniformMatrix4fv(glGetUniformLocation(this->firework_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-	glUniform1f(glGetUniformLocation(this->firework_shader->Program, "time"), firework_time - firework_time_begin);
-	glUniform1f(glGetUniformLocation(this->firework_shader->Program, "seed"), 1.0);
-	glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "center"), 1, &vec3(0.0)[0]);
-	glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "u_color"), 1, &vec3(1.0, 0.0, 0.0)[0]);
+	for (int j = 0; j < num_firework; j++)
+	{
+		if (!firework[j]->isShoot()) continue;
+		for (int i = 0; i < firework[j]->getFireballNum(); i++)
+		{
+			mat4 model_matrix = mat4();
+			model_matrix = translate(model_matrix, firework[j]->getPos(i));
+			model_matrix = scale(model_matrix, vec3(1.0f, 1.0f, 1.0f) * firework[j]->getScale());
+			glUniformMatrix4fv(glGetUniformLocation(this->firework_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform1f(glGetUniformLocation(this->firework_shader->Program, "time"), firework[j]->getTime());
+			glUniform1f(glGetUniformLocation(this->firework_shader->Program, "time_offset"), firework[j]->getTimeOffset());
+			glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "u_color"), 1, &firework[j]->getColor()[0]);
 
-	this->firework_obj->draw();
+			this->firework[j]->draw(i);
+		}
+	}
 
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
@@ -2514,8 +2521,12 @@ draw()
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
 
-		if (!firework_obj)
-			firework_obj = new Model(firework_obj_path);
+		if (!firework)
+		{
+			firework = new Firework*[num_firework];
+			for (int i = 0; i < num_firework; i++)
+				firework[i] = new Firework(128, vec3(rand() % 256 / 256.0, rand() % 256 / 256.0, rand() % 256 / 256.0));
+		}
 
 		if (!door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
