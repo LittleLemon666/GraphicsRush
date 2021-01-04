@@ -102,4 +102,8 @@ class CTrack {
 		Texture2D* middleTrack = nullptr;
 		Texture2D* rightTrack = nullptr;
 
+		std::vector<Obstacle> wall = {};
+		std::vector<std::vector<int>> wallLocation = { {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} };
+		std::vector<std::vector<int>> throwableObstacles = {};
+		std::vector<Obstacle> throwingPosition = {};
 };

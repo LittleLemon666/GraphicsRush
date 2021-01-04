@@ -30,6 +30,7 @@ const static std::vector<std::string> shop_items_textures = {
 			"../GraphicsRush/Images/shop/checkpoint4.png" ,
 			"../GraphicsRush/Images/shop/checkpoint5.png" };
 static enum { VER2, VER3, THIGH, SHADER, CUDA, CHECKPOINT1, CHECKPOINT2, CHECKPOINT3, CHECKPOINT4, CHECKPOINT5} item_name;
+static enum { CP1, CP2, CP3, CP4, CP5 } cp_name;
 
 class Shop {
 	public:
