@@ -125,7 +125,7 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 
 static unsigned long lastRedraw = 0;
 static unsigned long buttonBuffer = 0;
-static unsigned long buffer = 10;
+static unsigned long buffer = 5;
 
 static unsigned long invincibleStart = 0;
 static unsigned long deadTimer = 0;
@@ -142,13 +142,14 @@ unsigned long reversiBuffer = 0;
 void runButtonCB(TrainWindow* tw)
 //===========================================================================
 {
-	if (tw->cp5Button->value()) tw->startingChapter = 4;
-	else if (tw->cp4Button->value()) tw->startingChapter = 3;
-	else if (tw->cp3Button->value()) tw->startingChapter = 2;
-	else if (tw->cp2Button->value()) tw->startingChapter = 1;
-	else if (tw->cp1Button->value()) tw->startingChapter = 0;
-	tw->trainView->chapter = tw->startingChapter;
-	switch (tw->startingChapter) {
+	if (tw->trainView->game_state == CLOBBY) {
+		if (tw->cp5Button->value()) tw->startingChapter = 4;
+		else if (tw->cp4Button->value()) tw->startingChapter = 3;
+		else if (tw->cp3Button->value()) tw->startingChapter = 2;
+		else if (tw->cp2Button->value()) tw->startingChapter = 1;
+		else if (tw->cp1Button->value()) tw->startingChapter = 0;
+		tw->trainView->chapter = tw->startingChapter;
+		switch (tw->startingChapter) {
 		case -1:
 			tw->trainView->chapter = 0;
 			break;
@@ -169,8 +170,8 @@ void runButtonCB(TrainWindow* tw)
 			break;
 		default:
 			tw->trainView->chapter = 0;
+		}
 	}
-
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
 		//put away boss
