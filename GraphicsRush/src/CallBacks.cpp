@@ -314,6 +314,7 @@ void runButtonCB(TrainWindow* tw)
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
 			tw->trainView->rotate_objects();
+			tw->trainView->firework_time += 0.1;
 			lastRedraw = clock();
 			tw->damageMe();
 		}
