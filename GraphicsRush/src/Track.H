@@ -106,4 +106,6 @@ class CTrack {
 		std::vector<std::vector<int>> wallLocation = { {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} };
 		std::vector<std::vector<int>> throwableObstacles = {};
 		std::vector<Obstacle> throwingPosition = {};
+
+		float saveSpeed;
 };

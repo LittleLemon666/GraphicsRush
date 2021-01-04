@@ -125,7 +125,7 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 
 static unsigned long lastRedraw = 0;
 static unsigned long buttonBuffer = 0;
-static unsigned long buffer = 10;
+static unsigned long buffer = 5;
 
 static unsigned long invincibleStart = 0;
 static unsigned long deadTimer = 0;
@@ -142,13 +142,14 @@ unsigned long reversiBuffer = 0;
 void runButtonCB(TrainWindow* tw)
 //===========================================================================
 {
-	if (tw->cp5Button->value()) tw->startingChapter = 4;
-	else if (tw->cp4Button->value()) tw->startingChapter = 3;
-	else if (tw->cp3Button->value()) tw->startingChapter = 2;
-	else if (tw->cp2Button->value()) tw->startingChapter = 1;
-	else if (tw->cp1Button->value()) tw->startingChapter = 0;
-	tw->trainView->chapter = tw->startingChapter;
-	switch (tw->startingChapter) {
+	if (tw->trainView->game_state == CLOBBY) {
+		if (tw->cp5Button->value()) tw->startingChapter = 4;
+		else if (tw->cp4Button->value()) tw->startingChapter = 3;
+		else if (tw->cp3Button->value()) tw->startingChapter = 2;
+		else if (tw->cp2Button->value()) tw->startingChapter = 1;
+		else if (tw->cp1Button->value()) tw->startingChapter = 0;
+		tw->trainView->chapter = tw->startingChapter;
+		switch (tw->startingChapter) {
 		case -1:
 			tw->trainView->chapter = 0;
 			break;
@@ -169,8 +170,8 @@ void runButtonCB(TrainWindow* tw)
 			break;
 		default:
 			tw->trainView->chapter = 0;
+		}
 	}
-
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
 		//put away boss
@@ -301,7 +302,7 @@ void runButtonCB(TrainWindow* tw)
 				for (int money = 0; money < tw->m_Track.money.size(); money++) {
 					if (tw->m_Track.collection(money)) {
 						tw->m_Track.money.erase(tw->m_Track.money.begin() + money);
-						tw->m_Track.money_collected++;
+						tw->m_Track.money_collected += 1 * (tw->cudaButton->value() + 1);
 						tw->m_Track.score += tw->speed->value();
 						alSourcePlay(tw->trainView->moneySource);
 						break;
@@ -309,7 +310,7 @@ void runButtonCB(TrainWindow* tw)
 				}
 
 				if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
-				if (tw->trainView->door_offset < -0.25f) tw->m_Track.score += tw->speed->value(); // add score after door opened 50%
+				if (tw->trainView->door_offset < -0.25f) tw->m_Track.score += tw->speed->value() * (tw->shaderButton->value() + 1); // add score after door opened 50%
 				if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
@@ -439,6 +440,7 @@ void rmzCB(Fl_Widget*, TrainWindow* tw)
 }
 
 void endReset(TrainWindow* tw) {
+	if (tw->m_Track.player.invincible) return;
 	if (tw->thighButton->value() && tw->m_Track.player.items[THIGH] > 0) {
 		tw->m_Track.player.items[THIGH]--;
 		tw->thighButton->value(0);
@@ -446,10 +448,9 @@ void endReset(TrainWindow* tw) {
 		invincibleStart = clock();
 		return;
 	}
-	if (tw->m_Track.player.invincible) return;
-	if (tw->trainView->game_state == CGAME) deadTimer = clock();
-	tw->trainView->game_state = CDEAD; //***need to design***
-	if (clock() - deadTimer > CLOCKS_PER_SEC * 5) {
+	if (tw->trainView->game_state == CGAME && deadTimer == 0) deadTimer = clock();
+	//tw->trainView->game_state = CDEAD; //***need to design***
+	if (clock() - deadTimer > CLOCKS_PER_SEC * 2) {
 		//save score
 		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
 		tw->m_Track.player.money_total += tw->m_Track.money_collected;
@@ -468,10 +469,15 @@ void endReset(TrainWindow* tw) {
 		//mainboss
 		MainBoss::multiBallForward = 0.4f;
 
+		//extraBoss
+		ExtraBoss::health = 10;
+		tw->m_Track.throwableObstacles = {};
+		tw->m_Track.throwingPosition = {};
+
 		tw->trainView->camera_movement_state = 0;
 		tw->trainView->camera_movement_index = 0;
 		tw->trainView->door_offset = 0.0f;
-
+		tw->speed->value(tw->m_Track.saveSpeed);
 		if (tw->debug_mode->value()) {
 			tw->runButton->value(0);
 			tw->trainView->game_state = CGAME;
@@ -498,14 +504,18 @@ void endReset(TrainWindow* tw) {
 			tw->m_Track.extraBoss = false;
 			tw->m_Track.score = 0;
 			tw->m_Track.money_collected = 0;
-			tw->runButton->value(0);
 			tw->speed->value(1);
 			tw->trainView->switchChapter(0);
 			tw->trainView->game_state = CLOBBY;
+			tw->startingChapter = -1;
+			deadTimer = 0;
 		}
 		tw->m_Track.obstacles = {};
 		tw->m_Track.money = {};
-		tw->startingChapter = -1;
+	}
+	else {
+		if (tw->speed->value() > 0.01) tw->m_Track.saveSpeed = tw->speed->value();
+		tw->speed->value(0);
 	}
 }
 
