@@ -356,4 +356,11 @@ class TrainView : public Fl_Gl_Window
 		int firework_interval = 0;
 		bool shoot_firework = false;
 		void shootFireworks();
+
+		Model* main_boss_obj = nullptr;
+		std::string main_boss_obj_path = "../GraphicsRush/Objects/microphone.obj";
+		Texture2D* main_boss_obj_texture = nullptr;
+		std::string main_boss_obj_texture_path = "../GraphicsRush/Objects/microphone_texture.png";
+		float main_boss_step = 0.0;
+		void mainBossAdvance();
 };

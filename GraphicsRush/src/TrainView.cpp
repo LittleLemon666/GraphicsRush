@@ -1441,12 +1441,6 @@ void TrainView::loadObjects() {
 
 void TrainView::loadMiniBoss() {
 	m_pTrack->miniBoss = true;
-
-	if (!mini_boss_obj)
-		mini_boss_obj = new Model(mini_boss_obj_path);
-
-	if (!this->mini_boss_obj_texture)
-		this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
 }
 
 void TrainView::loadMainBoss() {
@@ -1562,8 +1556,8 @@ void TrainView::drawMiniBoss() {
 	miniBossPos += miniBossCross * MiniBoss::bossLane * 10.0f;
 
 	this->blending_shader->Use();
-	mat4 model_matrix = inverse(lookAt(miniBossPos, miniBossPos + miniBossForward, miniBossUp)); // the player is in a 5.0f height position
-	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(miniBossPos, miniBossPos + miniBossForward, miniBossUp));
+	model_matrix = scale(model_matrix, vec3(10.0f, 10.0f, 10.0f));
 	glUniformMatrix4fv(glGetUniformLocation(this->blending_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	this->mini_boss_obj_texture->bind(0);
 	glUniform1i(glGetUniformLocation(this->blending_shader->Program, "u_texture"), 0);
@@ -1579,14 +1573,27 @@ void TrainView::drawMainBoss() {
 	mainBossUp = normalize(mainBossUp);
 	mainBossCross = normalize(mainBossCross);
 	mainBossPos += mainBossUp * 10.0f;
+	mainBossPos += sin(radians(main_boss_step)) * mainBossUp * 2.0f;
 
-	glBegin(GL_QUADS);
-	glColor3f(0.0f, 0.0f, 1.0f);
-	glVertex3f(mainBossPos.x + mainBossUp.x, mainBossPos.y + mainBossUp.y, mainBossPos.z + mainBossUp.z);
-	glVertex3f(mainBossPos.x + mainBossCross.x, mainBossPos.y + mainBossCross.y, mainBossPos.z + mainBossCross.z);
-	glVertex3f(mainBossPos.x - mainBossUp.x, mainBossPos.y - mainBossUp.y, mainBossPos.z - mainBossUp.z);
-	glVertex3f(mainBossPos.x - mainBossCross.x, mainBossPos.y - mainBossCross.y, mainBossPos.z - mainBossCross.z);
-	glEnd();
+	this->basic_shader->Use();
+
+	mat4 model_matrix = inverse(lookAt(mainBossPos, mainBossPos + mainBossForward, mainBossUp));
+	if (main_boss_step >= 720)
+		model_matrix = rotate(model_matrix, -radians(main_boss_step), vec3(0, 0, 1));
+	model_matrix = scale(model_matrix, vec3(0.25f, 0.25f, 0.25f));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	this->main_boss_obj_texture->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 1);
+	this->shadow->bind(2);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 2);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+
+	main_boss_obj->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 void TrainView::drawMultiBall() {
@@ -2573,6 +2580,18 @@ draw()
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
 
+		if (!mini_boss_obj)
+			mini_boss_obj = new Model(mini_boss_obj_path);
+
+		if (!this->mini_boss_obj_texture)
+			this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
+
+		if (!main_boss_obj)
+			main_boss_obj = new Model(main_boss_obj_path);
+
+		if (!this->main_boss_obj_texture)
+			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
+
 		if (!firework)
 		{
 			firework = new Firework*[num_firework];
@@ -3109,4 +3128,12 @@ shootFireworks()
 		else if (firework_interval == 50) shoot_firework = false;
 		firework_interval++;
 	}
+}
+
+void TrainView::
+mainBossAdvance()
+{
+	if (main_boss_step < 720) main_boss_step += 5.0;
+	else main_boss_step += 10.0;
+	if (main_boss_step > 1080) main_boss_step -= 1080.0;
 }
