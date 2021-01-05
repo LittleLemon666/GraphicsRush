@@ -12,3 +12,4 @@ float MainBoss::targetUp = 10.0f;
 float MainBoss::targetCross = 0.0f;
 
 int ExtraBoss::health = 10;
+int ExtraBoss::health_max = 10;

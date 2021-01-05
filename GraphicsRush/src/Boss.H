@@ -18,4 +18,5 @@ static class MainBoss {
 static class ExtraBoss {
 	public:
 		static int health;
+		static int health_max;
 };

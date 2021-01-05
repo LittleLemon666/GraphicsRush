@@ -175,6 +175,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* blending_flat_shader = nullptr;
 		Shader* blending_flat_gray_shader = nullptr;
 		Shader* firework_shader = nullptr;
+		Shader* hp_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -214,6 +215,7 @@ class TrainView : public Fl_Gl_Window
 		void drawMainBoss();
 		void drawMultiBall();
 		void drawExtraBoss();
+		void drawHP();
 		void drawReversiPiece(bool doShadow = false);
 		void drawSkybox();
 		void drawUarrow(bool buttom = false);
@@ -364,6 +366,7 @@ class TrainView : public Fl_Gl_Window
 		float main_boss_step = 0.0;
 		void mainBossAdvance();
 
+		vec3 extraBossPos, extraBossForward, extraBossUp, extraBossCross;
 		Model* extra_boss_obj = nullptr;
 		std::string extra_boss_obj_path = "QUAD";
 		Texture2D* extra_boss_obj_texture = nullptr;
@@ -371,4 +374,6 @@ class TrainView : public Fl_Gl_Window
 
 		Model* hp_obj = nullptr;
 		std::string hp_obj_path = "QUAD";
+		vec3 hp_color_front = vec3(1.0, 0.0, 0.0);
+		vec3 hp_color_back = vec3(0.1, 0.1, 0.1);
 };

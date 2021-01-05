@@ -1259,6 +1259,7 @@ drawWorld()
 
 	if (m_pTrack->extraBoss) {
 		drawExtraBoss();
+		drawHP();
 	}
 
 	drawMoney();
@@ -1599,8 +1600,8 @@ void TrainView::drawMainBoss() {
 void TrainView::drawMultiBall() {
 	if (getting_environment) return;
 	this->environment_shader->Use();
-	mat4 model_matrix = inverse(lookAt(multiBallPos, multiBallPos + multiBallForward, multiBallUp)); // the player is in a 5.0f height position
-	model_matrix = scale(model_matrix, vec3(5.0f, 5.0f, 5.0f)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(multiBallPos, multiBallPos + multiBallForward, multiBallUp));
+	model_matrix = scale(model_matrix, vec3(5.0f, 5.0f, 5.0f));
 	glUniformMatrix4fv(glGetUniformLocation(this->environment_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	environment->bind(0);
 	glUniform1i(glGetUniformLocation(this->environment_shader->Program, "environment_box"), 0);
@@ -1613,7 +1614,6 @@ void TrainView::drawMultiBall() {
 }
 
 void TrainView::drawExtraBoss() {
-	vec3 extraBossPos, extraBossForward, extraBossUp, extraBossCross;
 	gmt.calculateAll(m_pTrack->trainU + 0.4, extraBossPos, extraBossForward, extraBossUp, extraBossCross);
 	extraBossForward = normalize(extraBossForward);
 	extraBossUp = normalize(extraBossUp);
@@ -1627,6 +1627,26 @@ void TrainView::drawExtraBoss() {
 	this->extra_boss_obj_texture->bind(0);
 	glUniform1i(glGetUniformLocation(this->blending_shader->Program, "u_texture"), 0);
 	extra_boss_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawHP() // must behide drawExtraBoss()
+{
+	vec3 hp_forward = normalize(extraBossForward);
+	vec3 hp_up = normalize(extraBossUp);
+	vec3 hp_cross = normalize(extraBossCross);
+	vec3 hp_pos = extraBossPos + hp_up * 30.0f;
+
+	this->hp_shader->Use();
+	mat4 model_matrix = inverse(lookAt(hp_pos, hp_pos + hp_forward, hp_up));
+	model_matrix = scale(model_matrix, vec3(20.0, 1.0, 1.0));
+	glUniformMatrix4fv(glGetUniformLocation(this->hp_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->hp_shader->Program, "u_color_back"), 1, &hp_color_back[0]);
+	glUniform3fv(glGetUniformLocation(this->hp_shader->Program, "u_color_front"), 1, &hp_color_front[0]);
+	glUniform1f(glGetUniformLocation(this->hp_shader->Program, "offset"), ExtraBoss::health / (float)ExtraBoss::health_max);
+	hp_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -1793,7 +1813,7 @@ drawEarth()
 	if (chapter != 4) return; // don't draw the door after beginning camera movement
 
 	this->basic_shader->Use();
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, vec3(-75, 5, 200));
 	model_matrix = rotate(model_matrix, earth_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(130, 130, 130));
@@ -1816,7 +1836,7 @@ drawSun()
 	if (chapter != 4) return; // don't draw the door after beginning camera movement
 
 	this->basic_shader->Use();
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, sun_pos);
 	model_matrix = rotate(model_matrix, sun_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(450, 450, 450));
@@ -1850,14 +1870,14 @@ drawFree(bool buttom)
 	else if (game_state == CLOBBY)
 		this->shop->items_pos[THIGH] = vec3(0.2f, -0.2f, 0.0f);
 
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, this->shop->items_pos[THIGH]);
 	if (!buttom)
 		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	if (game_state == CSHOP)
-		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f));
 	else if (game_state == CLOBBY)
-		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1893,7 +1913,7 @@ drawVer2(bool buttom)
 	else if (game_state == CLOBBY)
 		this->shop->items_pos[VER2] = vec3(0.5f, -0.2f, 0.0f);
 
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, this->shop->items_pos[VER2]);
 	if (!buttom)
 		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
@@ -1979,14 +1999,14 @@ drawShader(bool buttom)
 	else if (game_state == CLOBBY)
 		this->shop->items_pos[SHADER] = vec3(0.2f, -0.5f, 0.0f);
 
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, this->shop->items_pos[SHADER]);
 	if (!buttom)
 		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	if (game_state == CSHOP)
-		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f));
 	else if (game_state == CLOBBY)
-		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2022,14 +2042,14 @@ drawCuda(bool buttom)
 	else if (game_state == CLOBBY)
 		this->shop->items_pos[CUDA] = vec3(0.5f, -0.5f, 0.0f);
 
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, this->shop->items_pos[CUDA]);
 	if (!buttom)
 		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	if (game_state == CSHOP)
-		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f));
 	else if (game_state == CLOBBY)
-		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2071,14 +2091,14 @@ void TrainView::drawCheckpoint(bool buttom)
 		else if (game_state == CLOBBY)
 			this->shop->items_pos[CHECKPOINT1 + checkpoint_i] = vec3(0.2 + checkpoint_i * 0.15, -0.7f, 0.0f);
 
-		mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+		mat4 model_matrix = mat4();
 		model_matrix = translate(model_matrix, this->shop->items_pos[CHECKPOINT1 + checkpoint_i]);
 		if (!buttom)
 			model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 		if (game_state == CSHOP)
-			model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
+			model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 		else if (game_state == CLOBBY)
-			model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f)); // the player is in a 5.0f height position
+			model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
 		if (buttom)
 		{
 			glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2373,6 +2393,13 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/firework.frag");
 
+		if (!this->hp_shader)
+			this->hp_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/hp.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/hp.frag");
+
 		if (!this->commom_matrices)
 		{
 			this->commom_matrices = new UBO();
@@ -2593,6 +2620,9 @@ draw()
 
 		if (!this->extra_boss_obj_texture)
 			this->extra_boss_obj_texture = new Texture2D(extra_boss_obj_texture_path.c_str());
+
+		if (!hp_obj)
+			hp_obj = new Model(hp_obj_path);
 
 		if (!firework)
 		{
