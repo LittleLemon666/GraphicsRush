@@ -104,6 +104,8 @@ class TrainWindow : public Fl_Double_Window {
 		Fl_Button* cp5Button;
 		
 		int startingChapter = -1;
+		float startingSpeed = 1.5;
+
 #ifdef EXAMPLE_SOLUTION
 	ExampleWidgets ew;
 #endif
