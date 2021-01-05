@@ -278,7 +278,7 @@ void runButtonCB(TrainWindow* tw)
 				}
 				if (tw->trainView->chapter == 5) {
 					//printf("%d 1\n", tw->m_Track.throwableObstacles.size());
-					if (abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
+					if ((int)tw->m_Track.obstacles.size() > 0 && abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
 						loadThrowableObstacles(tw, getPlayerReversiGridLocation(tw));
 						for (int obstacle = 0; obstacle < (int)tw->m_Track.throwableObstacles.size(); obstacle++) {
 							tw->m_Track.throwingPosition.push_back(Obstacle(0.0f, tw->m_Track.throwableObstacles[obstacle][1], tw->m_Track.throwableObstacles[obstacle][0], 0));
@@ -508,7 +508,7 @@ void endReset(TrainWindow* tw) {
 			tw->m_Track.extraBoss = false;
 			tw->m_Track.score = 0;
 			tw->m_Track.money_collected = 0;
-			tw->speed->value(1);
+			tw->speed->value(tw->startingSpeed);
 			tw->trainView->switchChapter(0);
 			tw->trainView->game_state = CLOBBY;
 			tw->startingChapter = -1;
