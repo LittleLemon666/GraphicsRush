@@ -1302,7 +1302,10 @@ drawPath(bool doShadow) {
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
 			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			this->path_texture->bind(0);
+			if (chapter == 4)
+				this->galaxy_path_texture->bind(0);
+			else
+				this->path_texture->bind(0);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
 			this->shadow->bind(1);
 			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
@@ -2481,6 +2484,9 @@ draw()
 		else if (MiniBoss::clipping == -99)*/ {
 			this->path_texture = m_pTrack->defaultTrack;
 		}
+
+		if (!this->galaxy_path_texture)
+			galaxy_path_texture = new Texture2D(galaxy_path_texture_path.c_str());
 
 		if (m_pTrack->miniBoss) {
 			if (clock() - clipTime > CLOCKS_PER_SEC * 3) {

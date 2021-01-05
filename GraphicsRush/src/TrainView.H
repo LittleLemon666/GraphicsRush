@@ -141,7 +141,9 @@ class TrainView : public Fl_Gl_Window
 		CTrack*			m_pTrack;		// The track of the entire scene
 
 		Shader* basic_shader		= nullptr;
-		Texture2D* path_texture	= nullptr;
+		Texture2D* path_texture = nullptr;
+		Texture2D* galaxy_path_texture = nullptr;
+		std::string galaxy_path_texture_path = "../GraphicsRush/Images/tracks/galaxy.jpg";
 		UBO* commom_matrices = nullptr; // bind 0
 		UBO* skybox_matrices = nullptr; // bind 1
 		UBO* camera_properties = nullptr; // bind 2
