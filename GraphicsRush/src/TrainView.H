@@ -352,7 +352,7 @@ class TrainView : public Fl_Gl_Window
 		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 
 		Firework** firework = nullptr;
-		int num_firework = 3;
+		int num_firework = 10;
 		int firework_interval = 0;
 		bool shoot_firework = false;
 		void shootFireworks();
@@ -363,4 +363,12 @@ class TrainView : public Fl_Gl_Window
 		std::string main_boss_obj_texture_path = "../GraphicsRush/Objects/microphone_texture.png";
 		float main_boss_step = 0.0;
 		void mainBossAdvance();
+
+		Model* extra_boss_obj = nullptr;
+		std::string extra_boss_obj_path = "QUAD";
+		Texture2D* extra_boss_obj_texture = nullptr;
+		std::string extra_boss_obj_texture_path = "../GraphicsRush/Images/boss/reversi.png";
+
+		Model* hp_obj = nullptr;
+		std::string hp_obj_path = "QUAD";
 };

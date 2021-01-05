@@ -1620,13 +1620,15 @@ void TrainView::drawExtraBoss() {
 	extraBossCross = normalize(extraBossCross);
 	extraBossPos += extraBossUp * 10.0f;
 
-	glBegin(GL_QUADS);
-	glColor3f(0.0f, 1.0f, 0.0f);
-	glVertex3f(extraBossPos.x + extraBossUp.x, extraBossPos.y + extraBossUp.y, extraBossPos.z + extraBossUp.z);
-	glVertex3f(extraBossPos.x + extraBossCross.x, extraBossPos.y + extraBossCross.y, extraBossPos.z + extraBossCross.z);
-	glVertex3f(extraBossPos.x - extraBossUp.x, extraBossPos.y - extraBossUp.y, extraBossPos.z - extraBossUp.z);
-	glVertex3f(extraBossPos.x - extraBossCross.x, extraBossPos.y - extraBossCross.y, extraBossPos.z - extraBossCross.z);
-	glEnd();
+	this->blending_shader->Use();
+	mat4 model_matrix = inverse(lookAt(extraBossPos, extraBossPos + extraBossForward, extraBossUp));
+	model_matrix = scale(model_matrix, vec3(25.0f, 25.0f, 25.0f));
+	glUniformMatrix4fv(glGetUniformLocation(this->blending_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	this->extra_boss_obj_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->blending_shader->Program, "u_texture"), 0);
+	extra_boss_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 void TrainView::drawReversiPiece(bool doShadow) {
@@ -2586,6 +2588,12 @@ draw()
 		if (!this->main_boss_obj_texture)
 			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
 
+		if (!extra_boss_obj)
+			extra_boss_obj = new Model(extra_boss_obj_path);
+
+		if (!this->extra_boss_obj_texture)
+			this->extra_boss_obj_texture = new Texture2D(extra_boss_obj_texture_path.c_str());
+
 		if (!firework)
 		{
 			firework = new Firework*[num_firework];
@@ -2616,7 +2624,8 @@ draw()
 
 		initSkybox();
 
-		if (!font_isloaded) font_isloaded = initText();
+		if (!font_isloaded)
+			font_isloaded = initText();
 
 		initScreenRender();
 
@@ -3116,10 +3125,12 @@ shootFireworks()
 		gmt.setG_pos((int)(tw->m_Track.trainU + tw->speed->value() * 5));
 		float ratio = (tw->m_Track.trainU + tw->speed->value() * 5) - (int)tw->m_Track.trainU;
 		vec3 fireworkPos = gmt.calculate(ratio);
-		if (firework_interval == 10) firework[0]->fireworkBegin(fireworkPos);
-		else if (firework_interval == 20) firework[1]->fireworkBegin(fireworkPos);
-		else if (firework_interval == 30) firework[2]->fireworkBegin(fireworkPos);
-		else if (firework_interval == 50) shoot_firework = false;
+		for (int firework_interval_index = 0; firework_interval_index < num_firework; firework_interval_index++)
+		{
+			if (firework_interval == 10 * (firework_interval_index + 1)) firework[firework_interval_index]->fireworkBegin(fireworkPos);
+			else if (firework_interval == 10 * num_firework + 20) shoot_firework = false;
+		}
+		
 		firework_interval++;
 	}
 }
