@@ -451,7 +451,7 @@ void endReset(TrainWindow* tw) {
 		return;
 	}
 	if (tw->trainView->game_state == CGAME && deadTimer == 0) deadTimer = clock();
-	//tw->trainView->game_state = CDEAD; //***need to design***
+	tw->trainView->game_state = CDEAD; //***need to design***
 	if (clock() - deadTimer > CLOCKS_PER_SEC * 2) {
 		//save score
 		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;

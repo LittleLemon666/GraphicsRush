@@ -1089,7 +1089,7 @@ choose(int x, int y)
 		game_state = CLOBBY;
 		break;
 	case CDEAD:
-
+		game_state = CLOBBY;
 		break;
 	default:
 		game_state = CGAME;
@@ -1834,7 +1834,7 @@ drawSun()
 void TrainView::
 drawFree(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP && !(game_state == CDEAD && tw->thighButton->value())) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -1846,14 +1846,13 @@ drawFree(bool buttom)
 	if (game_state == CSHOP)
 		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.7f, 0.0f);
 	else if (game_state == CLOBBY)
-		this->shop->items_pos[THIGH] = vec3(0.2f, -0.5f, 0.0f);
-	else if (game_state == CDEAD)
-		this->shop->items_pos[THIGH] = vec3(-0.65f, 0.0f, 0.0f);
+		this->shop->items_pos[THIGH] = vec3(0.2f, -0.2f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[THIGH]);
-	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	if (game_state == CSHOP || game_state == CDEAD)
+	if (!buttom)
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (game_state == CSHOP)
 		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	else if (game_state == CLOBBY)
 		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
@@ -1878,22 +1877,28 @@ drawFree(bool buttom)
 void TrainView::
 drawVer2(bool buttom)
 {
-	if (!(game_state == CDEAD && tw->ver2Button->value()) && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->ver2Button->value() || game_state == CSHOP)
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[VER2] = vec3(0.0f, 0.7f, 0.0f);
-	else if (game_state == CDEAD)
-		this->shop->items_pos[VER2] = vec3(0.0f, 0.0f, 0.0f);
+	else if (game_state == CLOBBY)
+		this->shop->items_pos[VER2] = vec3(0.5f, -0.2f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[VER2]);
-	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+	if (!buttom)
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (game_state == CSHOP)
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f));
+	else if (game_state == CLOBBY)
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1915,22 +1920,28 @@ drawVer2(bool buttom)
 void TrainView::
 drawVer3(bool buttom)
 {
-	if (!(game_state == CDEAD && tw->ver3Button->value()) && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else
+	else if (tw->ver3Button->value() || game_state == CSHOP)
 		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
 
 	if (game_state == CSHOP)
 		this->shop->items_pos[VER3] = vec3(0.65f, 0.7f, 0.0f);
-	else if (game_state == CDEAD)
-		this->shop->items_pos[VER3] = vec3(0.65f, 0.0f, 0.0f);
+	else if (game_state == CLOBBY)
+		this->shop->items_pos[VER3] = vec3(0.8f, -0.2f, 0.0f);
 
-	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
+	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, this->shop->items_pos[VER3]);
-	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
+	if (!buttom)
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (game_state == CSHOP)
+		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f));
+	else if (game_state == CLOBBY)
+		model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
 	if (buttom)
 	{
 		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -1964,11 +1975,12 @@ drawShader(bool buttom)
 	if (game_state == CSHOP)
 		this->shop->items_pos[SHADER] = vec3(-0.65f, -0.05f, 0.0f);
 	else if (game_state == CLOBBY)
-		this->shop->items_pos[SHADER] = vec3(0.5f, -0.5f, 0.0f);
+		this->shop->items_pos[SHADER] = vec3(0.2f, -0.5f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[SHADER]);
-	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (!buttom)
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	if (game_state == CSHOP)
 		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	else if (game_state == CLOBBY)
@@ -2006,11 +2018,12 @@ drawCuda(bool buttom)
 	if (game_state == CSHOP)
 		this->shop->items_pos[CUDA] = vec3(0.0f, -0.05f, 0.0f);
 	else if (game_state == CLOBBY)
-		this->shop->items_pos[CUDA] = vec3(0.8f, -0.5f, 0.0f);
+		this->shop->items_pos[CUDA] = vec3(0.5f, -0.5f, 0.0f);
 
 	mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 	model_matrix = translate(model_matrix, this->shop->items_pos[CUDA]);
-	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+	if (!buttom)
+		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	if (game_state == CSHOP)
 		model_matrix = scale(model_matrix, vec3(0.20f, 0.20f, 0.20f)); // the player is in a 5.0f height position
 	else if (game_state == CLOBBY)
@@ -2058,7 +2071,8 @@ void TrainView::drawCheckpoint(bool buttom)
 
 		mat4 model_matrix = mat4(); // the player is in a 5.0f height position
 		model_matrix = translate(model_matrix, this->shop->items_pos[CHECKPOINT1 + checkpoint_i]);
-		model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
+		if (!buttom)
+			model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 		if (game_state == CSHOP)
 			model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f)); // the player is in a 5.0f height position
 		else if (game_state == CLOBBY)
@@ -2228,29 +2242,9 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		if (tw->thighButton->value())
-		{
-			char free_info[10];
-			sprintf(free_info, "thigh");
-			vec2 free_pos = ndcToViewport(this->shop->items_pos[THIGH] + vec3(-0.1f, -0.3f, 0.0f));
-			RenderText(free_info, free_pos.x, free_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
-		}
-
-		if (tw->ver2Button->value())
-		{
-			char ver2_info[10];
-			sprintf(ver2_info, "ver2");
-			vec2 ver2_pos = ndcToViewport(this->shop->items_pos[VER2] + vec3(0.0f, -0.3f, 0.0f));
-			RenderText(ver2_info, ver2_pos.x, ver2_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
-		}
-
-		if (tw->ver3Button->value())
-		{
-			char ver3_info[10];
-			sprintf(ver3_info, "ver3");
-			vec2 ver3_pos = ndcToViewport(this->shop->items_pos[VER3] + vec3(-0.1f, -0.3f, 0.0f));
-			RenderText(ver3_info, ver3_pos.x, ver3_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
-		}
+		char flunk_info[20];
+		sprintf(flunk_info, "You are flunked!");
+		RenderText(flunk_info, w() / 2.0 - 100.0f, h() - 55.0f, 0.6f, vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 
