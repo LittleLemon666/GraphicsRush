@@ -376,14 +376,17 @@ initPath() {
 			path->normal.push_back(next_cp_orient.z);
 
 			//initialize path->texture_coordinate
+			int coordinate_divide = PATH_DIVIDE;
+			float this_segment_texture_coordinate_y = 1.0 * ((segment) % coordinate_divide / (float)coordinate_divide);
+			float next_segment_texture_coordinate_y = 1.0 * ((segment + 1) % coordinate_divide / (float)coordinate_divide);
 			path->texture_coordinate.push_back((GLfloat)0.0);
+			path->texture_coordinate.push_back((GLfloat)this_segment_texture_coordinate_y);
+			path->texture_coordinate.push_back((GLfloat)1.0);
+			path->texture_coordinate.push_back((GLfloat)this_segment_texture_coordinate_y);
+			path->texture_coordinate.push_back((GLfloat)1.0);
+			path->texture_coordinate.push_back((GLfloat)next_segment_texture_coordinate_y);
 			path->texture_coordinate.push_back((GLfloat)0.0);
-			path->texture_coordinate.push_back((GLfloat)1.0);
-			path->texture_coordinate.push_back((GLfloat)0.0);
-			path->texture_coordinate.push_back((GLfloat)1.0);
-			path->texture_coordinate.push_back((GLfloat)1.0);
-			path->texture_coordinate.push_back((GLfloat)0.0);
-			path->texture_coordinate.push_back((GLfloat)1.0);
+			path->texture_coordinate.push_back((GLfloat)next_segment_texture_coordinate_y);
 
 			//initialize path->element
 			path->element.push_back(cp_id * PATH_DIVIDE * 4 + segment * 4);
