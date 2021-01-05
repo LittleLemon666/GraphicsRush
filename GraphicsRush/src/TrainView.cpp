@@ -1265,6 +1265,8 @@ drawWorld()
 
 	drawMoney();
 
+	drawPizza();
+
 	drawSkybox();
 
 	// Draw all the transparent objects after drawing all opaque objects
@@ -2169,6 +2171,33 @@ drawFireworks()
 }
 
 void TrainView::
+drawPizza()
+{
+	if (finish_computer_graphics && shoot_firework && game_state == CGAME)
+	{
+		this->basic_shader->Use();
+
+		vec3 pizza_pos = player_pos + 11.0f * player_forward + 11.0f * player_up;
+		vec3 pizza_forward = player_forward;
+		vec3 pizza_up = player_up;
+
+		mat4 model_matrix = inverse(lookAt(pizza_pos, pizza_pos + pizza_forward, pizza_up)); // the player is in a 5.0f height position
+		model_matrix = rotate(model_matrix, pizza_rotate, vec3(0, 1, 0));
+		model_matrix = scale(model_matrix, vec3(5.0f, 5.0f, 5.0f));
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+		glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+		this->pizza_obj_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+
+		this->pizza_obj->draw();
+
+		//unbind shader(switch to fixed pipeline)
+		glUseProgram(0);
+	}
+}
+
+void TrainView::
 printText()
 {
 	if (game_state == CLOBBY)
@@ -2522,6 +2551,24 @@ draw()
 		if (!this->sun_texture)
 			this->sun_texture = new Texture2D(sun_texture_path.c_str());
 
+		if (!this->main_boss_obj_texture)
+			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
+
+		if (!this->mini_boss_obj_texture)
+			this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
+
+		if (!this->extra_boss_obj_texture)
+			this->extra_boss_obj_texture = new Texture2D(extra_boss_obj_texture_path.c_str());
+
+		if (!this->pizza_obj_texture)
+			this->pizza_obj_texture = new Texture2D(pizza_obj_texture_path.c_str());
+
+		if (!door_scene_texture)
+			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
+
+		if (!door_texture)
+			door_texture = new Texture2D(door_texture_path.c_str());
+
 		if (!this->shop)
 			this->shop = new Shop;
 
@@ -2623,23 +2670,17 @@ draw()
 		if (!mini_boss_obj)
 			mini_boss_obj = new Model(mini_boss_obj_path);
 
-		if (!this->mini_boss_obj_texture)
-			this->mini_boss_obj_texture = new Texture2D(mini_boss_obj_texture_path.c_str());
-
 		if (!main_boss_obj)
 			main_boss_obj = new Model(main_boss_obj_path);
-
-		if (!this->main_boss_obj_texture)
-			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
 
 		if (!extra_boss_obj)
 			extra_boss_obj = new Model(extra_boss_obj_path);
 
-		if (!this->extra_boss_obj_texture)
-			this->extra_boss_obj_texture = new Texture2D(extra_boss_obj_texture_path.c_str());
-
 		if (!hp_obj)
 			hp_obj = new Model(hp_obj_path);
+
+		if (!pizza_obj)
+			pizza_obj = new Model(pizza_obj_path, true);
 
 		if (!firework)
 		{
@@ -2647,12 +2688,6 @@ draw()
 			for (int i = 0; i < num_firework; i++)
 				firework[i] = new Firework(128, randomColor());
 		}
-
-		if (!door_scene_texture)
-			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
-
-		if (!door_texture)
-			door_texture = new Texture2D(door_texture_path.c_str());
 
 		initDoor();
 
@@ -3162,6 +3197,9 @@ rotate_objects()
 
 	sun_rotate += 0.0025f;
 	if (sun_rotate > 360) sun_rotate -= 360;
+
+	pizza_rotate += 0.1f;
+	if (pizza_rotate > 360) pizza_rotate -= 360;
 }
 
 void TrainView::
