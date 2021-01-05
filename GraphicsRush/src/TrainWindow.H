@@ -102,6 +102,7 @@ class TrainWindow : public Fl_Double_Window {
 		Fl_Button* cp3Button;
 		Fl_Button* cp4Button;
 		Fl_Button* cp5Button;
+		Fl_Button* subdivisionButton;
 		
 		int startingChapter = -1;
 		float startingSpeed = 1.5;

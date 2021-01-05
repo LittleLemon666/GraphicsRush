@@ -2162,7 +2162,10 @@ drawFireworks()
 			glUniform1f(glGetUniformLocation(this->firework_shader->Program, "time_offset"), firework[j]->getTimeOffset());
 			glUniform3fv(glGetUniformLocation(this->firework_shader->Program, "u_color"), 1, &firework[j]->getColor()[0]);
 
-			this->firework[j]->draw(i);
+			if (tw->subdivisionButton->value())
+				this->firework[j]->draw(i, true, viewer_pos);
+			else
+				this->firework[j]->draw(i);
 		}
 	}
 

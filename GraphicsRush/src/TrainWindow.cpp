@@ -185,6 +185,10 @@ TrainWindow(const int x, const int y)
 		cp5Button = new Fl_Button(670, pty, 60, 20, "CP5");
 		togglify(cp5Button, 0);
 
+		pty += 30;
+		subdivisionButton = new Fl_Button(605, pty, 80, 20, "subdivision");
+		togglify(subdivisionButton, 1);
+		pty += 30;
 #ifdef EXAMPLE_SOLUTION
 		makeExampleWidgets(this,pty);
 #endif
