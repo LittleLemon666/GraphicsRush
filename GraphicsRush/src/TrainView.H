@@ -45,6 +45,7 @@ class CTrack;
 #include "Shop.H"
 #include "Firework.H"
 #include "Rain.H"
+#include "Filter.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -397,4 +398,10 @@ class TrainView : public Fl_Gl_Window
 		float pizza_rotate = 0;
 
 		Rain* rain = nullptr;
+
+		Filter* filter = nullptr;
+		int filter_effect_time = 0;
+		void filterAdvance();
+		int filter_id = FFilter::ORIGIN;
+		const std::string fiter_info[FFilter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Edge!" };
 };

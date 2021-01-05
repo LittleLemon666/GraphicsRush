@@ -66,6 +66,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Shop.h
     ${SRC_DIR}Firework.h
     ${SRC_DIR}Rain.h
+    ${SRC_DIR}Filter.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
