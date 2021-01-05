@@ -33,7 +33,7 @@ class Model
 {
 public:
 	Model();
-	Model(const std::string, bool uv_reflect = false);
+	Model(const std::string, bool uv_reflect = false, int subdivision_level = 4);
 	Model(const Model& model);
 
 	Model operator=(const Model& model);

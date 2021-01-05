@@ -141,7 +141,9 @@ class TrainView : public Fl_Gl_Window
 		CTrack*			m_pTrack;		// The track of the entire scene
 
 		Shader* basic_shader		= nullptr;
-		Texture2D* path_texture	= nullptr;
+		Texture2D* path_texture = nullptr;
+		Texture2D* galaxy_path_texture = nullptr;
+		std::string galaxy_path_texture_path = "../GraphicsRush/Images/tracks/galaxy.jpg";
 		UBO* commom_matrices = nullptr; // bind 0
 		UBO* skybox_matrices = nullptr; // bind 1
 		UBO* camera_properties = nullptr; // bind 2
@@ -175,6 +177,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* blending_flat_shader = nullptr;
 		Shader* blending_flat_gray_shader = nullptr;
 		Shader* firework_shader = nullptr;
+		Shader* hp_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -214,6 +217,7 @@ class TrainView : public Fl_Gl_Window
 		void drawMainBoss();
 		void drawMultiBall();
 		void drawExtraBoss();
+		void drawHP();
 		void drawReversiPiece(bool doShadow = false);
 		void drawSkybox();
 		void drawUarrow(bool buttom = false);
@@ -352,7 +356,7 @@ class TrainView : public Fl_Gl_Window
 		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 
 		Firework** firework = nullptr;
-		int num_firework = 3;
+		int num_firework = 10;
 		int firework_interval = 0;
 		bool shoot_firework = false;
 		void shootFireworks();
@@ -363,4 +367,22 @@ class TrainView : public Fl_Gl_Window
 		std::string main_boss_obj_texture_path = "../GraphicsRush/Objects/microphone_texture.png";
 		float main_boss_step = 0.0;
 		void mainBossAdvance();
+
+		vec3 extraBossPos, extraBossForward, extraBossUp, extraBossCross;
+		Model* extra_boss_obj = nullptr;
+		std::string extra_boss_obj_path = "QUAD";
+		Texture2D* extra_boss_obj_texture = nullptr;
+		std::string extra_boss_obj_texture_path = "../GraphicsRush/Images/boss/reversi.png";
+
+		Model* hp_obj = nullptr;
+		std::string hp_obj_path = "QUAD";
+		vec3 hp_color_front = vec3(1.0, 0.0, 0.0);
+		vec3 hp_color_middle = vec3(1.0, 1.0, 0.0);
+		vec3 hp_color_back = vec3(0.3, 0.3, 0.3);
+		void extraBossHPAdvance();
+		void Bomb(vec3 pos);
+		vec3 randomColor();
+
+		bool finish_computer_graphics = false;
+		void finishComputerGraphics();
 };

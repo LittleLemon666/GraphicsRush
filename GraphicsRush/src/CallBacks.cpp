@@ -314,12 +314,13 @@ void runButtonCB(TrainWindow* tw)
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
 			tw->trainView->rotate_objects();
-			tw->trainView->shootFireworks();
+			tw->trainView->shootFireworks(); // after chapter 5
 			if (tw->trainView->firework)
 				for (int i = 0; i < tw->trainView->num_firework; i++)
 					if (tw->trainView->firework[i]->isShoot())
 						tw->trainView->firework[i]->advanceFirework();
 			tw->trainView->mainBossAdvance();
+			tw->trainView->extraBossHPAdvance();
 			lastRedraw = clock();
 			tw->damageMe();
 		}
@@ -451,7 +452,7 @@ void endReset(TrainWindow* tw) {
 		return;
 	}
 	if (tw->trainView->game_state == CGAME && deadTimer == 0) deadTimer = clock();
-	//tw->trainView->game_state = CDEAD; //***need to design***
+	tw->trainView->game_state = CDEAD; //***need to design***
 	if (clock() - deadTimer > CLOCKS_PER_SEC * 2) {
 		//save score
 		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
@@ -473,6 +474,7 @@ void endReset(TrainWindow* tw) {
 
 		//extraBoss
 		ExtraBoss::health = 10;
+		ExtraBoss::health_minus = 10;
 		tw->m_Track.throwableObstacles = {};
 		tw->m_Track.throwingPosition = {};
 

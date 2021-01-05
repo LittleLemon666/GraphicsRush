@@ -18,15 +18,20 @@ public:
 		dir = new glm::vec3[num];
 		for (int i = 0; i < num; i++)
 		{
-			fireball[i] = new Model("SPHERE");
+			fireball[i] = new Model("SPHERE", false, 1);
 			dir[i] = glm::normalize(glm::vec3(rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f));
 		}
 	}
-	void fireworkBegin(glm::vec3 _center)
+	void fireworkBegin(glm::vec3 _position)
 	{
-		center = _center;
+		position = _position;
 		firework_time = 0.0;
 		shoot = true;
+	}
+	void bomb()
+	{
+		firework_time = time_offset;
+		position -= glm::vec3(0.0, height, 0.0);
 	}
 	void advanceFirework()
 	{
@@ -63,6 +68,10 @@ public:
 	const void setPos(glm::vec3 pos)
 	{
 		position = pos;
+	}
+	void setColor(glm::vec3 _color)
+	{
+		color = _color;
 	}
 	const glm::vec3 getColor() const
 	{
