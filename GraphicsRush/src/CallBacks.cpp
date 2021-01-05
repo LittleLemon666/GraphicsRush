@@ -249,9 +249,7 @@ void runButtonCB(TrainWindow* tw)
 					if (clock() - reversiBuffer > CLOCKS_PER_SEC * 5) {
 
 						//reset
-						for (int obstacle = 0; obstacle < (int)tw->m_Track.wall.size(); obstacle++) {
-							tw->m_Track.obstacles.erase(tw->m_Track.obstacles.begin() + (int)tw->m_Track.obstacles.size() - 1);
-						}
+						tw->m_Track.obstacles = {};
 						tw->m_Track.wall = {};
 						tw->m_Track.wallLocation = { {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0}, {0, 0, 0, 0, 0} };
 
@@ -278,12 +276,11 @@ void runButtonCB(TrainWindow* tw)
 				}
 				if (tw->trainView->chapter == 5) {
 					//printf("%d 1\n", tw->m_Track.throwableObstacles.size());
-					if (abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
+					if ((int)tw->m_Track.obstacles.size() > 0 && abs(tw->m_Track.trainU - tw->m_Track.obstacles[0].position) < 0.01) {
 						loadThrowableObstacles(tw, getPlayerReversiGridLocation(tw));
-						for (int obstacle = 0; obstacle < (int)tw->m_Track.throwableObstacles.size(); obstacle++) {
-							tw->m_Track.throwingPosition.push_back(Obstacle(0.0f, tw->m_Track.throwableObstacles[obstacle][1], tw->m_Track.throwableObstacles[obstacle][0], 0));
-							tw->m_Track.throwableObstacles.erase(tw->m_Track.throwableObstacles.begin() + obstacle);
-							obstacle--;
+						while ((int)tw->m_Track.throwableObstacles.size() > 0) {
+							tw->m_Track.throwingPosition.push_back(Obstacle(0.0f, tw->m_Track.throwableObstacles[0][1], tw->m_Track.throwableObstacles[0][0], 0));
+							tw->m_Track.throwableObstacles.erase(tw->m_Track.throwableObstacles.begin());
 						}
 					}
 					//printf("%d 2\n", tw->m_Track.throwableObstacles.size());
@@ -512,7 +509,7 @@ void endReset(TrainWindow* tw) {
 			tw->m_Track.extraBoss = false;
 			tw->m_Track.score = 0;
 			tw->m_Track.money_collected = 0;
-			tw->speed->value(1);
+			tw->speed->value(tw->startingSpeed);
 			tw->trainView->switchChapter(0);
 			tw->trainView->game_state = CLOBBY;
 			tw->startingChapter = -1;
@@ -541,26 +538,26 @@ void loadThrowableObstacles(TrainWindow* tw, int playerPosition) {
 	for (int row = -1; row < 2; row++) {
 		for (int col = -1; col < 2; col++) {
 			if (row == 0 && col == 0) col++;
-			vector<vector<int>> result = {};
-			reversiRecursion(player_x, player_y, row, col, tw, result);
+			std::vector<std::vector<int>> throwable_result = {};
+			reversiRecursion(player_x, player_y, row, col, tw, throwable_result);
 		}
 	}
 };
 
-void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow* tw, vector<vector<int>> result) {
+void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow* tw, vector<vector<int>> &throwable_result) {
 
 	//check if in range
 	if (player_x + col < 0 || player_x + col > 4) return;
 	if (player_y + row < 0 || player_y + row > 3) return;
 
 	if (tw->m_Track.wallLocation[player_y + row][player_x + col] == 2) {
-		result.push_back({ player_y + row, player_x + col });
-		reversiRecursion(player_x + col, player_y + row, row, col, tw, result);
+		throwable_result.push_back({ player_y + row, player_x + col });
+		reversiRecursion(player_x + col, player_y + row, row, col, tw, throwable_result);
 	}
 	else if (tw->m_Track.wallLocation[player_y + row][player_x + col] == 1) {
-		for (int hole = 0; hole < (int)result.size(); hole++) {
-			tw->m_Track.wallLocation[result[hole][0]][result[hole][1]] = 1;
-			tw->m_Track.throwableObstacles.push_back(result[hole]);
+		for (int hole = 0; hole < (int)throwable_result.size(); hole++) {
+			tw->m_Track.wallLocation[throwable_result[hole][0]][throwable_result[hole][1]] = 1;
+			tw->m_Track.throwableObstacles.push_back(throwable_result[hole]);
 		}
 	}
 };
