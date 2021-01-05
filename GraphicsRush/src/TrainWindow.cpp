@@ -185,6 +185,10 @@ TrainWindow(const int x, const int y)
 		cp5Button = new Fl_Button(670, pty, 60, 20, "CP5");
 		togglify(cp5Button, 0);
 
+		pty += 30;
+		subdivisionButton = new Fl_Button(605, pty, 80, 20, "subdivision");
+		togglify(subdivisionButton, 1);
+		pty += 30;
 #ifdef EXAMPLE_SOLUTION
 		makeExampleWidgets(this,pty);
 #endif
@@ -266,6 +270,7 @@ advanceTrain(float dir)
 			if ((int)m_Track.trainU >= (int)m_Track.points.size())
 			{
 				if (trainView->chapter == 1) m_Track.first_P2 = false;
+				if (trainView->chapter == 3) trainView->rain->rainEnd();
 				if (trainView->chapter == 4)
 				{
 					m_Track.first_P5 = false;
@@ -273,6 +278,7 @@ advanceTrain(float dir)
 				}
 				m_Track.trainU -= (int)m_Track.points.size();
 				trainView->switchChapter(trainView->chapter + 1);
+				if (trainView->chapter == 3) trainView->rain->rainBegin(trainView->player_pos);
 			}
 		}
 	}

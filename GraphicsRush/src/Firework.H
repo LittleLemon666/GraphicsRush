@@ -14,11 +14,13 @@ public:
 	}
 	void initFirework()
 	{
-		fireball = new Model * [num];
+		fireball = new Model*[subdivision_level_num];
+		for (int i = 0; i < subdivision_level_num; i++)
+			fireball[i] = new Model("SPHERE", false, i + 1);
+
 		dir = new glm::vec3[num];
 		for (int i = 0; i < num; i++)
 		{
-			fireball[i] = new Model("SPHERE", false, 1);
 			dir[i] = glm::normalize(glm::vec3(rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f));
 		}
 	}
@@ -77,13 +79,22 @@ public:
 	{
 		return color;
 	}
-	void draw(int index)
+	void draw(int index, bool subdivision = false, glm::vec3 camera_pos = glm::vec3())
 	{
-		fireball[index]->draw();
+		int level_index = 0;
+		if (subdivision)
+		{
+			glm::vec3 ball_pos = getPos(index);
+			float dist = glm::length(ball_pos - camera_pos);
+			if (dist < 50.0f) level_index = 2;
+			else if (dist < 100.0f) level_index = 1;
+			else level_index = 0;
+		}
+		fireball[level_index]->draw();
 	}
 	~Firework()
 	{
-		delete[] fireball;
+		delete fireball;
 		delete[] dir;
 	}
 
@@ -100,5 +111,5 @@ private:
 	float height = 100.0f;
 	float len = 20.0f;
 	bool shoot = false;
-
+	const int subdivision_level_num = 3;
 };
