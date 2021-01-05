@@ -1709,6 +1709,7 @@ void TrainView::drawReversiPiece(bool doShadow) {
 			m_pTrack->throwingPosition.erase(m_pTrack->throwingPosition.begin() + obstacle);
 			ExtraBoss::health -= 1;
 			obstacle--;
+			Bomb(obstaclePosition); // need to fix correct position
 		}
 	}
 	//unbind shader(switch to fixed pipeline)
@@ -3171,6 +3172,13 @@ shootFireworks()
 		
 		firework_interval++;
 	}
+}
+
+void TrainView::
+Bomb(vec3 fireworkPos)
+{
+	firework[0]->fireworkBegin(fireworkPos);
+	firework[0]->bomb();
 }
 
 void TrainView::

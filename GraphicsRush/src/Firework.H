@@ -18,7 +18,7 @@ public:
 		dir = new glm::vec3[num];
 		for (int i = 0; i < num; i++)
 		{
-			fireball[i] = new Model("SPHERE");
+			fireball[i] = new Model("SPHERE", false, 1);
 			dir[i] = glm::normalize(glm::vec3(rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f));
 		}
 	}
@@ -28,12 +28,21 @@ public:
 		firework_time = 0.0;
 		shoot = true;
 	}
+	void bomb()
+	{
+		firework_time = time_offset;
+		height = 0;
+	}
 	void advanceFirework()
 	{
 		firework_time += 0.2f;
 		if (firework_time < time_offset) center = glm::vec3(0.0, firework_time / time_offset * height, 0.0);
 		else if (firework_time < 1.5 * time_offset) center = glm::vec3(0.0, height, 0.0);
-		else shoot = false;
+		else
+		{
+			shoot = false;
+			if (height < 1.0) height = 100.0f;
+		}
 	}
 	const float getTime() const
 	{

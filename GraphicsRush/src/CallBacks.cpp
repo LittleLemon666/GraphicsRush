@@ -314,7 +314,7 @@ void runButtonCB(TrainWindow* tw)
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
 			}
 			tw->trainView->rotate_objects();
-			tw->trainView->shootFireworks();
+			tw->trainView->shootFireworks(); // after chapter 5
 			if (tw->trainView->firework)
 				for (int i = 0; i < tw->trainView->num_firework; i++)
 					if (tw->trainView->firework[i]->isShoot())

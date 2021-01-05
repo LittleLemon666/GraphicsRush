@@ -7,7 +7,7 @@ Model()
 }
 
 Model::
-Model(const std::string fileName, bool uv_reflect)
+Model(const std::string fileName, bool uv_reflect, int subdivision_level)
 {
 	if (fileName == "CUBE")
 	{
@@ -128,7 +128,7 @@ Model(const std::string fileName, bool uv_reflect)
 	}
 	else if (fileName == "SPHERE") // Under construction
 	{
-		int d_angle = 6;
+		int d_angle = 90.0 / pow(2, subdivision_level);
 		unsigned short indices_index = 0;
 		float r = 0.5f;
 		float sphere_x, sphere_y, sphere_z;
