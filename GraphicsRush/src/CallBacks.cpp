@@ -515,6 +515,7 @@ void endReset(TrainWindow* tw) {
 			tw->trainView->game_state = CLOBBY;
 			tw->startingChapter = -1;
 			deadTimer = 0;
+			tw->trainView->finish_computer_graphics = false;
 		}
 		tw->m_Track.obstacles = {};
 		tw->m_Track.money = {};
