@@ -2408,11 +2408,11 @@ printText()
 	{
 		char score_info[20];
 		sprintf(score_info, "Score:  %010d", m_pTrack->score);
-		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
-		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 		//power-ups
 		if (tw->thighButton->value()) {
@@ -2435,7 +2435,7 @@ printText()
 		{
 			char fcg_info[20];
 			sprintf(fcg_info, "You finished Computer Graphics!");
-			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 	}
 	else if (game_state == CDEAD)
@@ -3350,7 +3350,7 @@ shootFireworks()
 {
 	if (shoot_firework)
 	{
-		vec3 fireworkPos = player_pos + player_forward * 150.0f - player_up * 25.0f;
+		vec3 fireworkPos = player_pos + player_forward * 150.0f - player_up * 75.0f;
 		for (int firework_interval_index = 0; firework_interval_index < num_firework; firework_interval_index++)
 		{
 			if (firework_interval == 10 * (firework_interval_index + 1)) firework[firework_interval_index]->fireworkBegin(fireworkPos);
@@ -3393,7 +3393,10 @@ extraBossHPAdvance()
 void TrainView::
 finishComputerGraphics()
 {
-	finish_computer_graphics = true;
-	shoot_firework = true;
-	firework_interval = 0;
+	if (!finish_computer_graphics)
+	{
+		finish_computer_graphics = true;
+		shoot_firework = true;
+		firework_interval = 0;
+	}
 }
