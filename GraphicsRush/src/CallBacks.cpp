@@ -320,6 +320,7 @@ void runButtonCB(TrainWindow* tw)
 					if (tw->trainView->firework[i]->isShoot())
 						tw->trainView->firework[i]->advanceFirework();
 			tw->trainView->mainBossAdvance();
+			tw->trainView->extraBossHPAdvance();
 			lastRedraw = clock();
 			tw->damageMe();
 		}
@@ -473,6 +474,7 @@ void endReset(TrainWindow* tw) {
 
 		//extraBoss
 		ExtraBoss::health = 10;
+		ExtraBoss::health_minus = 10;
 		tw->m_Track.throwableObstacles = {};
 		tw->m_Track.throwingPosition = {};
 

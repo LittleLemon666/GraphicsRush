@@ -18,5 +18,6 @@ static class MainBoss {
 static class ExtraBoss {
 	public:
 		static int health;
+		static float health_minus;
 		static int health_max;
 };

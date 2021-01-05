@@ -1647,8 +1647,10 @@ drawHP() // must behide drawExtraBoss()
 	model_matrix = scale(model_matrix, vec3(20.0, 1.0, 1.0));
 	glUniformMatrix4fv(glGetUniformLocation(this->hp_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->hp_shader->Program, "u_color_back"), 1, &hp_color_back[0]);
+	glUniform3fv(glGetUniformLocation(this->hp_shader->Program, "u_color_middle"), 1, &hp_color_middle[0]);
 	glUniform3fv(glGetUniformLocation(this->hp_shader->Program, "u_color_front"), 1, &hp_color_front[0]);
-	glUniform1f(glGetUniformLocation(this->hp_shader->Program, "offset"), ExtraBoss::health / (float)ExtraBoss::health_max);
+	glUniform1f(glGetUniformLocation(this->hp_shader->Program, "offset_max"), ExtraBoss::health_minus / (float)ExtraBoss::health_max);
+	glUniform1f(glGetUniformLocation(this->hp_shader->Program, "offset_min"), ExtraBoss::health / (float)ExtraBoss::health_max);
 	hp_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
@@ -3177,4 +3179,11 @@ mainBossAdvance()
 	if (main_boss_step < 720) main_boss_step += 5.0;
 	else main_boss_step += 10.0;
 	if (main_boss_step > 1080) main_boss_step -= 1080.0;
+}
+
+void TrainView::
+extraBossHPAdvance()
+{
+	if (ExtraBoss::health_minus > ExtraBoss::health)
+		ExtraBoss::health_minus -= 0.1f;
 }

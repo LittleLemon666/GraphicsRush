@@ -377,5 +377,7 @@ class TrainView : public Fl_Gl_Window
 		Model* hp_obj = nullptr;
 		std::string hp_obj_path = "QUAD";
 		vec3 hp_color_front = vec3(1.0, 0.0, 0.0);
-		vec3 hp_color_back = vec3(0.1, 0.1, 0.1);
+		vec3 hp_color_middle = vec3(1.0, 1.0, 0.0);
+		vec3 hp_color_back = vec3(0.3, 0.3, 0.3);
+		void extraBossHPAdvance();
 };
