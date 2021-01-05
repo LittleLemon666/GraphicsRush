@@ -283,7 +283,7 @@ initPath() {
 			gmt.setG_pos(cp_id);
 			this_segment = gmt.calculate((float)segment / (float)PATH_DIVIDE);
 			next_segment = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
-
+			
 			vec3 segment_forward = next_segment - this_segment;
 			segment_forward = normalize(segment_forward);
 
@@ -311,6 +311,7 @@ initPath() {
 			GLfloat roadSize = 10.0f;
 			this_cross = roadSize * this_cross;
 			next_cross = roadSize * next_cross;
+
 			//record next segment and the first segment so later it can be used to perfectly connect segments
 			if (cp_id == 0 && segment == 0) {
 				first_segment_r = vec3(
@@ -1294,56 +1295,158 @@ drawWorld()
 
 void TrainView::
 drawPath(bool doShadow) {
-	if (chapter != 3)
-	{
-		//bind shader
-		if (!doShadow)
-			this->basic_shader->Use();
-
-		glm::mat4 model_matrix = glm::mat4();
-		model_matrix = glm::translate(model_matrix, this->source_pos);
-		if (!doShadow)
+	if (chapter != 2) {
+		if (chapter != 3)
 		{
-			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-			glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-			glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-			if (chapter == 4)
-				this->galaxy_path_texture->bind(0);
+			//bind shader
+			if (!doShadow)
+				this->basic_shader->Use();
+
+			glm::mat4 model_matrix = glm::mat4();
+			model_matrix = glm::translate(model_matrix, this->source_pos);
+			if (!doShadow)
+			{
+				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+				glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+				if (chapter == 4)
+					this->galaxy_path_texture->bind(0);
+				else
+					this->path_texture->bind(0);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+				this->shadow->bind(1);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+			}
 			else
-				this->path_texture->bind(0);
-			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
-			this->shadow->bind(1);
-			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
-			glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+				glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
 		}
 		else
-			glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
+		{
+			//bind shader
+			this->water_surface_shader->Use();
+
+			glm::mat4 model_matrix = glm::mat4();
+			model_matrix = glm::translate(model_matrix, this->source_pos);
+			glUniformMatrix4fv(glGetUniformLocation(this->water_surface_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
+			glUniform1i(glGetUniformLocation(this->water_surface_shader->Program, "skybox"), 0);
+		}
+
+
+		//bind VAO
+		glBindVertexArray(this->path->vertex_data->vao);
+
+		glDrawElements(GL_TRIANGLES, this->path->vertex_data->element_amount, GL_UNSIGNED_INT, 0);
+
+		//unbind VAO
+		glBindVertexArray(0);
+
+		//unbind shader(switch to fixed pipeline)
+		if (!doShadow)
+			glUseProgram(0);
 	}
-	else
-	{
-		//bind shader
-		this->water_surface_shader->Use();
+	else {
+		const int NUM_of_CPs = (int)m_pTrack->points.size();
+		vec3 first_left = { 0.0f, 0.0f, 0.0f }, first_right = {0.0f, 0.0f, 0.0f};
+		vec3 last_left = {0.0f, 0.0f, 0.0f}, last_right = { 0.0f, 0.0f, 0.0f };
+		for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
-		glm::mat4 model_matrix = glm::mat4();
-		model_matrix = glm::translate(model_matrix, this->source_pos);
-		glUniformMatrix4fv(glGetUniformLocation(this->water_surface_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
-		glUniform1i(glGetUniformLocation(this->water_surface_shader->Program, "skybox"), 0);
+			//create forward vector
+			vec3 this_cp = vec3(m_pTrack->points[cp_id].pos.x,
+				m_pTrack->points[cp_id].pos.y,
+				m_pTrack->points[cp_id].pos.z);
+			int next_cp_id = (cp_id + 1) % NUM_of_CPs;
+			vec3 next_cp = vec3(m_pTrack->points[next_cp_id].pos.x,
+				m_pTrack->points[next_cp_id].pos.y,
+				m_pTrack->points[next_cp_id].pos.z);
+			vec3 forward = next_cp - this_cp;
+
+			for (int segment = 0; segment < PATH_DIVIDE; segment+=5) {
+				//create forward vector for this segment
+				vec3 this_segment = this_cp + forward * ((float)segment / (float)PATH_DIVIDE);
+				vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
+
+				//overide linear track with BSpline track
+				gmt.setG_pos(cp_id);
+				this_segment = gmt.calculate((float)segment / (float)PATH_DIVIDE);
+				next_segment = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
+
+				vec3 segment_forward = next_segment - this_segment;
+				segment_forward = normalize(segment_forward);
+
+				//create orient vector
+				gmt.setG_orient(cp_id);
+				vec3 this_cp_orient = vec3(
+					m_pTrack->points[cp_id].orient.x * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)segment / (float)PATH_DIVIDE),
+					m_pTrack->points[cp_id].orient.y * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)segment / (float)PATH_DIVIDE),
+					m_pTrack->points[cp_id].orient.z * (1.0f - (float)segment / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)segment / (float)PATH_DIVIDE));
+				this_cp_orient = gmt.calculate((float)segment / (float)PATH_DIVIDE);
+				this_cp_orient = normalize(this_cp_orient);
+				vec3 next_cp_orient = vec3(
+					m_pTrack->points[cp_id].orient.x * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.x * ((float)(segment + 1) / (float)PATH_DIVIDE),
+					m_pTrack->points[cp_id].orient.y * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.y * ((float)(segment + 1) / (float)PATH_DIVIDE),
+					m_pTrack->points[cp_id].orient.z * (1.0f - (float)(segment + 1) / (float)PATH_DIVIDE) + m_pTrack->points[next_cp_id].orient.z * ((float)(segment + 1) / (float)PATH_DIVIDE));
+				next_cp_orient = gmt.calculate((float)(segment + 1) / (float)PATH_DIVIDE);
+				next_cp_orient = normalize(next_cp_orient);
+
+				//create cross vector
+				vec3 this_cross = cross(segment_forward, this_cp_orient);
+				this_cross = normalize(this_cross);
+				vec3 next_cross = cross(segment_forward, next_cp_orient);
+				next_cross = normalize(next_cross);
+				//initialize path->vertices
+				GLfloat roadSize = 10.0f;
+				this_cross = roadSize * this_cross;
+				next_cross = roadSize * next_cross;
+				if (first_left == vec3(0.0f, 0.0f, 0.0f)) {
+					first_left = this_segment - this_cross;
+					first_right = this_segment + this_cross;
+				}
+				if (last_left == vec3(0.0f, 0.0f, 0.0f)) {
+					last_left = this_segment - this_cross;
+					last_right = this_segment + this_cross;
+				}
+				glBegin(GL_QUADS);
+				glColor3f(1.0f, 1.0f, 1.0f);
+				glVertex3f(this_segment.x + this_cross.x - segment_forward.x, this_segment.y + this_cross.y - segment_forward.y, this_segment.z + this_cross.z - segment_forward.z);
+				glVertex3f(this_segment.x - this_cross.x - segment_forward.x, this_segment.y - this_cross.y - segment_forward.y, this_segment.z - this_cross.z - segment_forward.z);
+				glVertex3f(next_segment.x - next_cross.x + segment_forward.x, next_segment.y - next_cross.y + segment_forward.y, next_segment.z - next_cross.z + segment_forward.z);
+				glVertex3f(next_segment.x + next_cross.x + segment_forward.x, next_segment.y + next_cross.y + segment_forward.y, next_segment.z + next_cross.z + segment_forward.z);
+				glEnd();
+
+				glBegin(GL_LINES);
+				glColor3f(0.0f, 0.0f, 1.0f);
+				glVertex3f(last_right.x, last_right.y, last_right.z);
+				glVertex3f(next_segment.x + next_cross.x, next_segment.y + next_cross.y, next_segment.z + next_cross.z);
+				glEnd();
+
+				glBegin(GL_LINES);
+				glColor3f(0.0f, 0.0f, 1.0f);
+				glVertex3f(last_left.x, last_left.y, last_left.z);
+				glVertex3f(next_segment.x - next_cross.x, next_segment.y - next_cross.y, next_segment.z - next_cross.z);
+				glEnd();
+
+				last_left = next_segment - next_cross;
+				last_right = next_segment + next_cross;
+
+				if (cp_id + 1 >= NUM_of_CPs && segment + 5 >= PATH_DIVIDE) {
+					glBegin(GL_LINES);
+					glColor3f(0.0f, 0.0f, 1.0f);
+					glVertex3f(first_left.x, first_left.y, first_left.z);
+					glVertex3f(next_segment.x - next_cross.x, next_segment.y - next_cross.y, next_segment.z - next_cross.z);
+					glEnd();
+
+					glBegin(GL_LINES);
+					glColor3f(0.0f, 0.0f, 1.0f);
+					glVertex3f(first_right.x, first_right.y, first_right.z);
+					glVertex3f(next_segment.x + next_cross.x, next_segment.y + next_cross.y, next_segment.z + next_cross.z);
+					glEnd();
+				}
+			}
+		}
 	}
-	
-
-	//bind VAO
-	glBindVertexArray(this->path->vertex_data->vao);
-
-	glDrawElements(GL_TRIANGLES, this->path->vertex_data->element_amount, GL_UNSIGNED_INT, 0);
-
-	//unbind VAO
-	glBindVertexArray(0);
-
-	//unbind shader(switch to fixed pipeline)
-	if (!doShadow)
-		glUseProgram(0);
 };
 
 void TrainView::
