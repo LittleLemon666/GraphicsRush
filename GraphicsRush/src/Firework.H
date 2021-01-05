@@ -22,27 +22,23 @@ public:
 			dir[i] = glm::normalize(glm::vec3(rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f));
 		}
 	}
-	void fireworkBegin(glm::vec3 _center)
+	void fireworkBegin(glm::vec3 _position)
 	{
-		center = _center;
+		position = _position;
 		firework_time = 0.0;
 		shoot = true;
 	}
 	void bomb()
 	{
 		firework_time = time_offset;
-		height = 0;
+		position -= glm::vec3(0.0, height, 0.0);
 	}
 	void advanceFirework()
 	{
 		firework_time += 0.2f;
 		if (firework_time < time_offset) center = glm::vec3(0.0, firework_time / time_offset * height, 0.0);
 		else if (firework_time < 1.5 * time_offset) center = glm::vec3(0.0, height, 0.0);
-		else
-		{
-			shoot = false;
-			if (height < 1.0) height = 100.0f;
-		}
+		else shoot = false;
 	}
 	const float getTime() const
 	{
@@ -72,6 +68,10 @@ public:
 	const void setPos(glm::vec3 pos)
 	{
 		position = pos;
+	}
+	void setColor(glm::vec3 _color)
+	{
+		color = _color;
 	}
 	const glm::vec3 getColor() const
 	{

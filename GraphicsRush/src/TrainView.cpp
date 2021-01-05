@@ -481,8 +481,6 @@ switchChapter(const int& chapter_index)
 	if (chapter == 5) {
 		tw->m_Track.first_P2 = false;
 		tw->m_Track.first_P5 = false;
-		shoot_firework = true;
-		firework_interval = 0;
 	}
 	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
 		do {
@@ -2267,6 +2265,13 @@ printText()
 			sprintf(ver3_info, "ver3: ON");
 			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 		}
+
+		if (finish_computer_graphics && shoot_firework)
+		{
+			char fcg_info[20];
+			sprintf(fcg_info, "You finished Computer Graphics!");
+			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		}
 	}
 	else if (game_state == CDEAD)
 	{
@@ -2637,7 +2642,7 @@ draw()
 		{
 			firework = new Firework*[num_firework];
 			for (int i = 0; i < num_firework; i++)
-				firework[i] = new Firework(128, vec3(rand() % 256 / 256.0, rand() % 256 / 256.0, rand() % 256 / 256.0));
+				firework[i] = new Firework(128, randomColor());
 		}
 
 		if (!door_scene_texture)
@@ -3161,9 +3166,7 @@ shootFireworks()
 {
 	if (shoot_firework)
 	{
-		gmt.setG_pos((int)(tw->m_Track.trainU + tw->speed->value() * 5));
-		float ratio = (tw->m_Track.trainU + tw->speed->value() * 5) - (int)tw->m_Track.trainU;
-		vec3 fireworkPos = gmt.calculate(ratio);
+		vec3 fireworkPos = player_pos + player_forward * 150.0f - player_up * 25.0f;
 		for (int firework_interval_index = 0; firework_interval_index < num_firework; firework_interval_index++)
 		{
 			if (firework_interval == 10 * (firework_interval_index + 1)) firework[firework_interval_index]->fireworkBegin(fireworkPos);
@@ -3178,7 +3181,14 @@ void TrainView::
 Bomb(vec3 fireworkPos)
 {
 	firework[0]->fireworkBegin(fireworkPos);
+	firework[0]->setColor(randomColor());
 	firework[0]->bomb();
+}
+
+vec3 TrainView::
+randomColor()
+{
+	return glm::vec3(rand() % 256 / 256.0f, rand() % 256 / 256.0f, rand() % 256 / 256.0);
 }
 
 void TrainView::
@@ -3194,4 +3204,12 @@ extraBossHPAdvance()
 {
 	if (ExtraBoss::health_minus > ExtraBoss::health)
 		ExtraBoss::health_minus -= 0.1f;
+}
+
+void TrainView::
+finishComputerGraphics()
+{
+	finish_computer_graphics = true;
+	shoot_firework = true;
+	firework_interval = 0;
 }

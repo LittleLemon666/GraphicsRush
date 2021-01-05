@@ -381,4 +381,8 @@ class TrainView : public Fl_Gl_Window
 		vec3 hp_color_back = vec3(0.3, 0.3, 0.3);
 		void extraBossHPAdvance();
 		void Bomb(vec3 pos);
+		vec3 randomColor();
+
+		bool finish_computer_graphics = false;
+		void finishComputerGraphics();
 };
