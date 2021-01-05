@@ -44,6 +44,7 @@ class CTrack;
 #include "Boss.H"
 #include "Shop.H"
 #include "Firework.H"
+#include "Rain.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -178,6 +179,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* blending_flat_gray_shader = nullptr;
 		Shader* firework_shader = nullptr;
 		Shader* hp_shader = nullptr;
+		Shader* rain_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -233,6 +235,7 @@ class TrainView : public Fl_Gl_Window
 		void drawScreenQuad();
 		void drawFireworks();
 		void drawPizza();
+		void drawRain();
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
@@ -392,4 +395,6 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* pizza_obj_texture = nullptr;
 		std::string pizza_obj_texture_path = "../GraphicsRush/Objects/pizza_texture.png";
 		float pizza_rotate = 0;
+
+		Rain* rain = nullptr;
 };

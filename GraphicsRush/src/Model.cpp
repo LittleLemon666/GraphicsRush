@@ -203,6 +203,123 @@ Model(const std::string fileName, bool uv_reflect, int subdivision_level)
 
 		VAOProcess();
 	}
+	else if (fileName == "LINE")
+	{
+		indexed_vertices = {
+			glm::vec3(-0.01f,  0.0f, -0.01f),
+			glm::vec3(-0.01f,  0.0f,  0.01f),
+			glm::vec3(0.01f,  0.0f,  0.01f),
+			glm::vec3(0.01f,  0.0f, -0.01f),
+
+			glm::vec3(-0.01f,  0.0f, -0.01f),
+			glm::vec3(-0.01f,  0.0f,  0.01f),
+			glm::vec3(-0.01f,  1.0f,  0.01f),
+			glm::vec3(-0.01f,  1.0f, -0.01f),
+
+			glm::vec3(0.01f,  0.0f,  0.01f),
+			glm::vec3(-0.01f,  0.0f,  0.01f),
+			glm::vec3(-0.01f,  1.0f,  0.01f),
+			glm::vec3(0.01f,  1.0f,  0.01f),
+
+			glm::vec3(0.01f,  0.0f, -0.01f),
+			glm::vec3(0.01f,  0.0f,  0.01f),
+			glm::vec3(0.01f,  1.0f,  0.01f),
+			glm::vec3(0.01f,  1.0f, -0.01f),
+
+			glm::vec3(0.01f,  0.0f, -0.01f),
+			glm::vec3(-0.01f,  0.0f, -0.01f),
+			glm::vec3(-0.01f,  1.0f, -0.01f),
+			glm::vec3(0.01f,  1.0f, -0.01f),
+
+			glm::vec3(0.01f,  1.0f,  0.01f),
+			glm::vec3(0.01f,  1.0f, -0.01f),
+			glm::vec3(-0.01f,  1.0f, -0.01f),
+			glm::vec3(-0.01f,  1.0f,  0.01f),
+		};
+		indexed_normals = {
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+			glm::vec3(0.0f, -1.0f, 0.0f),
+
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+			glm::vec3(-1.0f, 0.0f, 0.0f),
+
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+			glm::vec3(0.0f, 0.0f, 1.0f),
+
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f),
+
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+			glm::vec3(0.0f, 0.0f, -1.0f),
+
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(0.0f, 1.0f, 0.0f)
+		};
+		indexed_uvs = {
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f),
+
+			glm::vec2(0.0f, 0.0f),
+			glm::vec2(1.0f, 0.0f),
+			glm::vec2(1.0f, 1.0f),
+			glm::vec2(0.0f, 1.0f)
+		};
+		indices = {
+			0, 1, 2,
+			0, 2, 3,
+
+			6, 7, 4,
+			6, 4, 5,
+
+			8, 9, 10,
+			8, 10, 11,
+
+			12, 13, 14,
+			12, 14, 15,
+
+			16, 17, 18,
+			16, 18, 19,
+
+			20, 21, 22,
+			20, 22, 23
+		};
+
+		VAOProcess();
+	}
 	else if (fileName == "CUBEMAPSPHERE") // Under construction
 	{
 		unsigned short indices_index = 0;

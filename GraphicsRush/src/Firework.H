@@ -14,13 +14,13 @@ public:
 	}
 	void initFirework()
 	{
-		fireball = new Model **[num];
+		fireball = new Model*[subdivision_level_num];
+		for (int i = 0; i < subdivision_level_num; i++)
+			fireball[i] = new Model("SPHERE", false, i + 1);
+
 		dir = new glm::vec3[num];
 		for (int i = 0; i < num; i++)
 		{
-			fireball[i] = new Model*[subdivision_level_num];
-			for (int j = 0; j < subdivision_level_num; j++)
-				fireball[i][j] = new Model("SPHERE", false, j + 1);
 			dir[i] = glm::normalize(glm::vec3(rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f, rand() % 256 / 256.0f - 0.5f));
 		}
 	}
@@ -90,16 +90,16 @@ public:
 			else if (dist < 100.0f) level_index = 1;
 			else level_index = 0;
 		}
-		fireball[index][level_index]->draw();
+		fireball[level_index]->draw();
 	}
 	~Firework()
 	{
-		delete[] fireball;
+		delete fireball;
 		delete[] dir;
 	}
 
 private:
-	Model*** fireball;
+	Model** fireball;
 	int num;
 	glm::vec3 color;
 	glm::vec3 center;

@@ -319,6 +319,8 @@ void runButtonCB(TrainWindow* tw)
 				for (int i = 0; i < tw->trainView->num_firework; i++)
 					if (tw->trainView->firework[i]->isShoot())
 						tw->trainView->firework[i]->advanceFirework();
+			if (tw->trainView->rain && tw->trainView->chapter == 3)
+				tw->trainView->rain->advanceRain();
 			tw->trainView->mainBossAdvance();
 			tw->trainView->extraBossHPAdvance();
 			lastRedraw = clock();

@@ -1287,6 +1287,8 @@ drawWorld()
 
 	drawFireworks();
 
+	drawRain();
+
 	glDisable(GL_BLEND);
 }
 
@@ -2201,6 +2203,31 @@ drawPizza()
 }
 
 void TrainView::
+drawRain()
+{
+	if (chapter == 3)
+	{
+		rain->setPos(player_pos);
+		this->rain_shader->Use();
+
+		for (int i = 0; i < rain->getRainNum(); i++)
+		{
+			mat4 model_matrix = mat4();
+			model_matrix = translate(model_matrix, rain->getPos(i));
+			glUniformMatrix4fv(glGetUniformLocation(this->rain_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform1i(glGetUniformLocation(this->rain_shader->Program, "rain_time"), rain->getTime());
+			glUniform1i(glGetUniformLocation(this->rain_shader->Program, "rain_step"), rain->getRainStep(i));
+			glUniform1i(glGetUniformLocation(this->rain_shader->Program, "height"), rain->getSize().y);
+			glUniform3fv(glGetUniformLocation(this->rain_shader->Program, "u_color"), 1, &rain->getColor()[0]);
+			this->rain->draw(i);
+		}
+		
+		//unbind shader(switch to fixed pipeline)
+		glUseProgram(0);
+	}
+}
+
+void TrainView::
 printText()
 {
 	if (game_state == CLOBBY)
@@ -2445,6 +2472,13 @@ draw()
 				"../GraphicsRush/src/shaders/hp.vert",
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/hp.frag");
+
+		if (!this->rain_shader)
+			this->rain_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/rain.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/rain.frag");
 
 		if (!this->commom_matrices)
 		{
@@ -2691,6 +2725,9 @@ draw()
 			for (int i = 0; i < num_firework; i++)
 				firework[i] = new Firework(128, randomColor());
 		}
+
+		if (!rain)
+			rain = new Rain();
 
 		initDoor();
 

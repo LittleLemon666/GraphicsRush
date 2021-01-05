@@ -270,6 +270,7 @@ advanceTrain(float dir)
 			if ((int)m_Track.trainU >= (int)m_Track.points.size())
 			{
 				if (trainView->chapter == 1) m_Track.first_P2 = false;
+				if (trainView->chapter == 3) trainView->rain->rainEnd();
 				if (trainView->chapter == 4)
 				{
 					m_Track.first_P5 = false;
@@ -277,6 +278,7 @@ advanceTrain(float dir)
 				}
 				m_Track.trainU -= (int)m_Track.points.size();
 				trainView->switchChapter(trainView->chapter + 1);
+				if (trainView->chapter == 3) trainView->rain->rainBegin(trainView->player_pos);
 			}
 		}
 	}

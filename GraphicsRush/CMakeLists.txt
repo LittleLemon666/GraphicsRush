@@ -34,7 +34,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/firework.vert
     ${SRC_DIR}shaders/firework.frag
     ${SRC_DIR}shaders/hp.vert
-    ${SRC_DIR}shaders/hp.frag)
+    ${SRC_DIR}shaders/hp.frag
+    ${SRC_DIR}shaders/rain.vert
+    ${SRC_DIR}shaders/rain.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
@@ -63,6 +65,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Boss.h
     ${SRC_DIR}Shop.h
     ${SRC_DIR}Firework.h
+    ${SRC_DIR}Rain.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp
