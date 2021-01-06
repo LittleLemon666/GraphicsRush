@@ -481,7 +481,7 @@ void TrainView::
 switchChapter(const int& chapter_index)
 {
 	int old_chapter = chapter;
-	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5) {
+	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
 		do {
 			chapter = rand() % (NUMBER_OF_PROJECTS + 1);
 		} while (chapter == old_chapter);
