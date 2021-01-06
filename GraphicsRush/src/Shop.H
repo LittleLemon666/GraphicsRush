@@ -42,6 +42,6 @@ class Shop {
 		std::vector<Texture2D> items_texture;
 		std::vector<glm::vec3> items_pos;
 
-		std::vector<int> item_price = { 100, 200, 100, 200, 200, 500, 100, 200, 300, 400 };
+		std::vector<int> item_price = { 100, 200, 100, 200, 200, 500, 100, 200, 300, 400 }; //github change this
 		void buy(TrainWindow* tw, int item_id);
 };

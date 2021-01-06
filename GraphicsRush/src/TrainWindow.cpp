@@ -73,7 +73,7 @@ TrainWindow(const int x, const int y)
 		rb->callback((Fl_Callback*)backCB,this);
 		
 		debug_mode = new Fl_Button(730,pty,65,20,"Debug");
-		togglify(debug_mode,1);
+		togglify(debug_mode,0);
   
 		pty+=25;
 		speed = new Fl_Value_Slider(655,pty,140,20,"speed");
