@@ -993,7 +993,11 @@ choose(int x, int y)
 			shop->buy(tw, VER2);
 			game_state = CSHOP;
 		}
-		else game_state = CGAME;
+		else
+		{
+			tw->ver2Button->value(!tw->ver2Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CVER3:
 		if (origin_game_state == CSHOP)
@@ -1001,7 +1005,11 @@ choose(int x, int y)
 			shop->buy(tw, VER3);
 			game_state = CSHOP;
 		}
-		else game_state = CGAME;
+		else
+		{
+			tw->ver3Button->value(!tw->ver3Button->value());
+			game_state = origin_game_state;
+		}
 		break;
 	case CSHADER:
 		if (origin_game_state == CSHOP)
@@ -1036,6 +1044,10 @@ choose(int x, int y)
 		else
 		{
 			tw->cp1Button->value(!tw->cp1Button->value());
+			tw->cp2Button->value(0);
+			tw->cp3Button->value(0);
+			tw->cp4Button->value(0);
+			tw->cp5Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1047,7 +1059,11 @@ choose(int x, int y)
 		}
 		else
 		{
+			tw->cp1Button->value(0);
 			tw->cp2Button->value(!tw->cp2Button->value());
+			tw->cp3Button->value(0);
+			tw->cp4Button->value(0);
+			tw->cp5Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1059,7 +1075,11 @@ choose(int x, int y)
 		}
 		else
 		{
+			tw->cp1Button->value(0);
+			tw->cp2Button->value(0);
 			tw->cp3Button->value(!tw->cp3Button->value());
+			tw->cp4Button->value(0);
+			tw->cp5Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1071,7 +1091,11 @@ choose(int x, int y)
 		}
 		else
 		{
+			tw->cp1Button->value(0);
+			tw->cp2Button->value(0);
+			tw->cp3Button->value(0);
 			tw->cp4Button->value(!tw->cp4Button->value());
+			tw->cp5Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1083,6 +1107,10 @@ choose(int x, int y)
 		}
 		else
 		{
+			tw->cp1Button->value(0);
+			tw->cp2Button->value(0);
+			tw->cp3Button->value(0);
+			tw->cp4Button->value(0);
 			tw->cp5Button->value(!tw->cp5Button->value());
 			game_state = origin_game_state;
 		}
@@ -1160,7 +1188,7 @@ renderEnvironment()
 void TrainView::
 drawShop(bool buttom)
 {
-	if (game_state != CLOBBY || chapter != 0) return; // don't draw the shop if not in lobby
+	if (game_state != CLOBBY) return; // don't draw the shop if not in lobby
 
 	if (buttom)
 		this->choose_shader->Use();
