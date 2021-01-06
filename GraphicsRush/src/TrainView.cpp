@@ -1233,9 +1233,9 @@ drawShop(bool buttom)
 	else
 		this->basic_shader->Use();
 
-	vec3 shop_pos = door_pos + 22.0f * door_forward + 2.0f * door_up;
-	vec3 shop_forward = door_forward;
-	vec3 shop_up = door_up;
+	vec3 shop_pos = player_pos + 10.0f * player_forward + 6.0f * player_up;
+	vec3 shop_forward = player_forward + player_up;
+	vec3 shop_up = player_up - player_forward;
 	vec3 shop_cross = normalize(cross(shop_forward, shop_up));
 	shop_pos += 4.0f * shop_cross;
 	
@@ -1942,9 +1942,9 @@ drawUarrow(bool buttom)
 	else
 		this->basic_shader->Use();
 
-	vec3 uarrow_pos = door_pos + 22.0f * door_forward + 5.0f * door_up;
-	vec3 uarrow_forward = door_forward;
-	vec3 uarrow_up = door_up;
+	vec3 uarrow_pos = player_pos + 7.0f * player_forward + 11.5f * player_up;
+	vec3 uarrow_forward = player_forward + player_up;
+	vec3 uarrow_up = player_up - player_forward;
 	vec3 uarrow_cross = normalize(cross(uarrow_forward, uarrow_up));
 	uarrow_pos -= 6.0f * uarrow_cross;
 
