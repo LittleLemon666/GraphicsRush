@@ -321,8 +321,7 @@ void runButtonCB(TrainWindow* tw)
 						tw->trainView->firework[i]->advanceFirework();
 			if (tw->trainView->rain && tw->trainView->chapter == 3)
 				tw->trainView->rain->advanceRain();
-			if (tw->m_Track.miniBoss)
-				tw->trainView->filterAdvance();
+			tw->trainView->filterAdvance();
 			if (tw->trainView->star)
 				tw->trainView->star->advanceStar();
 			tw->trainView->mainBossAdvance();

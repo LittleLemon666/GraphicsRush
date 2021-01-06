@@ -980,6 +980,7 @@ choose(int x, int y)
 		else
 		{
 			tw->thighButton->value(!tw->thighButton->value());
+			if (tw->m_Track.player.items[THIGH] == 0) tw->thighButton->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -992,6 +993,7 @@ choose(int x, int y)
 		else
 		{
 			tw->ver2Button->value(!tw->ver2Button->value());
+			if (tw->m_Track.player.items[VER2] == 0) tw->ver2Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1004,6 +1006,7 @@ choose(int x, int y)
 		else
 		{
 			tw->ver3Button->value(!tw->ver3Button->value());
+			if (tw->m_Track.player.items[VER3] == 0) tw->ver3Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1016,6 +1019,7 @@ choose(int x, int y)
 		else
 		{
 			tw->shaderButton->value(!tw->shaderButton->value());
+			if (tw->m_Track.player.items[SHADER] == 0) tw->shaderButton->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1028,6 +1032,7 @@ choose(int x, int y)
 		else
 		{
 			tw->cudaButton->value(!tw->cudaButton->value());
+			if (tw->m_Track.player.items[CUDA] == 0) tw->cudaButton->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1044,6 +1049,7 @@ choose(int x, int y)
 			tw->cp3Button->value(0);
 			tw->cp4Button->value(0);
 			tw->cp5Button->value(0);
+			if (tw->m_Track.player.cps[CP1] == 0) tw->cp1Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1060,6 +1066,7 @@ choose(int x, int y)
 			tw->cp3Button->value(0);
 			tw->cp4Button->value(0);
 			tw->cp5Button->value(0);
+			if (tw->m_Track.player.cps[CP2] == 0) tw->cp2Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1076,6 +1083,7 @@ choose(int x, int y)
 			tw->cp3Button->value(!tw->cp3Button->value());
 			tw->cp4Button->value(0);
 			tw->cp5Button->value(0);
+			if (tw->m_Track.player.cps[CP3] == 0) tw->cp3Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1092,6 +1100,7 @@ choose(int x, int y)
 			tw->cp3Button->value(0);
 			tw->cp4Button->value(!tw->cp4Button->value());
 			tw->cp5Button->value(0);
+			if (tw->m_Track.player.cps[CP4] == 0) tw->cp4Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -1108,6 +1117,7 @@ choose(int x, int y)
 			tw->cp3Button->value(0);
 			tw->cp4Button->value(0);
 			tw->cp5Button->value(!tw->cp5Button->value());
+			if (tw->m_Track.player.cps[CP5] == 0) tw->cp5Button->value(0);
 			game_state = origin_game_state;
 		}
 		break;
@@ -2386,7 +2396,26 @@ drawRain()
 void TrainView::
 drawStars()
 {
+	star->setPos(player_pos);
+	this->star_shader->Use();
 
+	for (int i = 0; i < star->getStarNum(); i++)
+	{
+		mat4 model_matrix = mat4();
+		model_matrix = translate(model_matrix, star->getPos());
+		model_matrix = rotate(model_matrix, radians((float)star->getTime() * 5), vec3(0, 1, 0));
+		model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
+		glUniformMatrix4fv(glGetUniformLocation(this->star_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->star_shader->Program, "star_time"), star->getTime());
+		glUniform1f(glGetUniformLocation(this->star_shader->Program, "star_angle"), star->getStarAngle(i));
+		glUniform1f(glGetUniformLocation(this->star_shader->Program, "height"), star->getHeight());
+		glUniform1f(glGetUniformLocation(this->star_shader->Program, "r"), star->getR());
+		glUniform3fv(glGetUniformLocation(this->star_shader->Program, "u_color"), 1, &star->getColor()[0]);
+		this->star->draw(i);
+	}
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
 }
 
 void TrainView::
@@ -3404,26 +3433,29 @@ void TrainView::
 rotate_objects()
 {
 	money_rotate += 0.1f;
-	if (money_rotate > 360) money_rotate -= 360;
+	if (money_rotate > 314) money_rotate -= 314;
 
 	shop_rotate += 0.1f;
-	if (shop_rotate > 360) shop_rotate -= 360;
+	if (shop_rotate > 314) shop_rotate -= 314;
 	
 	earth_rotate += 0.005f;
-	if (earth_rotate > 360) earth_rotate -= 360;
+	if (earth_rotate > 314) earth_rotate -= 314;
 
 	sun_rotate += 0.0025f;
-	if (sun_rotate > 360) sun_rotate -= 360;
+	if (sun_rotate > 314) sun_rotate -= 314;
 
 	pizza_rotate += 0.1f;
-	if (pizza_rotate > 360) pizza_rotate -= 360;
+	if (pizza_rotate > 314) pizza_rotate -= 314;
 }
 
 void TrainView::
 filterAdvance()
 {
-	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2) filter_id = 0;
-	if (game_state != CGAME) return;
+	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2)
+	{
+		filter_id = 0;
+		return;
+	}
 
 	filter_effect_time++;
 	if (filter_effect_time == 100)
