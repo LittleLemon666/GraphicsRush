@@ -2408,6 +2408,18 @@ printText()
 {
 	if (game_state == CLOBBY)
 	{
+		char title_info[20];
+		sprintf(title_info, "Graphics Rush");
+		RenderText(title_info, w() / 2.0f - 240.0f * w() / h(), h() * 2.3 / 3.0, 1.5f * w() / h(), vec3(0.0f, 0.9f, 0.9f));
+
+		char score_info[30];
+		sprintf(score_info, "height Score:  %010d", m_pTrack->player.highscore);
+		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
+		char money_info[20];
+		sprintf(money_info, "money: %010d", m_pTrack->player.money_total);
+		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+
 		char shop_info[20];
 		sprintf(shop_info, "140.118.127.125");
 		RenderText(shop_info, w() / 2.0f - 245.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
@@ -2464,6 +2476,23 @@ printText()
 		vec2 cuda_money_pos = ndcToViewport(this->shop->items_pos[CUDA] + vec3(-0.1f, -0.4f, 0.0f));
 		RenderText(cuda_money, cuda_money_pos.x, cuda_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
+		char money_info[10];
+		sprintf(money_info, "money");
+		vec2 total_money_pos = ndcToViewport(vec3(this->shop->items_pos[VER3].x - 0.1f, this->shop->items_pos[CUDA].y - 0.3, this->shop->items_pos[VER3].z));
+		RenderText(money_info, total_money_pos.x, total_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
+		char money_money_info_info[20];
+		sprintf(money_money_info_info, "$%d", m_pTrack->player.money_total);
+		unsigned int money_money_info_info_size = 0;
+		int money_total_t = m_pTrack->player.money_total;
+		while (money_total_t > 0)
+		{
+			money_money_info_info_size++;
+			money_total_t /= 10;
+		}
+		vec2 total_money_money_pos = ndcToViewport(vec3(this->shop->items_pos[VER3].x - 0.05 * money_money_info_info_size, this->shop->items_pos[CUDA].y - 0.4, this->shop->items_pos[VER3].z));
+		RenderText(money_money_info_info, total_money_money_pos.x, total_money_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
+
 		char checkpoint_info[10];
 		sprintf(checkpoint_info, "checkpoint");
 		vec2 checkpoint_info_pos = ndcToViewport(this->shop->items_pos[CHECKPOINT3] + vec3(-0.25f, -0.2f, 0.0f));
@@ -2481,11 +2510,11 @@ printText()
 	{
 		char score_info[20];
 		sprintf(score_info, "Score:  %010d", m_pTrack->score);
-		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
-		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 		//power-ups
 		if (tw->thighButton->value()) {
@@ -2508,7 +2537,7 @@ printText()
 		{
 			char fcg_info[40];
 			sprintf(fcg_info, "You finished Computer Graphics!");
-			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
 		if (filter_id > Filter::ORIGIN)
@@ -3436,7 +3465,7 @@ rotate_objects()
 void TrainView::
 filterAdvance()
 {
-	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2)
+	if (chapter != 1 || game_state != CGAME || !m_pTrack->miniBoss)
 	{
 		filter_id = 0;
 		return;
