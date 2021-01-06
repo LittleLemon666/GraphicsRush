@@ -4,7 +4,7 @@
 class Star
 {
 public:
-	Star() : num(12), color(glm::vec3(1.0, 1.0, 0.0)), r(50.0), height(100.0)
+	Star() : num(12), color(glm::vec3(1.0, 0.5, 0.0)), r(50.0), height(100.0)
 	{
 		initStar();
 	}

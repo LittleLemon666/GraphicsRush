@@ -561,19 +561,21 @@ void endResetForCallBack(TrainWindow* tw) {
 		tw->runButton->value(0);
 		tw->trainView->game_state = CGAME;
 	}
-	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) {
+	else if (TrainView::verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) {
 		tw->m_Track.player.items[VER2]--;
 		tw->ver2Button->value(0);
-		verState = 2;
+		TrainView::verState = 2;
 		tw->trainView->game_state = CGAME;
 		tw->trainView->ver2_blink = true;
+		tw->trainView->ver3_blink = false;
 		tw->trainView->blink_start = true;
 	}
-	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
+	else if (TrainView::verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
 		tw->m_Track.player.items[VER3]--;
 		tw->ver3Button->value(0);
-		verState = 3;
+		TrainView::verState = 3;
 		tw->trainView->game_state = CGAME;
+		tw->trainView->ver2_blink = false;
 		tw->trainView->ver3_blink = true;
 		tw->trainView->blink_start = true;
 	}
@@ -584,12 +586,15 @@ void endResetForCallBack(TrainWindow* tw) {
 		tw->m_Track.player.money_total += tw->m_Track.money_collected;
 		tw->m_Track.player.saveFile();
 
-		verState = 1;
+		TrainView::verState = 1;
 		tw->m_Track.first_P2 = true;
 		tw->m_Track.first_P5 = true;
 		tw->m_Track.miniBoss = false;
 		tw->m_Track.mainBoss = false;
 		tw->m_Track.extraBoss = false;
+		tw->trainView->ver2_blink = false;
+		tw->trainView->ver3_blink = false;
+		tw->trainView->star->starEnd();
 		tw->m_Track.score = 0;
 		tw->m_Track.money_collected = 0;
 		tw->speed->value(tw->startingSpeed);

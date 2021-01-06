@@ -40,6 +40,7 @@
 
 using namespace glm;
 static unsigned int clipTime = 0;
+int TrainView::verState = 1;
 
 #ifdef EXAMPLE_SOLUTION
 #	include "TrainExample/TrainExample.H"
@@ -2420,7 +2421,7 @@ drawStars()
 		{
 			mat4 model_matrix = mat4();
 			model_matrix = translate(model_matrix, star->getPos());
-			model_matrix = rotate(model_matrix, radians((float)star->getTime() * 5), vec3(0, 1, 0));
+			model_matrix = rotate(model_matrix, radians((float)star->getTime() * 40), vec3(0, 1, 0));
 			model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
 			glUniformMatrix4fv(glGetUniformLocation(this->star_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 			glUniform1i(glGetUniformLocation(this->star_shader->Program, "star_time"), star->getTime());
@@ -2593,7 +2594,19 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		if (!ver2_blink && !ver3_blink)
+		if (tw->ver2Button->value() && TrainView::verState == 1)
+		{
+			char ver2_info[10];
+			sprintf(ver2_info, "Ver 2!");
+			RenderText(ver2_info, w() / 2.0 - 100.0f, h() - 110.0f, 1.5f, vec3(0.0f, 0.0f, 1.0f));
+		}
+		else if (tw->ver3Button->value() && TrainView::verState == 2)
+		{
+			char ver3_info[10];
+			sprintf(ver3_info, "Ver 3!");
+			RenderText(ver3_info, w() / 2.0 - 100.0f, h() - 110.0f, 1.5f, vec3(0.0f, 0.0f, 1.0f));
+		}
+		else
 		{
 			char flunk_info[20];
 			sprintf(flunk_info, "You flunked!");
@@ -3597,7 +3610,7 @@ starAdvance()
 	if (blink_start)
 	{
 		if (ver2_blink)
-			star->setColor(vec3(0.9f, 0.9f, 0.0f));
+			star->setColor(vec3(0.9f, 0.5f, 0.0f));
 		else if (ver3_blink)
 			star->setColor(vec3(0.0f, 0.9f, 0.0f));
 

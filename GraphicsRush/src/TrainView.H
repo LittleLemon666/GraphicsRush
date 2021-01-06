@@ -413,4 +413,6 @@ class TrainView : public Fl_Gl_Window
 		bool ver3_blink = false;
 		bool blink_start = false;
 		void starAdvance();
+
+		static int verState;
 };
