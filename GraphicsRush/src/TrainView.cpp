@@ -1295,62 +1295,10 @@ drawWorld()
 
 void TrainView::
 drawPath(bool doShadow) {
-	if (chapter != 2) {
-		if (chapter != 3)
-		{
-			//bind shader
-			if (!doShadow)
-				this->basic_shader->Use();
-
-			glm::mat4 model_matrix = glm::mat4();
-			model_matrix = glm::translate(model_matrix, this->source_pos);
-			if (!doShadow)
-			{
-				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-				glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
-				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
-				if (chapter == 4)
-					this->galaxy_path_texture->bind(0);
-				else
-					this->path_texture->bind(0);
-				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
-				this->shadow->bind(1);
-				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
-				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
-			}
-			else
-				glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
-		}
-		else
-		{
-			//bind shader
-			this->water_surface_shader->Use();
-
-			glm::mat4 model_matrix = glm::mat4();
-			model_matrix = glm::translate(model_matrix, this->source_pos);
-			glUniformMatrix4fv(glGetUniformLocation(this->water_surface_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
-			glUniform1i(glGetUniformLocation(this->water_surface_shader->Program, "skybox"), 0);
-		}
-
-
-		//bind VAO
-		glBindVertexArray(this->path->vertex_data->vao);
-
-		glDrawElements(GL_TRIANGLES, this->path->vertex_data->element_amount, GL_UNSIGNED_INT, 0);
-
-		//unbind VAO
-		glBindVertexArray(0);
-
-		//unbind shader(switch to fixed pipeline)
-		if (!doShadow)
-			glUseProgram(0);
-	}
-	else {
+	if (chapter == 2) {
 		const int NUM_of_CPs = (int)m_pTrack->points.size();
-		vec3 first_left = { 0.0f, 0.0f, 0.0f }, first_right = {0.0f, 0.0f, 0.0f};
-		vec3 last_left = {0.0f, 0.0f, 0.0f}, last_right = { 0.0f, 0.0f, 0.0f };
+		vec3 first_left = { 0.0f, 0.0f, 0.0f }, first_right = { 0.0f, 0.0f, 0.0f };
+		vec3 last_left = { 0.0f, 0.0f, 0.0f }, last_right = { 0.0f, 0.0f, 0.0f };
 		for (int cp_id = 0; cp_id < NUM_of_CPs; cp_id++) {
 
 			//create forward vector
@@ -1363,7 +1311,7 @@ drawPath(bool doShadow) {
 				m_pTrack->points[next_cp_id].pos.z);
 			vec3 forward = next_cp - this_cp;
 
-			for (int segment = 0; segment < PATH_DIVIDE; segment+=5) {
+			for (int segment = 0; segment < PATH_DIVIDE; segment += 5) {
 				//create forward vector for this segment
 				vec3 this_segment = this_cp + forward * ((float)segment / (float)PATH_DIVIDE);
 				vec3 next_segment = this_cp + forward * ((float)(segment + 1) / (float)PATH_DIVIDE);
@@ -1446,6 +1394,59 @@ drawPath(bool doShadow) {
 				}
 			}
 		}
+	}
+	else
+	{
+		if (chapter == 3)
+		{
+			//bind shader
+			this->water_surface_shader->Use();
+
+			glm::mat4 model_matrix = glm::mat4();
+			model_matrix = glm::translate(model_matrix, this->source_pos);
+			glUniformMatrix4fv(glGetUniformLocation(this->water_surface_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemap_texture[chapter]);
+			glUniform1i(glGetUniformLocation(this->water_surface_shader->Program, "skybox"), 0);
+		}
+		else
+		{
+			//bind shader
+			if (!doShadow)
+				this->basic_shader->Use();
+
+			glm::mat4 model_matrix = glm::mat4();
+			model_matrix = glm::translate(model_matrix, this->source_pos);
+			if (!doShadow)
+			{
+				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+				glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &glm::vec3(0.0f, 1.0f, 0.0f)[0]);
+				glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+				if (chapter == 4)
+					this->galaxy_path_texture->bind(0);
+				else
+					this->path_texture->bind(0);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+				this->shadow->bind(1);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+				glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+			}
+			else
+				glUniformMatrix4fv(glGetUniformLocation(this->shadow_shader->Program, "model"), 1, GL_FALSE, &model_matrix[0][0]);
+
+		}
+
+		//bind VAO
+		glBindVertexArray(this->path->vertex_data->vao);
+
+		glDrawElements(GL_TRIANGLES, this->path->vertex_data->element_amount, GL_UNSIGNED_INT, 0);
+
+		//unbind VAO
+		glBindVertexArray(0);
+
+		//unbind shader(switch to fixed pipeline)
+		if (!doShadow)
+			glUseProgram(0);
 	}
 };
 

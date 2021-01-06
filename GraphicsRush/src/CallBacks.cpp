@@ -452,9 +452,13 @@ void endReset(TrainWindow* tw) {
 		invincibleStart = clock();
 		return;
 	}
-	if (tw->trainView->game_state == CGAME && deadTimer == 0) deadTimer = clock();
-	tw->trainView->game_state = CDEAD; //***need to design***
+	if (tw->trainView->game_state == CGAME && deadTimer == 0)
+	{
+		deadTimer = clock();
+		tw->trainView->game_state = CDEAD; //***need to design***
+	}
 	if (clock() - deadTimer > CLOCKS_PER_SEC * 2) {
+		tw->trainView->game_state = CLOBBY;
 		//save score
 		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
 		tw->m_Track.player.money_total += tw->m_Track.money_collected;
