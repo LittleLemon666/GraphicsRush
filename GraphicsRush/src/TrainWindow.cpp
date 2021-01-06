@@ -259,6 +259,9 @@ advanceTrain(float dir)
 			if (ExtraBoss::health <= 0) {
 				if (trainView->screen_brightness < 0.1f) {
 					trainView->switchChapter(0);
+
+					resetReversiBoss(this);
+
 					m_Track.trainU = 0.0f;
 				}
 				trainView->screen_brightness -= 0.1f;

@@ -1119,6 +1119,21 @@ choose(int x, int y)
 		break;
 	default:
 		game_state = CGAME;
+		if (tw->cp1Button->value()) {
+			tw->m_Track.player.cps[CP1]--;
+		}
+		if (tw->cp2Button->value()) {
+			tw->m_Track.player.cps[CP2]--;
+		}
+		if (tw->cp3Button->value()) {
+			tw->m_Track.player.cps[CP3]--;
+		}
+		if (tw->cp4Button->value()) {
+			tw->m_Track.player.cps[CP4]--;
+		}
+		if (tw->cp5Button->value()) {
+			tw->m_Track.player.cps[CP5]--;
+		}
 		break;
 	}
 	glad_glDeleteBuffers(1, &chooser_FBO->fbo);
@@ -1268,7 +1283,7 @@ drawWorld()
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
 	else if (!m_pTrack->extraBoss && chapter == 5) loadExtraBoss();
 	
-	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && !m_pTrack->extraBoss && (int)m_pTrack->money.size() == 0 && !(game_state == CLOBBY)) {
+	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && !m_pTrack->extraBoss && (int)m_pTrack->money.size() == 0) {
 		loadObjects();
 		m_pTrack->miniBoss = false;
 		MiniBoss::clipping = -99;
@@ -2435,7 +2450,7 @@ printText()
 		vec2 cuda_money_pos = ndcToViewport(this->shop->items_pos[CUDA] + vec3(-0.1f, -0.4f, 0.0f));
 		RenderText(cuda_money, cuda_money_pos.x, cuda_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
-		char checkpoint_info[10];
+		char checkpoint_info[20];
 		sprintf(checkpoint_info, "checkpoint");
 		vec2 checkpoint_info_pos = ndcToViewport(this->shop->items_pos[CHECKPOINT3] + vec3(-0.25f, -0.2f, 0.0f));
 		RenderText(checkpoint_info, checkpoint_info_pos.x, checkpoint_info_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));

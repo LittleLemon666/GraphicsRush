@@ -65,3 +65,5 @@ static int verState = 1;
 int getPlayerReversiGridLocation(TrainWindow* tw);
 void loadThrowableObstacles(TrainWindow* tw, int playerPosition);
 void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow* tw, vector<vector<int>> & throwable_result);
+
+void resetReversiBoss(TrainWindow* tw);

@@ -483,10 +483,7 @@ void endReset(TrainWindow* tw) {
 		MainBoss::multiBallForward = 0.4f;
 
 		//extraBoss
-		ExtraBoss::health = 10;
-		ExtraBoss::health_minus = 10;
-		tw->m_Track.throwableObstacles = {};
-		tw->m_Track.throwingPosition = {};
+		resetReversiBoss(tw);
 
 		tw->trainView->camera_movement_state = 0;
 		tw->trainView->camera_movement_index = 0;
@@ -538,7 +535,7 @@ int getPlayerReversiGridLocation(TrainWindow* tw) {
 	int lane = 0, height = 0;
 	if (tw->m_Track.switchLane < -0.33f) lane = -1;
 	else if (tw->m_Track.switchLane > 0.33f) lane = 1;
-	if (tw->m_Track.airbornePosition[tw->m_Track.jumpingState] > 0.5) height = 1;
+	if (tw->m_Track.jumpingState > -1 && tw->m_Track.airbornePosition[tw->m_Track.jumpingState] > 0.5) height = 1;
 	return (height + 1) * 5 + lane + 2;
 };
 
@@ -569,4 +566,12 @@ void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow*
 			tw->m_Track.throwableObstacles.push_back(throwable_result[hole]);
 		}
 	}
+};
+
+void resetReversiBoss(TrainWindow* tw) {
+	ExtraBoss::health = 1;
+	ExtraBoss::health_minus = 1;
+	tw->m_Track.throwableObstacles = {};
+	tw->m_Track.throwingPosition = {};
+	reversiBuffer = 0;
 };

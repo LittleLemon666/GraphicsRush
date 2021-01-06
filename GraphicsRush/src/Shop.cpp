@@ -25,4 +25,5 @@ void Shop::buy(TrainWindow* tw, int item_id) {
 		tw->m_Track.player.money_total -= item_price[item_id];
 		tw->m_Track.player.items[item_id]++;
 	}
+	tw->m_Track.player.saveFile();
 };
