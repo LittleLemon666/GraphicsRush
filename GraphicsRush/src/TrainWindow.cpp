@@ -249,9 +249,9 @@ advanceTrain(float dir)
 		vec3 nextPos = trainView->gmt.calculate(ratio + 1.0f / (float)trainView->PATH_DIVIDE);
 		float difference = sqrt(pow(thisPos.x - nextPos.x, 2) + pow(thisPos.y - nextPos.y, 2) + pow(thisPos.z - nextPos.z, 2));
 		if (walked + difference >= distance) {
-			m_Track.trainU += (1.0f / (float)trainView->PATH_DIVIDE) * ((distance - walked) / difference);
+			if (!trainView->pizza_time) m_Track.trainU += (1.0f / (float)trainView->PATH_DIVIDE) * ((distance - walked) / difference);
 		}
-		else m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
+		else if (!trainView->pizza_time) m_Track.trainU += 1.0f / (float)trainView->PATH_DIVIDE;
 		walked += difference;
 		//infinite reversi
 		if (trainView->chapter == 5) {
