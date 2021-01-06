@@ -1128,35 +1128,39 @@ choose(int x, int y)
 		game_state = CLOBBY;
 		break;
 	default:
-		game_state = CGAME;
-		if (tw->shaderButton->value()) {
-			tw->m_Track.player.items[SHADER]--;
-			tw->shaderButton->value(0);
+		if (origin_game_state != CSHOP) {
+			game_state = CGAME;
+			if (tw->shaderButton->value()) {
+				tw->m_Track.player.items[SHADER]--;
+				tw->shaderButton->value(0);
+			}
+			if (tw->cudaButton->value()) {
+				tw->m_Track.player.items[CUDA]--;
+				tw->cudaButton->value(0);
+			}
+			if (tw->cp1Button->value()) {
+				tw->m_Track.player.cps[CP1]--;
+				tw->cp1Button->value(0);
+			}
+			if (tw->cp2Button->value()) {
+				tw->m_Track.player.cps[CP2]--;
+				tw->cp2Button->value(0);
+			}
+			if (tw->cp3Button->value()) {
+				tw->m_Track.player.cps[CP3]--;
+				tw->cp3Button->value(0);
+			}
+			if (tw->cp4Button->value()) {
+				tw->m_Track.player.cps[CP4]--;
+				tw->cp4Button->value(0);
+			}
+			if (tw->cp5Button->value()) {
+				tw->m_Track.player.cps[CP5]--;
+				tw->cp5Button->value(0);
+			}
 		}
-		if (tw->cudaButton->value()) {
-			tw->m_Track.player.items[CUDA]--;
-			tw->cudaButton->value(0);
-		}
-		if (tw->cp1Button->value()) {
-			tw->m_Track.player.cps[CP1]--;
-			tw->cp1Button->value(0);
-		}
-		if (tw->cp2Button->value()) {
-			tw->m_Track.player.cps[CP2]--;
-			tw->cp2Button->value(0);
-		}
-		if (tw->cp3Button->value()) {
-			tw->m_Track.player.cps[CP3]--;
-			tw->cp3Button->value(0);
-		}
-		if (tw->cp4Button->value()) {
-			tw->m_Track.player.cps[CP4]--;
-			tw->cp4Button->value(0);
-		}
-		if (tw->cp5Button->value()) {
-			tw->m_Track.player.cps[CP5]--;
-			tw->cp5Button->value(0);
-		}
+		else
+			game_state = CSHOP;
 		break;
 	}
 	glad_glDeleteBuffers(1, &chooser_FBO->fbo);
@@ -2442,15 +2446,15 @@ printText()
 
 		char score_info[30];
 		sprintf(score_info, "height Score:  %010d", m_pTrack->player.highscore);
-		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(score_info, w() / 2.0f - 175.0f, h() * 2.0 / 3.0, 0.7f, vec3(0.9f, 0.5f, 0.0f));
 
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->player.money_total);
-		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(money_info, w() / 2.0f - 150.0f, h() * 1.8 / 3.0, 0.7f, vec3(0.9f, 0.5f, 0.0f));
 
 		char shop_info[20];
 		sprintf(shop_info, "140.118.127.125");
-		RenderText(shop_info, w() / 2.0f - 245.0f, 100.0f, 0.6f, vec3(0.0f, 0.9f, 0.0f));
+		RenderText(shop_info, w() / 2.0f - 250.0f, 120.0f, 0.7f, vec3(0.0f, 0.9f, 0.0f));
 	}
 	else if (game_state == CSHOP)
 	{
