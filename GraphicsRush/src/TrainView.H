@@ -393,6 +393,7 @@ class TrainView : public Fl_Gl_Window
 
 		bool finish_computer_graphics = false;
 		void finishComputerGraphics();
+		bool pizza_time = false;
 
 		Model* pizza_obj = nullptr;
 		std::string pizza_obj_path = "../GraphicsRush/Objects/pizza.obj";
