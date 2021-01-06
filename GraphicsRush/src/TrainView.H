@@ -162,6 +162,8 @@ class TrainView : public Fl_Gl_Window
 		ALuint buffer;
 		ALuint moneySource;
 		ALuint moneyBuffer;
+		ALuint collisionSource;
+		ALuint collisionBuffer;
 
 		/*********************NEW ADDITIONS*********************/
 		ShaderInfo* path = nullptr;
