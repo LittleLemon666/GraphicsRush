@@ -4,11 +4,11 @@
 class Star
 {
 public:
-	Star() : num(6), color(glm::vec3(1.0, 1.0, 0.0)), r(30.0)
+	Star() : num(12), color(glm::vec3(1.0, 1.0, 0.0)), r(50.0), height(50.0)
 	{
 		initStar();
 	}
-	Star(int _num, glm::vec3 _color) : num(_num), color(_color), r(30.0)
+	Star(int _num, glm::vec3 _color) : num(_num), color(_color), r(50.0), height(50.0)
 	{
 		initStar();
 	}
@@ -19,7 +19,7 @@ public:
 		int first_angle = rand() % 360;
 		for (int i = 0; i < num; i++)
 		{
-			star_angle[i] = (first_angle + 360 / num) % 360;
+			star_angle[i] = (first_angle + i * 360 / num) % 360;
 		}
 	}
 	void starBegin(glm::vec3 _position)
@@ -34,8 +34,8 @@ public:
 	}
 	void advanceStar()
 	{
-		star_time++;
-		if (star_time >= 720) star_time = 0;
+		star_time += 10;
+		if (star_time >= 1080) star_time = 0;
 	}
 	const int getTime() const
 	{
@@ -53,6 +53,10 @@ public:
 	{
 		return shiny;
 	}
+	const glm::vec3 getPos() const
+	{
+		return center;
+	}
 	const void setPos(glm::vec3 pos)
 	{
 		center = pos;
@@ -64,6 +68,10 @@ public:
 	const float getR() const
 	{
 		return r;
+	}
+	const float getHeight() const
+	{
+		return height;
 	}
 	void setColor(glm::vec3 _color)
 	{
@@ -89,6 +97,7 @@ private:
 	glm::vec3 color;
 	glm::vec3 center;
 	float r;
+	float height;
 	float* star_angle = 0;
 	int star_time = 0;
 	bool shiny = false;
