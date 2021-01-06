@@ -148,9 +148,14 @@ void runButtonCB(TrainWindow* tw)
 		else if (tw->cp3Button->value()) tw->startingChapter = 2;
 		else if (tw->cp2Button->value()) tw->startingChapter = 1;
 		else if (tw->cp1Button->value()) tw->startingChapter = 0;
+		else tw->startingChapter = -1;
 		if (tw->startingChapter != -1) {
 			tw->trainView->chapter = tw->startingChapter;
 			tw->trainView->switchChapter(tw->trainView->chapter);
+		}
+		else {
+			tw->trainView->chapter = 0;
+			tw->trainView->switchChapter(0);
 		}
 		switch (tw->startingChapter) {
 		case -1:

@@ -23,7 +23,8 @@ loadItemsModel()
 void Shop::buy(TrainWindow* tw, int item_id) {
 	if (tw->m_Track.player.money_total >= item_price[item_id]) {
 		tw->m_Track.player.money_total -= item_price[item_id];
-		tw->m_Track.player.items[item_id]++;
+		if (item_id < 5) tw->m_Track.player.items[item_id]++;
+		else tw->m_Track.player.cps[item_id - 5]++;
 	}
 	tw->m_Track.player.saveFile();
 };
