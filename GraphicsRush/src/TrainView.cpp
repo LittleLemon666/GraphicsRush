@@ -2522,7 +2522,7 @@ printText()
 			money_money_info_info_size++;
 			money_total_t /= 10;
 		}
-		vec2 total_money_money_pos = ndcToViewport(vec3(this->shop->items_pos[VER3].x - 0.05 * money_money_info_info_size, this->shop->items_pos[CUDA].y - 0.4, this->shop->items_pos[VER3].z));
+		vec2 total_money_money_pos = ndcToViewport(vec3(this->shop->items_pos[VER3].x - 0.025 * money_money_info_info_size, this->shop->items_pos[CUDA].y - 0.4, this->shop->items_pos[VER3].z));
 		RenderText(money_money_info_info, total_money_money_pos.x, total_money_money_pos.y, 0.6f, vec3(1.0f, 1.0f, 0.0f));
 
 		char checkpoint_info[20];

@@ -17,6 +17,6 @@ uniform float r;
 void main()
 {
     float rotate_angle = star_time + star_angle;
-    vec3 bias = vec3(r * cos(radians(rotate_angle)), height * (int(rotate_angle) % 360) / 360.0, -r * sin(radians(rotate_angle)));
+    vec3 bias = vec3(r * cos(radians(rotate_angle)), height * (star_time % 360) / 360.0, -r * sin(radians(rotate_angle)));
     gl_Position = u_projection * u_view * u_model * vec4(position + bias, 1.0f);
 }
