@@ -3407,7 +3407,7 @@ rotate_objects()
 void TrainView::
 filterAdvance()
 {
-	if (chapter != 1) filter_id = 0;
+	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2) filter_id = 0;
 	if (game_state != CGAME) return;
 
 	filter_effect_time++;
@@ -3427,7 +3427,8 @@ shootFireworks()
 {
 	if (shoot_firework)
 	{
-		vec3 fireworkPos = player_pos + player_forward * 150.0f - player_up * 75.0f;
+		vec3 firework_cross = normalize(cross(player_forward, player_up));
+		vec3 fireworkPos = player_pos + player_forward * 150.0f - player_up * 75.0f + (float)(rand() % 300 / 10.0 - 15.0) * firework_cross;
 		for (int firework_interval_index = 0; firework_interval_index < num_firework; firework_interval_index++)
 		{
 			if (firework_interval == 10 * (firework_interval_index + 1)) firework[firework_interval_index]->fireworkBegin(fireworkPos);
