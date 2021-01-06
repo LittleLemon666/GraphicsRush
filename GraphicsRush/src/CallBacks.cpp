@@ -237,6 +237,7 @@ void runButtonCB(TrainWindow* tw)
 				if (MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f && !tw->debug_mode->value()) {
+					alSourcePlay(tw->trainView->collisionSource);
 					endReset(tw);
 				}
 
@@ -310,6 +311,7 @@ void runButtonCB(TrainWindow* tw)
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 					if (tw->m_Track.collision(obstacle) && !tw->debug_mode->value()) {
+						alSourcePlay(tw->trainView->collisionSource);
 						endReset(tw);
 						break;
 					}
@@ -327,6 +329,7 @@ void runButtonCB(TrainWindow* tw)
 				}
 
 				if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->moneySource);
+				if (AL_SOURCE_STATE == 4116) alSourceStop(tw->trainView->collisionSource);
 				if (tw->trainView->door_offset < -0.25f) tw->m_Track.score += tw->speed->value() * (tw->shaderButton->value() + 1); // add score after door opened 50%
 				if (tw->speed->value() < 4) tw->speed->value(tw->speed->value() + 0.0001);
 				if (tw->trainView->door_offset < -0.25f) tw->advanceTrain(); // run out when door is opened 50%
@@ -525,8 +528,8 @@ void reversiRecursion(int player_x, int player_y, int row, int col, TrainWindow*
 };
 
 void resetReversiBoss(TrainWindow* tw) {
-	ExtraBoss::health = 1;
-	ExtraBoss::health_minus = 1;
+	ExtraBoss::health = 10;
+	ExtraBoss::health_minus = 10;
 	tw->m_Track.throwableObstacles = {};
 	tw->m_Track.throwingPosition = {};
 	reversiBuffer = 0;

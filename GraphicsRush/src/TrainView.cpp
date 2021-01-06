@@ -1892,6 +1892,7 @@ void TrainView::drawReversiPiece(bool doShadow) {
 		m_pTrack->throwingPosition[obstacle].position += 0.01;
 		if (m_pTrack->throwingPosition[obstacle].position > 0.4) {
 			m_pTrack->throwingPosition.erase(m_pTrack->throwingPosition.begin() + obstacle);
+			alSourcePlay(tw->trainView->collisionSource);
 			ExtraBoss::health -= 1;
 			obstacle--;
 			Bomb(obstaclePosition); // need to fix correct position
@@ -2926,7 +2927,7 @@ draw()
 			ALboolean loop = AL_TRUE;
 
 			//Material from: ThinMatrix
-			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/wholesome.wav", &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/rush.wav", &format, &data, &size, &freq, &loop); //music from bensound.com
 			alBufferData(this->buffer, format, data, size, freq);
 			alSourcei(this->source, AL_BUFFER, this->buffer);
 
@@ -2950,14 +2951,24 @@ draw()
 			loop = AL_FALSE;
 
 			//Material from: ThinMatrix
-			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/bounce.wav", &format, &data, &size, &freq, &loop);
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/coin.wav", &format, &data, &size, &freq, &loop);
 			alBufferData(this->moneyBuffer, format, data, size, freq);
 			alSourcei(this->moneySource, AL_BUFFER, this->moneyBuffer);
 
-			if (format == AL_FORMAT_STEREO16 || format == AL_FORMAT_STEREO8)
-				puts("TYPE::STEREO");
-			else if (format == AL_FORMAT_MONO16 || format == AL_FORMAT_MONO8)
-				puts("TYPE::MONO");
+			//collision sound
+			alGenSources((ALuint)1, &this->collisionSource);
+			alSourcef(this->collisionSource, AL_PITCH, 1);
+			alSourcef(this->collisionSource, AL_GAIN, 1.0f);
+			alSource3f(this->collisionSource, AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
+			alSource3f(this->collisionSource, AL_VELOCITY, 0, 0, 0);
+			alSourcei(this->collisionSource, AL_LOOPING, AL_FALSE);
+
+			alGenBuffers((ALuint)1, &this->collisionBuffer);
+
+			//Material from: ThinMatrix
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/collision.wav", &format, &data, &size, &freq, &loop);
+			alBufferData(this->collisionBuffer, format, data, size, freq);
+			alSourcei(this->collisionSource, AL_BUFFER, this->collisionBuffer);
 
 			// cleanup context
 			//alDeleteSources(1, &source);
