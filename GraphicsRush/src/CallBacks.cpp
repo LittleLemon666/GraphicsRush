@@ -219,6 +219,7 @@ void runButtonCB(TrainWindow* tw)
 				if (MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f && !tw->debug_mode->value()) {
+					printf("1\n");
 					endReset(tw);
 				}
 
@@ -292,6 +293,7 @@ void runButtonCB(TrainWindow* tw)
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 					if (tw->m_Track.collision(obstacle) && !tw->debug_mode->value()) {
+						printf("2\n");
 						endReset(tw);
 						break;
 					}
@@ -456,6 +458,9 @@ void endReset(TrainWindow* tw) {
 		invincibleStart = clock();
 		return;
 	}
+
+	tw->m_Track.throwingPosition = {};
+
 	if (tw->trainView->game_state == CGAME && deadTimer == 0)
 	{
 		deadTimer = clock();

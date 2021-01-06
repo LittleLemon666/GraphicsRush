@@ -1129,20 +1129,33 @@ choose(int x, int y)
 		break;
 	default:
 		game_state = CGAME;
+		if (tw->shaderButton->value()) {
+			tw->m_Track.player.items[SHADER]--;
+			tw->shaderButton->value(0);
+		}
+		if (tw->cudaButton->value()) {
+			tw->m_Track.player.items[CUDA]--;
+			tw->cudaButton->value(0);
+		}
 		if (tw->cp1Button->value()) {
 			tw->m_Track.player.cps[CP1]--;
+			tw->cp1Button->value(0);
 		}
 		if (tw->cp2Button->value()) {
 			tw->m_Track.player.cps[CP2]--;
+			tw->cp2Button->value(0);
 		}
 		if (tw->cp3Button->value()) {
 			tw->m_Track.player.cps[CP3]--;
+			tw->cp3Button->value(0);
 		}
 		if (tw->cp4Button->value()) {
 			tw->m_Track.player.cps[CP4]--;
+			tw->cp4Button->value(0);
 		}
 		if (tw->cp5Button->value()) {
 			tw->m_Track.player.cps[CP5]--;
+			tw->cp5Button->value(0);
 		}
 		break;
 	}
