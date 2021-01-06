@@ -1304,6 +1304,10 @@ drawWorld()
 
 	drawSun();
 
+	drawMars();
+
+	drawMercury();
+
 	//use money to check if world is loaded
 	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
@@ -2002,7 +2006,7 @@ drawDoor()
 void TrainView::
 drawEarth()
 {
-	if (chapter != 4) return; // don't draw the door after beginning camera movement
+	if (chapter != 4) return; // don't draw Earth when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2025,7 +2029,7 @@ drawEarth()
 void TrainView::
 drawSun()
 {
-	if (chapter != 4) return; // don't draw the door after beginning camera movement
+	if (chapter != 4) return; // don't draw Sun when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2041,6 +2045,52 @@ drawSun()
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	sun_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawMars()
+{
+	if (chapter != 4) return; // don't draw Mars when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-218.0, 5.0 ,590.0));
+	model_matrix = rotate(model_matrix, mars_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(35, 35, 35));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	mars_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	mars_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawMercury()
+{
+	if (chapter != 4) return; // don't draw mercury when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-255.5, 170.0, 200.0)); //-346.611 260.85 198.76
+	model_matrix = rotate(model_matrix, mercury_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(30, 30, 30));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	mercury_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	mercury_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2868,6 +2918,12 @@ draw()
 		if (!this->sun_texture)
 			this->sun_texture = new Texture2D(sun_texture_path.c_str());
 
+		if (!this->mars_texture)
+			this->mars_texture = new Texture2D(mars_texture_path.c_str());
+
+		if (!this->mercury_texture)
+			this->mercury_texture = new Texture2D(mercury_texture_path.c_str());
+
 		if (!this->main_boss_obj_texture)
 			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
 
@@ -3006,6 +3062,12 @@ draw()
 
 		if (!sun_obj)
 			sun_obj = new Model(sun_obj_path);
+
+		if (!mars_obj)
+			mars_obj = new Model(mars_obj_path);
+
+		if (!mercury_obj)
+			mercury_obj = new Model(mercury_obj_path);
 
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
@@ -3546,6 +3608,12 @@ rotate_objects()
 
 	sun_rotate += 0.0025f;
 	if (sun_rotate > 314) sun_rotate -= 314;
+
+	mars_rotate += 0.005f;
+	if (mars_rotate > 314) mars_rotate -= 314;
+
+	mercury_rotate += 0.005f;
+	if (mercury_rotate > 314) mercury_rotate -= 314;
 
 	pizza_rotate += 0.1f;
 	if (pizza_rotate > 314) pizza_rotate -= 314;
