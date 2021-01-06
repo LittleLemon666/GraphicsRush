@@ -34,8 +34,12 @@ public:
 	}
 	void advanceStar()
 	{
-		star_time += 10;
-		if (star_time >= 1080) star_time = 0;
+		star_time += 5;
+		if (star_time >= 1080)
+		{
+			shiny = false;
+			star_time = 0;
+		}
 	}
 	const int getTime() const
 	{

@@ -341,7 +341,7 @@ void runButtonCB(TrainWindow* tw)
 				tw->trainView->rain->advanceRain();
 			tw->trainView->filterAdvance();
 			if (tw->trainView->star)
-				tw->trainView->star->advanceStar();
+				tw->trainView->starAdvance();
 			tw->trainView->mainBossAdvance();
 			tw->trainView->extraBossHPAdvance();
 			lastRedraw = clock();
@@ -518,12 +518,16 @@ void endReset(TrainWindow* tw) {
 			tw->ver2Button->value(0);
 			verState = 2;
 			tw->trainView->game_state = CGAME;
+			tw->trainView->ver2_blink = true;
+			tw->trainView->blink_start = true;
 		}
 		else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
 			tw->m_Track.player.items[VER3]--;
 			tw->ver3Button->value(0);
 			verState = 3;
 			tw->trainView->game_state = CGAME;
+			tw->trainView->ver3_blink = true;
+			tw->trainView->blink_start = true;
 		}
 		else
 		{

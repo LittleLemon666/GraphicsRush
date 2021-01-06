@@ -2413,26 +2413,29 @@ drawRain()
 void TrainView::
 drawStars()
 {
-	star->setPos(player_pos);
-	this->star_shader->Use();
-
-	for (int i = 0; i < star->getStarNum(); i++)
+	if (star->isShiny())
 	{
-		mat4 model_matrix = mat4();
-		model_matrix = translate(model_matrix, star->getPos());
-		model_matrix = rotate(model_matrix, radians((float)star->getTime() * 5), vec3(0, 1, 0));
-		model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
-		glUniformMatrix4fv(glGetUniformLocation(this->star_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
-		glUniform1i(glGetUniformLocation(this->star_shader->Program, "star_time"), star->getTime());
-		glUniform1f(glGetUniformLocation(this->star_shader->Program, "star_angle"), star->getStarAngle(i));
-		glUniform1f(glGetUniformLocation(this->star_shader->Program, "height"), star->getHeight());
-		glUniform1f(glGetUniformLocation(this->star_shader->Program, "r"), star->getR());
-		glUniform3fv(glGetUniformLocation(this->star_shader->Program, "u_color"), 1, &star->getColor()[0]);
-		this->star->draw(i);
-	}
+		star->setPos(player_pos);
+		this->star_shader->Use();
 
-	//unbind shader(switch to fixed pipeline)
-	glUseProgram(0);
+		for (int i = 0; i < star->getStarNum(); i++)
+		{
+			mat4 model_matrix = mat4();
+			model_matrix = translate(model_matrix, star->getPos());
+			model_matrix = rotate(model_matrix, radians((float)star->getTime() * 5), vec3(0, 1, 0));
+			model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
+			glUniformMatrix4fv(glGetUniformLocation(this->star_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+			glUniform1i(glGetUniformLocation(this->star_shader->Program, "star_time"), star->getTime());
+			glUniform1f(glGetUniformLocation(this->star_shader->Program, "star_angle"), star->getStarAngle(i));
+			glUniform1f(glGetUniformLocation(this->star_shader->Program, "height"), star->getHeight());
+			glUniform1f(glGetUniformLocation(this->star_shader->Program, "r"), star->getR());
+			glUniform3fv(glGetUniformLocation(this->star_shader->Program, "u_color"), 1, &star->getColor()[0]);
+			this->star->draw(i);
+		}
+
+		//unbind shader(switch to fixed pipeline)
+		glUseProgram(0);
+	}
 }
 
 void TrainView::
@@ -3571,5 +3574,33 @@ finishComputerGraphics()
 		shoot_firework = true;
 		firework_interval = 0;
 		pizza_time = true;
+	}
+}
+
+void TrainView::
+starAdvance()
+{
+	if (blink_start)
+	{
+		if (ver2_blink)
+			star->setColor(vec3(0.9f, 0.9f, 0.0f));
+		else if (ver3_blink)
+			star->setColor(vec3(0.0f, 0.9f, 0.0f));
+
+		star->starBegin(player_pos);
+		blink_start = false;
+	}
+	else if (ver2_blink || ver3_blink)
+	{
+		if (!star->isShiny())
+		{
+			ver2_blink = false;
+			ver3_blink = false;
+		}
+		else
+		{
+			star->setPos(player_pos);
+			star->advanceStar();
+		}
 	}
 }
