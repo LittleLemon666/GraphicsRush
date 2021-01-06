@@ -43,7 +43,7 @@
 //========================================================================
 TrainWindow::
 TrainWindow(const int x, const int y) 
-	: Fl_Double_Window(x,y,800,600,"Train and Roller Coaster")
+	: Fl_Double_Window(x,y,800,600,"Graphics Rush")
 //========================================================================
 {
 	// make all of the widgets

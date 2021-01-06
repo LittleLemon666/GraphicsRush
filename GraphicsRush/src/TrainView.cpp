@@ -3188,7 +3188,7 @@ setProjection()
 			crossed = normalize(crossed);
 			//set look at (trainPosition(viewerPosition) -> where to look at -> up)
 			viewer_pos = train_pos + up * 20.0f - forward * 10.0f;
-			if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01) {
+			if (abs(m_pTrack->switchLane - (float)m_pTrack->lane) > 0.01 && game_state != CDEAD) {
 				if (m_pTrack->switchLane < (float)m_pTrack->lane) m_pTrack->switchLane += 0.1f;
 				else if (m_pTrack->switchLane > (float)m_pTrack->lane) m_pTrack->switchLane -= 0.1f;
 			}

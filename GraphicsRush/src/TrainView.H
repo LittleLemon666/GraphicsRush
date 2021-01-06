@@ -409,4 +409,8 @@ class TrainView : public Fl_Gl_Window
 		const std::string fiter_info[Filter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Blueprint!", "Draw!" };
 
 		Star* star = nullptr;
+		bool ver2_blink = false;
+		bool ver3_blink = false;
+		bool blink_start = false;
+		void starAdvance();
 };
