@@ -2568,6 +2568,19 @@ printText()
 			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 		}
 
+		if (ver2_blink)
+		{
+			char ver2_info[20];
+			sprintf(ver2_info, "Second chance!");
+			RenderText(ver2_info, w() / 2.0 - 210.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+		}
+		else if (ver3_blink)
+		{
+			char ver3_info[20];
+			sprintf(ver3_info, "Last chance!");
+			RenderText(ver3_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+		}
+
 		if (finish_computer_graphics && shoot_firework)
 		{
 			char fcg_info[40];
@@ -2582,9 +2595,12 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		char flunk_info[20];
-		sprintf(flunk_info, "You flunked!");
-		RenderText(flunk_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+		if (!tw->ver2Button->value() && !tw->ver3Button->value())
+		{
+			char flunk_info[20];
+			sprintf(flunk_info, "You flunked!");
+			RenderText(flunk_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+		}
 	}
 }
 
