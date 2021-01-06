@@ -179,14 +179,19 @@ void runButtonCB(TrainWindow* tw)
 			tw->trainView->chapter = 0;
 		}
 	}
+	if (clock() - lastRedraw > CLOCKS_PER_SEC / 30 && !tw->runButton->value()) {
+		if (buttonBuffer > 0) buttonBuffer--;
+		lastRedraw = clock();
+	}
 
-	//use spacebar to pause
-	if (buttonBuffer > 0) buttonBuffer--;
-	if (buttonBuffer == 0) {
-		if (GetKeyState(VK_SPACE) < 0) {
+	if (GetAsyncKeyState(VK_SPACE) < 0) {
+		if (buttonBuffer == 0) {
 			tw->runButton->value(!tw->runButton->value());
+			buttonBuffer = buffer;
 		}
 	}
+
+	//printf("%d\n", buttonBuffer);
 
 	if (tw->runButton->value()) {	// only advance time if appropriate
 
@@ -199,11 +204,8 @@ void runButtonCB(TrainWindow* tw)
 			if (clock() - invincibleStart > CLOCKS_PER_SEC) tw->m_Track.player.invincible = false;
 
 			//button input
+			if (buttonBuffer > 0) buttonBuffer--;
 			if (buttonBuffer == 0) {
-				if (GetKeyState(VK_SPACE)) {
-					tw->runButton->value(!tw->runButton->value());
-					buttonBuffer = buffer;
-				}
 				if (GetAsyncKeyState('A') && tw->m_Track.lane > -1 && tw->speed->value() > 0.1f) {
 					tw->m_Track.lane--;
 					buttonBuffer = buffer;

@@ -965,7 +965,7 @@ choose(int x, int y)
 
 	int origin_game_state = game_state;
 	game_state = decodeChoose(uv);
-	printf("%d %d\n", game_state, origin_game_state);
+	//printf("%d %d\n", game_state, origin_game_state);
 	switch (game_state)
 	{
 	case CSHOP:
