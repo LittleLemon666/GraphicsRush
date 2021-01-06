@@ -125,7 +125,7 @@ void backCB(Fl_Widget*, TrainWindow* tw)
 
 static unsigned long lastRedraw = 0;
 static unsigned long buttonBuffer = 0;
-static unsigned long buffer = 5;
+static unsigned long buffer = 10;
 
 static unsigned long invincibleStart = 0;
 static unsigned long deadTimer = 0;
@@ -202,6 +202,7 @@ void runButtonCB(TrainWindow* tw)
 			if (buttonBuffer == 0) {
 				if (GetKeyState(VK_SPACE)) {
 					tw->runButton->value(!tw->runButton->value());
+					buttonBuffer = buffer;
 				}
 				if (GetAsyncKeyState('A') && tw->m_Track.lane > -1 && tw->speed->value() > 0.1f) {
 					tw->m_Track.lane--;
@@ -214,7 +215,6 @@ void runButtonCB(TrainWindow* tw)
 			}
 			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1 && tw->speed->value() > 0.1f) {
 				tw->m_Track.jumpingState = 0;
-				//buttonBuffer = buffer;
 			}
 			
 			if (tw->trainView->game_state == CGAME)
@@ -235,7 +235,6 @@ void runButtonCB(TrainWindow* tw)
 				if (MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f && !tw->debug_mode->value()) {
-					printf("1\n");
 					endReset(tw);
 				}
 
@@ -309,7 +308,6 @@ void runButtonCB(TrainWindow* tw)
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
 					if (tw->m_Track.collision(obstacle) && !tw->debug_mode->value()) {
-						printf("2\n");
 						endReset(tw);
 						break;
 					}
