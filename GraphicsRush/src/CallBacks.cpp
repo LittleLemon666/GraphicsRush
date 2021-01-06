@@ -480,73 +480,9 @@ void endReset(TrainWindow* tw) {
 		deadTimer = clock();
 		tw->trainView->game_state = CDEAD; //***need to design***
 	}
-	if (clock() - deadTimer > CLOCKS_PER_SEC * 2) {
-		tw->trainView->game_state = CLOBBY;
-		//save score
-		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
-		tw->m_Track.player.money_total += tw->m_Track.money_collected;
-		tw->m_Track.player.saveFile();
 
-		//reset variables
-		tw->m_Track.trainU = 0.0f;
-		tw->m_Track.lane = 0;
-		tw->m_Track.switchLane = 0.0f;
-		tw->m_Track.jumpingState = -1;
-
-		//miniboss
-		MiniBoss::bossLane = 5;
-		MiniBoss::clipping = -99;
-
-		//mainboss
-		MainBoss::multiBallForward = 0.4f;
-
-		//extraBoss
-		resetReversiBoss(tw);
-
-		tw->trainView->camera_movement_state = 0;
-		tw->trainView->camera_movement_index = 0;
-		tw->trainView->door_offset = 0.0f;
-		tw->speed->value(tw->m_Track.saveSpeed);
-		if (tw->debug_mode->value()) {
-			tw->runButton->value(0);
-			tw->trainView->game_state = CGAME;
-		}
-		else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) {
-			tw->m_Track.player.items[VER2]--;
-			tw->ver2Button->value(0);
-			verState = 2;
-			tw->trainView->game_state = CGAME;
-		}
-		else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
-			tw->m_Track.player.items[VER3]--;
-			tw->ver3Button->value(0);
-			verState = 3;
-			tw->trainView->game_state = CGAME;
-		}
-		else
-		{
-			verState = 1;
-			tw->m_Track.first_P2 = true;
-			tw->m_Track.first_P5 = true;
-			tw->m_Track.miniBoss = false;
-			tw->m_Track.mainBoss = false;
-			tw->m_Track.extraBoss = false;
-			tw->m_Track.score = 0;
-			tw->m_Track.money_collected = 0;
-			tw->speed->value(tw->startingSpeed);
-			tw->trainView->switchChapter(0);
-			tw->trainView->game_state = CLOBBY;
-			tw->startingChapter = -1;
-			deadTimer = 0;
-			tw->trainView->finish_computer_graphics = false;
-		}
-		tw->m_Track.obstacles = {};
-		tw->m_Track.money = {};
-	}
-	else {
-		if (tw->speed->value() > 0.01) tw->m_Track.saveSpeed = tw->speed->value();
-		tw->speed->value(0);
-	}
+	if (tw->speed->value() > 0.01) tw->m_Track.saveSpeed = tw->speed->value();
+	tw->speed->value(0);
 }
 
 int getPlayerReversiGridLocation(TrainWindow* tw) {
@@ -593,3 +529,66 @@ void resetReversiBoss(TrainWindow* tw) {
 	tw->m_Track.throwingPosition = {};
 	reversiBuffer = 0;
 };
+
+void endResetForCallBack(TrainWindow* tw) {
+	//save score
+	if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
+	tw->m_Track.player.money_total += tw->m_Track.money_collected;
+	tw->m_Track.player.saveFile();
+
+	//reset variables
+	tw->m_Track.trainU = 0.0f;
+	tw->m_Track.lane = 0;
+	tw->m_Track.switchLane = 0.0f;
+	tw->m_Track.jumpingState = -1;
+
+	//miniboss
+	MiniBoss::bossLane = 5;
+	MiniBoss::clipping = -99;
+
+	//mainboss
+	MainBoss::multiBallForward = 0.4f;
+
+	//extraBoss
+	resetReversiBoss(tw);
+
+	tw->trainView->camera_movement_state = 0;
+	tw->trainView->camera_movement_index = 0;
+	tw->trainView->door_offset = 0.0f;
+	tw->speed->value(tw->m_Track.saveSpeed);
+	if (tw->debug_mode->value()) {
+		tw->runButton->value(0);
+		tw->trainView->game_state = CGAME;
+	}
+	else if (verState == 1 && tw->ver2Button->value() && tw->m_Track.player.items[VER2] > 0) {
+		tw->m_Track.player.items[VER2]--;
+		tw->ver2Button->value(0);
+		verState = 2;
+		tw->trainView->game_state = CGAME;
+	}
+	else if (verState == 2 && tw->ver3Button->value() && tw->m_Track.player.items[VER3] > 0) {
+		tw->m_Track.player.items[VER3]--;
+		tw->ver3Button->value(0);
+		verState = 3;
+		tw->trainView->game_state = CGAME;
+	}
+	else
+	{
+		verState = 1;
+		tw->m_Track.first_P2 = true;
+		tw->m_Track.first_P5 = true;
+		tw->m_Track.miniBoss = false;
+		tw->m_Track.mainBoss = false;
+		tw->m_Track.extraBoss = false;
+		tw->m_Track.score = 0;
+		tw->m_Track.money_collected = 0;
+		tw->speed->value(tw->startingSpeed);
+		tw->trainView->switchChapter(0);
+		tw->trainView->game_state = CLOBBY;
+		tw->startingChapter = -1;
+		deadTimer = 0;
+		tw->trainView->finish_computer_graphics = false;
+	}
+	tw->m_Track.obstacles = {};
+	tw->m_Track.money = {};
+}

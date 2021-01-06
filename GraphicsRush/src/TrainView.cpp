@@ -965,7 +965,7 @@ choose(int x, int y)
 
 	int origin_game_state = game_state;
 	game_state = decodeChoose(uv);
-	//printf("%d\n", game_state);
+	printf("%d %d\n", game_state, origin_game_state);
 	switch (game_state)
 	{
 	case CSHOP:
@@ -1124,11 +1124,9 @@ choose(int x, int y)
 	case CRETURN:
 		game_state = CLOBBY;
 		break;
-	case CDEAD:
-		game_state = CLOBBY;
-		break;
 	default:
-		if (origin_game_state != CSHOP) {
+		if (origin_game_state == CDEAD) endResetForCallBack(tw);
+		else if (origin_game_state != CSHOP) {
 			game_state = CGAME;
 			if (tw->shaderButton->value()) {
 				tw->m_Track.player.items[SHADER]--;
@@ -3197,7 +3195,7 @@ setProjection()
 			viewer_pos = viewer_pos + (float)m_pTrack->switchLane * crossed * 5.0f;
 			if (m_pTrack->jumpingState != -1) {
 				viewer_pos = viewer_pos + m_pTrack->airbornePosition[m_pTrack->jumpingState] * up * 10.0f;
-				m_pTrack->jumpingState++;
+				if (game_state != CDEAD) m_pTrack->jumpingState++;
 		}
 			if (m_pTrack->jumpingState == (int)m_pTrack->airbornePosition.size()) m_pTrack->jumpingState = -1;
 			gluLookAt(viewer_pos.x, viewer_pos.y, viewer_pos.z,
