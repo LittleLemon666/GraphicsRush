@@ -533,10 +533,6 @@ void resetReversiBoss(TrainWindow* tw) {
 };
 
 void endResetForCallBack(TrainWindow* tw) {
-	//save score
-	if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
-	tw->m_Track.player.money_total += tw->m_Track.money_collected;
-	tw->m_Track.player.saveFile();
 
 	//reset variables
 	tw->m_Track.trainU = 0.0f;
@@ -557,7 +553,10 @@ void endResetForCallBack(TrainWindow* tw) {
 	tw->trainView->camera_movement_state = 0;
 	tw->trainView->camera_movement_index = 0;
 	tw->trainView->door_offset = 0.0f;
+
 	tw->speed->value(tw->m_Track.saveSpeed);
+	deadTimer = 0;
+
 	if (tw->debug_mode->value()) {
 		tw->runButton->value(0);
 		tw->trainView->game_state = CGAME;
@@ -580,6 +579,11 @@ void endResetForCallBack(TrainWindow* tw) {
 	}
 	else
 	{
+		//save score
+		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
+		tw->m_Track.player.money_total += tw->m_Track.money_collected;
+		tw->m_Track.player.saveFile();
+
 		verState = 1;
 		tw->m_Track.first_P2 = true;
 		tw->m_Track.first_P5 = true;
