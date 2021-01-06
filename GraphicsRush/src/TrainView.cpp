@@ -2583,8 +2583,8 @@ printText()
 	else if (game_state == CDEAD)
 	{
 		char flunk_info[20];
-		sprintf(flunk_info, "You are flunked!");
-		RenderText(flunk_info, w() / 2.0 - 100.0f, h() - 55.0f, 0.6f, vec3(1.0f, 0.0f, 0.0f));
+		sprintf(flunk_info, "You flunked!");
+		RenderText(flunk_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
 	}
 }
 
