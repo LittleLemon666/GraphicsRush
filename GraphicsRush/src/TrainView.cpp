@@ -2005,9 +2005,9 @@ drawEarth()
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, vec3(-75, 5, 200));
+	model_matrix = translate(model_matrix, vec3(-340.0f, 25.0f, 455.0f));
 	model_matrix = rotate(model_matrix, earth_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(130, 130, 130));
+	model_matrix = scale(model_matrix, vec3(60, 60, 60));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
@@ -2030,7 +2030,7 @@ drawSun()
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, sun_pos);
 	model_matrix = rotate(model_matrix, sun_rotate, vec3(0, 1, 0));
-	model_matrix = scale(model_matrix, vec3(450, 450, 450));
+	model_matrix = scale(model_matrix, vec3(130, 130, 130));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
@@ -2571,13 +2571,13 @@ printText()
 		{
 			char ver2_info[20];
 			sprintf(ver2_info, "Second chance!");
-			RenderText(ver2_info, w() / 2.0 - 210.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+			RenderText(ver2_info, w() / 2.0 - 240.0f, h() - 110.0f, 1.5f, vec3(0.0f, 0.0f, 1.0f));
 		}
 		else if (ver3_blink)
 		{
 			char ver3_info[20];
 			sprintf(ver3_info, "Last chance!");
-			RenderText(ver3_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(1.0f, 0.0f, 0.0f));
+			RenderText(ver3_info, w() / 2.0 - 200.0f, h() - 110.0f, 1.5f, vec3(0.0f, 0.0f, 1.0f));
 		}
 
 		if (finish_computer_graphics && shoot_firework)
@@ -2594,7 +2594,7 @@ printText()
 	}
 	else if (game_state == CDEAD)
 	{
-		if (!tw->ver2Button->value() && !tw->ver3Button->value())
+		if (!ver2_blink && !ver3_blink)
 		{
 			char flunk_info[20];
 			sprintf(flunk_info, "You flunked!");
