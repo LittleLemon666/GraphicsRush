@@ -2444,7 +2444,7 @@ printText()
 
 		if (finish_computer_graphics && shoot_firework)
 		{
-			char fcg_info[20];
+			char fcg_info[40];
 			sprintf(fcg_info, "You finished Computer Graphics!");
 			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
