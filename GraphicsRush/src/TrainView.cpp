@@ -3389,26 +3389,29 @@ void TrainView::
 rotate_objects()
 {
 	money_rotate += 0.1f;
-	if (money_rotate > 360) money_rotate -= 360;
+	if (money_rotate > 314) money_rotate -= 314;
 
 	shop_rotate += 0.1f;
-	if (shop_rotate > 360) shop_rotate -= 360;
+	if (shop_rotate > 314) shop_rotate -= 314;
 	
 	earth_rotate += 0.005f;
-	if (earth_rotate > 360) earth_rotate -= 360;
+	if (earth_rotate > 314) earth_rotate -= 314;
 
 	sun_rotate += 0.0025f;
-	if (sun_rotate > 360) sun_rotate -= 360;
+	if (sun_rotate > 314) sun_rotate -= 314;
 
 	pizza_rotate += 0.1f;
-	if (pizza_rotate > 360) pizza_rotate -= 360;
+	if (pizza_rotate > 314) pizza_rotate -= 314;
 }
 
 void TrainView::
 filterAdvance()
 {
-	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2) filter_id = 0;
-	if (game_state != CGAME) return;
+	if (chapter != 1 || game_state != CGAME || !tw->m_Track.first_P2)
+	{
+		filter_id = 0;
+		return;
+	}
 
 	filter_effect_time++;
 	if (filter_effect_time == 100)
