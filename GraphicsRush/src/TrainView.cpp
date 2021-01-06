@@ -481,16 +481,12 @@ void TrainView::
 switchChapter(const int& chapter_index)
 {
 	int old_chapter = chapter;
-	chapter = chapter_index;
-	if (chapter == 5) {
-		tw->m_Track.first_P2 = false;
-		tw->m_Track.first_P5 = false;
-	}
-	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
+	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5) {
 		do {
 			chapter = rand() % (NUMBER_OF_PROJECTS + 1);
 		} while (chapter == old_chapter);
 	}
+	else chapter = chapter_index;
 	load_chapter = false;
 }
 
@@ -1244,7 +1240,7 @@ drawWorld()
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
 	else if (!m_pTrack->extraBoss && chapter == 5) loadExtraBoss();
 	
-	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && !m_pTrack->extraBoss && (int)m_pTrack->money.size() == 0) {
+	if (!m_pTrack->miniBoss && !m_pTrack->mainBoss && !m_pTrack->extraBoss && (int)m_pTrack->money.size() == 0 && !(game_state == CLOBBY)) {
 		loadObjects();
 		m_pTrack->miniBoss = false;
 		MiniBoss::clipping = -99;
@@ -1347,7 +1343,7 @@ drawPath(bool doShadow) {
 				vec3 next_cross = cross(segment_forward, next_cp_orient);
 				next_cross = normalize(next_cross);
 				//initialize path->vertices
-				GLfloat roadSize = 10.0f;
+				GLfloat roadSize = 5.0f;
 				this_cross = roadSize * this_cross;
 				next_cross = roadSize * next_cross;
 				if (first_left == vec3(0.0f, 0.0f, 0.0f)) {
@@ -1358,6 +1354,11 @@ drawPath(bool doShadow) {
 					last_left = this_segment - this_cross;
 					last_right = this_segment + this_cross;
 				}
+
+				roadSize = 7.0f / 5.0f;
+				this_cross = roadSize * this_cross;
+				next_cross = roadSize * next_cross;
+
 				glBegin(GL_QUADS);
 				glColor3f(1.0f, 1.0f, 1.0f);
 				glVertex3f(this_segment.x + this_cross.x - segment_forward.x, this_segment.y + this_cross.y - segment_forward.y, this_segment.z + this_cross.z - segment_forward.z);
@@ -1366,6 +1367,10 @@ drawPath(bool doShadow) {
 				glVertex3f(next_segment.x + next_cross.x + segment_forward.x, next_segment.y + next_cross.y + segment_forward.y, next_segment.z + next_cross.z + segment_forward.z);
 				glEnd();
 
+				roadSize = 5.0f / 7.0f;
+				this_cross = roadSize * this_cross;
+				next_cross = roadSize * next_cross;
+				glLineWidth(3);
 				glBegin(GL_LINES);
 				glColor3f(0.0f, 0.0f, 1.0f);
 				glVertex3f(last_right.x, last_right.y, last_right.z);

@@ -148,7 +148,10 @@ void runButtonCB(TrainWindow* tw)
 		else if (tw->cp3Button->value()) tw->startingChapter = 2;
 		else if (tw->cp2Button->value()) tw->startingChapter = 1;
 		else if (tw->cp1Button->value()) tw->startingChapter = 0;
-		if (tw->startingChapter != -1) tw->trainView->chapter = tw->startingChapter;
+		if (tw->startingChapter != -1) {
+			tw->trainView->chapter = tw->startingChapter;
+			tw->trainView->switchChapter(tw->trainView->chapter);
+		}
 		switch (tw->startingChapter) {
 		case -1:
 			break;
@@ -184,16 +187,16 @@ void runButtonCB(TrainWindow* tw)
 			//button input
 			if (buttonBuffer > 0) buttonBuffer--;
 			if (buttonBuffer == 0) {
-				if (GetAsyncKeyState('A') && tw->m_Track.lane > -1) {
+				if (GetAsyncKeyState('A') && tw->m_Track.lane > -1 && tw->speed->value() > 0.1f) {
 					tw->m_Track.lane--;
 					buttonBuffer = buffer;
 				}
-				if (GetAsyncKeyState('D') && tw->m_Track.lane < 1) {
+				if (GetAsyncKeyState('D') && tw->m_Track.lane < 1 && tw->speed->value() > 0.1f) {
 					tw->m_Track.lane++;
 					buttonBuffer = buffer;
 				}
 			}
-			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1) {
+			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1 && tw->speed->value() > 0.1f) {
 				tw->m_Track.jumpingState = 0;
 				//buttonBuffer = buffer;
 			}
@@ -215,7 +218,7 @@ void runButtonCB(TrainWindow* tw)
 				//player multiball collision
 				if (MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
-					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f) {
+					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f && !tw->debug_mode->value()) {
 					endReset(tw);
 				}
 
@@ -288,7 +291,7 @@ void runButtonCB(TrainWindow* tw)
 
 				//player obstacle collision
 				for (int obstacle = 0; obstacle < tw->m_Track.obstacles.size(); obstacle++) {
-					if (tw->m_Track.collision(obstacle)) {
+					if (tw->m_Track.collision(obstacle) && !tw->debug_mode->value()) {
 						endReset(tw);
 						break;
 					}
