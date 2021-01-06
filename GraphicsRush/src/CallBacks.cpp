@@ -320,6 +320,8 @@ void runButtonCB(TrainWindow* tw)
 				tw->trainView->rain->advanceRain();
 			if (tw->m_Track.miniBoss)
 				tw->trainView->filterAdvance();
+			if (tw->trainView->star)
+				tw->trainView->star->advanceStar();
 			tw->trainView->mainBossAdvance();
 			tw->trainView->extraBossHPAdvance();
 			lastRedraw = clock();

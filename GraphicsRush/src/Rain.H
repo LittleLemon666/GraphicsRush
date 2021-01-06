@@ -36,6 +36,7 @@ public:
 	void advanceRain()
 	{
 		rain_time++;
+		if (rain_time >= size.y * 2) rain_time = 0;
 	}
 	const int getTime() const
 	{

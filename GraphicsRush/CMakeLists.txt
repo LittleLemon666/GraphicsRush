@@ -36,7 +36,9 @@ set(SRC_SHADER
     ${SRC_DIR}shaders/hp.vert
     ${SRC_DIR}shaders/hp.frag
     ${SRC_DIR}shaders/rain.vert
-    ${SRC_DIR}shaders/rain.frag)
+    ${SRC_DIR}shaders/rain.frag
+    ${SRC_DIR}shaders/star.vert
+    ${SRC_DIR}shaders/star.frag)
 
 set(SRC_RENDER_UTILITIES
     ${SRC_DIR}RenderUtilities/BufferObject.h
@@ -67,6 +69,7 @@ add_executable(GraphicsRush
     ${SRC_DIR}Firework.h
     ${SRC_DIR}Rain.h
     ${SRC_DIR}Filter.h
+    ${SRC_DIR}Star.h
 
     ${SRC_DIR}main.cpp
     ${SRC_DIR}CallBacks.cpp

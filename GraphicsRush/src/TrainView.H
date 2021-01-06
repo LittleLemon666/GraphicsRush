@@ -46,6 +46,7 @@ class CTrack;
 #include "Firework.H"
 #include "Rain.H"
 #include "Filter.H"
+#include "Star.H"
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -181,6 +182,7 @@ class TrainView : public Fl_Gl_Window
 		Shader* firework_shader = nullptr;
 		Shader* hp_shader = nullptr;
 		Shader* rain_shader = nullptr;
+		Shader* star_shader = nullptr;
 		void loadObjects();
 		void loadMiniBoss();
 		void loadMainBoss();
@@ -237,6 +239,7 @@ class TrainView : public Fl_Gl_Window
 		void drawFireworks();
 		void drawPizza();
 		void drawRain();
+		void drawStars();
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
@@ -403,4 +406,6 @@ class TrainView : public Fl_Gl_Window
 		void filterAdvance();
 		int filter_id = Filter::ORIGIN;
 		const std::string fiter_info[Filter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Blueprint!", "Draw!" };
+
+		Star* star = nullptr;
 };

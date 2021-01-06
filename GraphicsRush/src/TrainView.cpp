@@ -1290,6 +1290,8 @@ drawWorld()
 
 	drawRain();
 
+	drawStars();
+
 	glDisable(GL_BLEND);
 }
 
@@ -2334,6 +2336,12 @@ drawRain()
 }
 
 void TrainView::
+drawStars()
+{
+
+}
+
+void TrainView::
 printText()
 {
 	if (game_state == CLOBBY)
@@ -2591,6 +2599,13 @@ draw()
 				nullptr, nullptr, nullptr,
 				"../GraphicsRush/src/shaders/rain.frag");
 
+		if (!this->star_shader)
+			this->star_shader = new
+			Shader(
+				"../GraphicsRush/src/shaders/star.vert",
+				nullptr, nullptr, nullptr,
+				"../GraphicsRush/src/shaders/star.frag");
+
 		if (!this->commom_matrices)
 		{
 			this->commom_matrices = new UBO();
@@ -2839,6 +2854,9 @@ draw()
 
 		if (!rain)
 			rain = new Rain();
+
+		if (!star)
+			star = new Star();
 
 		initDoor();
 
