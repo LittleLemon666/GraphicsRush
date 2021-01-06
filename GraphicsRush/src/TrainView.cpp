@@ -3434,7 +3434,7 @@ shootFireworks()
 			else if (firework_interval == 10 * num_firework + 20) shoot_firework = false;
 		}
 		
-		if (pizza_time = true && !shoot_firework) pizza_time = false;
+		if (pizza_time && !shoot_firework) pizza_time = false;
 		firework_interval++;
 	}
 }
