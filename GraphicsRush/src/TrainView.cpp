@@ -2970,7 +2970,7 @@ draw()
 
 			alGenSources((ALuint)1, &this->source);
 			alSourcef(this->source, AL_PITCH, 1);
-			alSourcef(this->source, AL_GAIN, 1.0f);
+			alSourcef(this->source, AL_GAIN, 0.5f);
 			alSource3f(this->source, AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
 			alSource3f(this->source, AL_VELOCITY, 0, 0, 0);
 			alSourcei(this->source, AL_LOOPING, AL_TRUE);
