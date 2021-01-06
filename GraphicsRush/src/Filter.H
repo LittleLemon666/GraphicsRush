@@ -5,7 +5,8 @@ enum FFilter
 	ORIGIN,
 	UNIFORM,
 	CLIPPING,
-	EDGE,
+	BLUEPRINT,
+	DRAW,
 	MAXFILTER	// nothing, it is used to filterAdvance()
 };
 

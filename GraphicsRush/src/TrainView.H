@@ -403,5 +403,5 @@ class TrainView : public Fl_Gl_Window
 		int filter_effect_time = 0;
 		void filterAdvance();
 		int filter_id = FFilter::ORIGIN;
-		const std::string fiter_info[FFilter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Edge!" };
+		const std::string fiter_info[FFilter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Blueprint!", "Draw!" };
 };

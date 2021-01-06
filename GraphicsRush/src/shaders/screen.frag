@@ -58,7 +58,7 @@ vec3 gray(vec3 color)
     return vec3(color.r * 0.3 + color.g * 0.59 + color.b * 0.11);
 }
 
-vec4 edge()
+vec3 edge()
 {
     float dx = 1.0 / size.x;
     float dy = 1.0 / size.y;
@@ -74,9 +74,20 @@ vec4 edge()
         gray(texture(screen, vec2(f_in.uv.x + dx, f_in.uv.y - dy)).rgb) -
         gray(texture(screen, vec2(f_in.uv.x + dx, f_in.uv.y)).rgb) -
         gray(texture(screen, vec2(f_in.uv.x + dx, f_in.uv.y + dy)).rgb)) / 6.0;
-    vec3 color = (Ix + Iy) * 16.0;
+    return (Ix + Iy) * 16.0;
+}
+
+vec4 bluePaint(vec3 color)
+{
     if (color.b < 0.5)  color = vec3(0.3,0.4,1.0);
     return vec4(color, 1.0);
+}
+
+vec4 handPaint(vec3 color)
+{
+    vec3 Edge = edge();
+    vec3 cartoon = vec3(cartoonRG(color.r), cartoonRG(color.g), cartoonB(color.b));
+    return vec4(cartoon - Edge, 1.0);
 }
 
 void main()
@@ -90,7 +101,9 @@ void main()
             color = color * vec4(0.3,0.3,0.3,1.0);
     }
     else if (filter_id == 3)
-        color = edge();
+        color = bluePaint(edge());
+    else if (filter_id == 4)
+        color = handPaint(vec3(color));
 
     f_color = color * brightness;
 }

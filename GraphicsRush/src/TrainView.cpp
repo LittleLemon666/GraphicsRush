@@ -61,7 +61,7 @@ TrainView(int x, int y, int w, int h, const char* l)
 
 	/*********************NEW ADDITIONS*********************/
 	srand(time(NULL));
-
+	
 	// loads a cubemap texture from 6 individual texture faces
 	// order:
 	// +X (right)
