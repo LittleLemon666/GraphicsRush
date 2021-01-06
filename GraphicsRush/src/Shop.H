@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include "Model.H"
 #include "RenderUtilities/Texture.h"
+#include <AL/alut.h>
 #include <vector>
 #include <string>
 #include "TrainWindow.H"

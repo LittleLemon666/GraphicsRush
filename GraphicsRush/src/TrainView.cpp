@@ -2970,6 +2970,22 @@ draw()
 			alBufferData(this->collisionBuffer, format, data, size, freq);
 			alSourcei(this->collisionSource, AL_BUFFER, this->collisionBuffer);
 
+			//buy sound
+			alGenSources((ALuint)1, &this->buySource);
+			alSourcef(this->buySource, AL_PITCH, 1);
+			alSourcef(this->buySource, AL_GAIN, 1.0f);
+			alSource3f(this->buySource, AL_POSITION, source_pos.x, source_pos.y, source_pos.z);
+			alSource3f(this->buySource, AL_VELOCITY, 0, 0, 0);
+			alSourcei(this->buySource, AL_LOOPING, AL_FALSE);
+
+			alGenBuffers((ALuint)1, &this->buyBuffer);
+
+			//Material from: ThinMatrix
+			alutLoadWAVFile((ALbyte*)"../GraphicsRush/Audios/buy.wav", &format, &data, &size, &freq, &loop);
+			alBufferData(this->buyBuffer, format, data, size, freq);
+			alSourcei(this->buySource, AL_BUFFER, this->buyBuffer);
+
+
 			// cleanup context
 			//alDeleteSources(1, &source);
 			//alDeleteBuffers(1, &buffer);

@@ -1,4 +1,5 @@
 #include "Shop.h"
+#include "TrainView.H"
 Shop::Shop()
 {
 	if (gladLoadGL())
@@ -27,4 +28,5 @@ void Shop::buy(TrainWindow* tw, int item_id) {
 		else tw->m_Track.player.cps[item_id - 5]++;
 	}
 	tw->m_Track.player.saveFile();
+	alSourcePlay(tw->trainView->buySource);
 };
