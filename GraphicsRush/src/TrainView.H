@@ -347,7 +347,7 @@ class TrainView : public Fl_Gl_Window
 		float sun_rotate = 0;
 		void rotate_objects();
 
-		vec3 sun_pos = vec3(-580.0f, 50.0f, 530.0f);
+		vec3 sun_pos = vec3(-75, 5, 200);
 		int light_mode = Lighting::LDIR;
 
 		Environment* environment = nullptr;
