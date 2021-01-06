@@ -2243,8 +2243,6 @@ drawScreenQuad()
 	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "screen"), 0);
 	glUniform1f(glGetUniformLocation(this->screen_shader->Program, "brightness"), screen_brightness);
 	glUniform1i(glGetUniformLocation(this->screen_shader->Program, "filter_id"), filter_id);
-	for (int i = 0; i < 5 * 5; i++)
-		glUniform1f(glGetUniformLocation(this->screen_shader->Program, ("filter_map[" + std::to_string(i) + "]").c_str()), filter->edge_filter1[i]);
 	glUniform2fv(glGetUniformLocation(this->screen_shader->Program, "size"), 1, &vec2(w(), h())[0]);
 
 	glBindVertexArray(this->screen_quad->vao);
@@ -2443,7 +2441,7 @@ printText()
 			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.9f, 0.9f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
-		if (filter_id > FFilter::ORIGIN)
+		if (filter_id > Filter::ORIGIN)
 		{
 			RenderText(fiter_info[filter_id].c_str(), w() / 2.0 - 50.0, h() - 120.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 		}
@@ -2841,9 +2839,6 @@ draw()
 
 		if (!rain)
 			rain = new Rain();
-
-		if (!filter)
-			filter = new Filter();
 
 		initDoor();
 
@@ -3367,7 +3362,7 @@ filterAdvance()
 	filter_effect_time++;
 	if (filter_effect_time == 100)
 	{
-		filter_id = rand() % FFilter::MAXFILTER;
+		filter_id = rand() % Filter::MAXFILTER;
 	}
 	else if (filter_effect_time == 200)
 	{

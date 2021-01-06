@@ -399,9 +399,8 @@ class TrainView : public Fl_Gl_Window
 
 		Rain* rain = nullptr;
 
-		Filter* filter = nullptr;
 		int filter_effect_time = 0;
 		void filterAdvance();
-		int filter_id = FFilter::ORIGIN;
-		const std::string fiter_info[FFilter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Blueprint!", "Draw!" };
+		int filter_id = Filter::ORIGIN;
+		const std::string fiter_info[Filter::MAXFILTER] = { "", "Uniform!", "Clipping!", "Blueprint!", "Draw!" };
 };
