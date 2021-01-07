@@ -1308,6 +1308,8 @@ drawWorld()
 
 	drawMercury();
 
+	drawJupiter();
+
 	//use money to check if world is loaded
 	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
@@ -2010,7 +2012,7 @@ drawEarth()
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, vec3(-340.0f, 25.0f, 455.0f));
+	model_matrix = translate(model_matrix, vec3(50.0, -5.0, 200.0));
 	model_matrix = rotate(model_matrix, earth_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(60, 60, 60));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2091,6 +2093,29 @@ drawMercury()
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	mercury_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawJupiter()
+{
+	if (chapter != 4) return; // don't draw jupiter when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-560.0f, 25.0f, 560.0f)); //-346.611 260.85 198.76
+	model_matrix = rotate(model_matrix, jupiter_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(480, 480, 480));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	jupiter_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	jupiter_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2924,6 +2949,9 @@ draw()
 		if (!this->mercury_texture)
 			this->mercury_texture = new Texture2D(mercury_texture_path.c_str());
 
+		if (!this->jupiter_texture)
+			this->jupiter_texture = new Texture2D(jupiter_texture_path.c_str());
+
 		if (!this->main_boss_obj_texture)
 			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
 
@@ -3068,6 +3096,9 @@ draw()
 
 		if (!mercury_obj)
 			mercury_obj = new Model(mercury_obj_path);
+
+		if (!jupiter_obj)
+			jupiter_obj = new Model(jupiter_obj_path);
 
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
@@ -3614,6 +3645,9 @@ rotate_objects()
 
 	mercury_rotate += 0.005f;
 	if (mercury_rotate > 314) mercury_rotate -= 314;
+
+	jupiter_rotate += 0.0025f;
+	if (jupiter_rotate > 314) jupiter_rotate -= 314;
 
 	pizza_rotate += 0.1f;
 	if (pizza_rotate > 314) pizza_rotate -= 314;

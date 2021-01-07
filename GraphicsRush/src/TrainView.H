@@ -235,6 +235,7 @@ class TrainView : public Fl_Gl_Window
 		void drawSun();
 		void drawMars();
 		void drawMercury();
+		void drawJupiter();
 		void drawFree(bool buttom = false);
 		void drawVer2(bool buttom = false);
 		void drawVer3(bool buttom = false);
@@ -363,6 +364,12 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* mercury_texture = nullptr;
 		std::string mercury_texture_path = "../GraphicsRush/Objects/mercury.jpg";
 		float mercury_rotate = 0;
+
+		Model* jupiter_obj = nullptr;
+		std::string jupiter_obj_path = "SPHERE";
+		Texture2D* jupiter_texture = nullptr;
+		std::string jupiter_texture_path = "../GraphicsRush/Objects/jupiter.jpg";
+		float jupiter_rotate = 0;
 		void rotate_objects();
 
 		vec3 sun_pos = vec3(-75, 5, 200);
