@@ -4,7 +4,7 @@
 class Rain
 {
 public:
-	Rain() : num(512), color(glm::vec3(0.0, 0.0, 1.0)), size(glm::vec3(100, 100, 100))
+	Rain() : num(2048), color(glm::vec3(0.0, 0.0, 1.0)), size(glm::vec3(100, 100, 100))
 	{
 		initRain();
 	}
