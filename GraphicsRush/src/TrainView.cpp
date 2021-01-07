@@ -1310,6 +1310,14 @@ drawWorld()
 
 	drawJupiter();
 
+	drawVenus();
+
+	drawSaturn();
+
+	drawUranus();
+
+	drawNeptune();
+
 	//use money to check if world is loaded
 	if (!m_pTrack->miniBoss && m_pTrack->first_P2 && chapter == 1) loadMiniBoss();
 	else if (!m_pTrack->mainBoss && m_pTrack->first_P5 && chapter == 4) loadMainBoss();
@@ -2081,7 +2089,7 @@ drawMercury()
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, vec3(-255.5, 170.0, 200.0)); //-346.611 260.85 198.76
+	model_matrix = translate(model_matrix, vec3(-255.5, 170.0, 200.0));
 	model_matrix = rotate(model_matrix, mercury_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(30, 30, 30));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2116,6 +2124,98 @@ drawJupiter()
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	jupiter_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawVenus()
+{
+	if (chapter != 4) return; // don't draw venus when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-133.5, 5.0, 546.5));
+	model_matrix = rotate(model_matrix, venus_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(25, 25, 25));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	venus_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	venus_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawSaturn()
+{
+	if (chapter != 4) return; // don't draw saturn when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-330.0, 260.0, -30.0));
+	model_matrix = rotate(model_matrix, saturn_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(480, 480, 480));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	saturn_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	saturn_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawUranus()
+{
+	if (chapter != 4) return; // don't draw uranus when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-650.0, -40.0, 170.0));
+	model_matrix = rotate(model_matrix, uranus_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(160, 160, 160));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	uranus_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	uranus_obj->draw();
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
+drawNeptune()
+{
+	if (chapter != 4) return; // don't draw Neptune when not in chapter 5
+
+	this->basic_shader->Use();
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-75.0, 280.0, 200.0));
+	model_matrix = rotate(model_matrix, neptune_rotate, vec3(0, 1, 0));
+	model_matrix = scale(model_matrix, vec3(160, 160, 160));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	glUniform3fv(glGetUniformLocation(this->basic_shader->Program, "u_color"), 1, &vec3(0.0f, 1.0f, 0.0f)[0]);
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "lightSpaceMatrix"), 1, GL_FALSE, &lightSpaceMatrix[0][0]);
+	neptune_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	this->shadow->bind(1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
+	neptune_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2952,6 +3052,18 @@ draw()
 		if (!this->jupiter_texture)
 			this->jupiter_texture = new Texture2D(jupiter_texture_path.c_str());
 
+		if (!this->venus_texture)
+			this->venus_texture = new Texture2D(venus_texture_path.c_str());
+
+		if (!this->saturn_texture)
+			this->saturn_texture = new Texture2D(saturn_texture_path.c_str());
+
+		if (!this->uranus_texture)
+			this->uranus_texture = new Texture2D(uranus_texture_path.c_str());
+
+		if (!this->neptune_texture)
+			this->neptune_texture = new Texture2D(neptune_texture_path.c_str());
+
 		if (!this->main_boss_obj_texture)
 			this->main_boss_obj_texture = new Texture2D(main_boss_obj_texture_path.c_str());
 
@@ -3099,6 +3211,18 @@ draw()
 
 		if (!jupiter_obj)
 			jupiter_obj = new Model(jupiter_obj_path);
+
+		if (!venus_obj)
+			venus_obj = new Model(venus_obj_path);
+
+		if (!saturn_obj)
+			saturn_obj = new Model(saturn_obj_path);
+
+		if (!uranus_obj)
+			uranus_obj = new Model(uranus_obj_path);
+
+		if (!neptune_obj)
+			neptune_obj = new Model(neptune_obj_path);
 
 		if (!multiball_obj)
 			multiball_obj = new Model(multiball_obj_path);
@@ -3648,6 +3772,18 @@ rotate_objects()
 
 	jupiter_rotate += 0.0025f;
 	if (jupiter_rotate > 314) jupiter_rotate -= 314;
+
+	venus_rotate += 0.005f;
+	if (venus_rotate > 314) venus_rotate -= 314;
+
+	saturn_rotate += 0.005f;
+	if (saturn_rotate > 314) saturn_rotate -= 314;
+
+	uranus_rotate += 0.005f;
+	if (uranus_rotate > 314) uranus_rotate -= 314;
+
+	neptune_rotate += 0.005f;
+	if (neptune_rotate > 314) neptune_rotate -= 314;
 
 	pizza_rotate += 0.1f;
 	if (pizza_rotate > 314) pizza_rotate -= 314;

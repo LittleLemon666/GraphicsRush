@@ -236,6 +236,10 @@ class TrainView : public Fl_Gl_Window
 		void drawMars();
 		void drawMercury();
 		void drawJupiter();
+		void drawVenus();
+		void drawSaturn();
+		void drawUranus();
+		void drawNeptune();
 		void drawFree(bool buttom = false);
 		void drawVer2(bool buttom = false);
 		void drawVer3(bool buttom = false);
@@ -370,6 +374,30 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* jupiter_texture = nullptr;
 		std::string jupiter_texture_path = "../GraphicsRush/Objects/jupiter.jpg";
 		float jupiter_rotate = 0;
+
+		Model* venus_obj = nullptr;
+		std::string venus_obj_path = "SPHERE";
+		Texture2D* venus_texture = nullptr;
+		std::string venus_texture_path = "../GraphicsRush/Objects/venus.jpg";
+		float venus_rotate = 0;
+
+		Model* saturn_obj = nullptr;
+		std::string saturn_obj_path = "SPHERE";
+		Texture2D* saturn_texture = nullptr;
+		std::string saturn_texture_path = "../GraphicsRush/Objects/saturn.jpg";
+		float saturn_rotate = 0;
+
+		Model* uranus_obj = nullptr;
+		std::string uranus_obj_path = "SPHERE";
+		Texture2D* uranus_texture = nullptr;
+		std::string uranus_texture_path = "../GraphicsRush/Objects/uranus.jpg";
+		float uranus_rotate = 0;
+
+		Model* neptune_obj = nullptr;
+		std::string neptune_obj_path = "SPHERE";
+		Texture2D* neptune_texture = nullptr;
+		std::string neptune_texture_path = "../GraphicsRush/Objects/neptune.jpg";
+		float neptune_rotate = 0;
 		void rotate_objects();
 
 		vec3 sun_pos = vec3(-75, 5, 200);
