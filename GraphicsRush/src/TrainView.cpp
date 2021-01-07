@@ -381,6 +381,8 @@ initPath() {
 			int coordinate_divide = PATH_DIVIDE;
 			float this_segment_texture_coordinate_y = 1.0 * ((segment) % coordinate_divide / (float)coordinate_divide);
 			float next_segment_texture_coordinate_y = 1.0 * ((segment + 1) % coordinate_divide / (float)coordinate_divide);
+			if (segment == coordinate_divide - 1)
+				next_segment_texture_coordinate_y = 1.0;
 			path->texture_coordinate.push_back((GLfloat)0.0);
 			path->texture_coordinate.push_back((GLfloat)this_segment_texture_coordinate_y);
 			path->texture_coordinate.push_back((GLfloat)1.0);
@@ -2085,7 +2087,7 @@ drawMars()
 void TrainView::
 drawMercury()
 {
-	if (chapter != 4) return; // don't draw mercury when not in chapter 5
+	if (chapter != 4) return; // don't draw Mercury when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2131,7 +2133,7 @@ drawJupiter()
 void TrainView::
 drawVenus()
 {
-	if (chapter != 4) return; // don't draw venus when not in chapter 5
+	if (chapter != 4) return; // don't draw Venus when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2154,7 +2156,7 @@ drawVenus()
 void TrainView::
 drawSaturn()
 {
-	if (chapter != 4) return; // don't draw saturn when not in chapter 5
+	if (chapter != 4) return; // don't draw Saturn when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2170,6 +2172,12 @@ drawSaturn()
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "shadowMap"), 1);
 	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "light_mode"), light_mode);
 	saturn_obj->draw();
+
+	model_matrix = scale(model_matrix, vec3(1.9, 1.9, 1.9));
+	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+	saturn_ring_texture->bind(0);
+	glUniform1i(glGetUniformLocation(this->basic_shader->Program, "u_texture"), 0);
+	saturn_ring_obj->draw();
 	//unbind shader(switch to fixed pipeline)
 	glUseProgram(0);
 }
@@ -2177,7 +2185,7 @@ drawSaturn()
 void TrainView::
 drawUranus()
 {
-	if (chapter != 4) return; // don't draw uranus when not in chapter 5
+	if (chapter != 4) return; // don't draw Uranus when not in chapter 5
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
@@ -2204,7 +2212,7 @@ drawNeptune()
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, vec3(-75.0, 280.0, 200.0));
+	model_matrix = translate(model_matrix, vec3(-50.0, 380.0, 200.0));
 	model_matrix = rotate(model_matrix, neptune_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(160, 160, 160));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -3058,6 +3066,9 @@ draw()
 		if (!this->saturn_texture)
 			this->saturn_texture = new Texture2D(saturn_texture_path.c_str());
 
+		if (!this->saturn_ring_texture)
+			this->saturn_ring_texture = new Texture2D(saturn_ring_texture_path.c_str());
+
 		if (!this->uranus_texture)
 			this->uranus_texture = new Texture2D(uranus_texture_path.c_str());
 
@@ -3217,6 +3228,9 @@ draw()
 
 		if (!saturn_obj)
 			saturn_obj = new Model(saturn_obj_path);
+
+		if (!saturn_ring_obj)
+			saturn_ring_obj = new Model(saturn_ring_obj_path);
 
 		if (!uranus_obj)
 			uranus_obj = new Model(uranus_obj_path);

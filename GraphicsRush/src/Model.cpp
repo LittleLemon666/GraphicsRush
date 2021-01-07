@@ -320,6 +320,54 @@ Model(const std::string fileName, bool uv_reflect, int subdivision_level)
 
 		VAOProcess();
 	}
+	else if (fileName == "RING") // Under construction
+	{
+		int d_angle = 90.0 / pow(2, subdivision_level);
+		unsigned short indices_index = 0;
+		float r1 = 0.5f, r2 = 0.35f;
+		float ring_x, ring_y, ring_z;
+		
+		for (int theta = 0; theta < 360; theta += d_angle)
+		{
+			ring_x = r1 * glm::cos(glm::radians((float)theta));
+			ring_y = 0.0f;
+			ring_z = r1 * glm::sin(glm::radians((float)theta));
+			indexed_vertices.push_back(glm::vec3(ring_x, ring_y, ring_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(ring_x, ring_y, ring_z)));
+			indexed_uvs.push_back(glm::vec2(0.0f, theta / 360.0f));
+
+			ring_x = r1 * glm::cos(glm::radians((float)(theta + d_angle)));
+			ring_y = 0.0f;
+			ring_z = r1 * glm::sin(glm::radians((float)(theta + d_angle)));
+			indexed_vertices.push_back(glm::vec3(ring_x, ring_y, ring_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(ring_x, ring_y, ring_z)));
+			indexed_uvs.push_back(glm::vec2(0.0f, (theta + d_angle) / 360.0f));
+
+			ring_x = r2 * glm::cos(glm::radians((float)(theta + d_angle)));
+			ring_y = 0.0f;
+			ring_z = r2 * glm::sin(glm::radians((float)(theta + d_angle)));
+			indexed_vertices.push_back(glm::vec3(ring_x, ring_y, ring_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(ring_x, ring_y, ring_z)));
+			indexed_uvs.push_back(glm::vec2(1.0f, (theta + d_angle) / 360.0f));
+
+			ring_x = r2 * glm::cos(glm::radians((float)theta));
+			ring_y = 0.0f;
+			ring_z = r2 * glm::sin(glm::radians((float)theta));
+			indexed_vertices.push_back(glm::vec3(ring_x, ring_y, ring_z));
+			indexed_normals.push_back(glm::normalize(glm::vec3(ring_x, ring_y, ring_z)));
+			indexed_uvs.push_back(glm::vec2(1.0f, theta / 360.0f));
+
+			indices.push_back(indices_index);
+			indices.push_back(indices_index + 1);
+			indices.push_back(indices_index + 2);
+			indices.push_back(indices_index);
+			indices.push_back(indices_index + 2);
+			indices.push_back(indices_index + 3);
+			indices_index += 4;
+		}
+
+		VAOProcess();
+	}
 	else
 	{
 		loadOBJ(fileName);

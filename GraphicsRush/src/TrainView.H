@@ -385,6 +385,10 @@ class TrainView : public Fl_Gl_Window
 		std::string saturn_obj_path = "SPHERE";
 		Texture2D* saturn_texture = nullptr;
 		std::string saturn_texture_path = "../GraphicsRush/Objects/saturn.jpg";
+		Model* saturn_ring_obj = nullptr;
+		std::string saturn_ring_obj_path = "RING";
+		Texture2D* saturn_ring_texture = nullptr;
+		std::string saturn_ring_texture_path = "../GraphicsRush/Objects/saturn_ring.png";
 		float saturn_rotate = 0;
 
 		Model* uranus_obj = nullptr;
