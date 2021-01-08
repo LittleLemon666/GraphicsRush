@@ -234,7 +234,7 @@ void runButtonCB(TrainWindow* tw)
 				}
 
 				//player multiball collision
-				if (MainBoss::multiBallForward < 0.01 
+				if (tw->m_Track.mainBoss && MainBoss::multiBallForward < 0.01 
 					&& abs(((MainBoss::multiBallUp / 5.0f) - 1.0f) - ((tw->m_Track.jumpingState == -1) ? 0.0f : tw->m_Track.airbornePosition[tw->m_Track.jumpingState])) < 0.4f 
 					&& abs(MainBoss::multiBallCross - tw->m_Track.switchLane) < 0.4f && !tw->debug_mode->value()) {
 					alSourcePlay(tw->trainView->collisionSource);
