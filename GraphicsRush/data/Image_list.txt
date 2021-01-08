@@ -9,7 +9,7 @@ URL: https://pixabay.com/photos/milky-way-starry-sky-night-sky-star-2695569/
 
 Skybox
 Classroom
-URL: 
+URL: https://hdrmaps.com/industrial-room-2/
 Roller-Coaster
 URL: http://www.andrewhazelden.com/projects/kartavr/docs/images/examples-roller-coaster-ride-latlong.jpg
 Default-Skybox
