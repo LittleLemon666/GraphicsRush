@@ -1128,9 +1128,7 @@ choose(int x, int y)
 		game_state = CLOBBY;
 		break;
 	case CEXIT:
-		tw->ver2Button->value(0);
-		tw->ver3Button->value(0);
-		endResetForCallBack(tw);
+		dropComputerGraphics();
 		break;
 	default:
 		if (origin_game_state == CDEAD) endResetForCallBack(tw);
@@ -3965,4 +3963,12 @@ starAdvance()
 			star->advanceStar();
 		}
 	}
+}
+
+void TrainView::
+dropComputerGraphics()
+{
+	tw->ver2Button->value(0);
+	tw->ver3Button->value(0);
+	endResetForCallBack(tw);
 }

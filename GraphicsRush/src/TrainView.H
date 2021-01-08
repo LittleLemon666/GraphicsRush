@@ -480,4 +480,5 @@ class TrainView : public Fl_Gl_Window
 		Texture2D* drop_obj_texture = nullptr;
 		std::string drop_obj_texture_path = "../GraphicsRush/Images/doc.png";
 		bool drop_term = true;
+		void dropComputerGraphics();
 };
