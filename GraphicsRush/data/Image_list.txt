@@ -16,3 +16,6 @@ Default-Skybox
 URL: https://learnopengl.com/img/advanced/cubemaps_skybox.png
 Space
 URL: https://wwwtyro.github.io/space-3d/#animationSpeed=1&fov=35&nebulae=true&pointStars=true&resolution=1024&seed=172pw53a7uow&stars=true&sun=false
+
+Drop
+URL: https://pixabay.com/illustrations/material-icon-doc-icon-document-doc-2155438/
