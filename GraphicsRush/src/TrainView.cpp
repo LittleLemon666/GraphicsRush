@@ -1141,6 +1141,7 @@ choose(int x, int y)
 			}
 			if (tw->cp1Button->value()) {
 				tw->m_Track.player.cps[CP1]--;
+				finish_computer_graphics = true;
 				tw->cp1Button->value(0);
 			}
 			if (tw->cp2Button->value()) {
