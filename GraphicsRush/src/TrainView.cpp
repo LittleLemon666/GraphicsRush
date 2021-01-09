@@ -1144,6 +1144,8 @@ choose(int x, int y)
 			}
 			if (tw->cp1Button->value()) {
 				tw->m_Track.player.cps[CP1]--;
+				tw->m_Track.first_P2 = false;
+				tw->m_Track.first_P5 = false;
 				finish_computer_graphics = true;
 				tw->cp1Button->value(0);
 			}
@@ -1153,14 +1155,17 @@ choose(int x, int y)
 			}
 			if (tw->cp3Button->value()) {
 				tw->m_Track.player.cps[CP3]--;
+				tw->m_Track.first_P2 = false;
 				tw->cp3Button->value(0);
 			}
 			if (tw->cp4Button->value()) {
 				tw->m_Track.player.cps[CP4]--;
+				tw->m_Track.first_P2 = false;
 				tw->cp4Button->value(0);
 			}
 			if (tw->cp5Button->value()) {
 				tw->m_Track.player.cps[CP5]--;
+				tw->m_Track.first_P2 = false;
 				tw->cp5Button->value(0);
 			}
 		}
