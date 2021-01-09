@@ -2810,12 +2810,10 @@ printText()
 			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
-		if (drop_term)
-		{
-			char drop_info[5];
-			sprintf(drop_info, "BACK");
-			RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
-		}
+		char drop_info[5];
+		sprintf(drop_info, "BACK");
+		RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
+
 
 		if (filter_id > Filter::ORIGIN)
 		{
