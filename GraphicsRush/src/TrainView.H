@@ -98,7 +98,8 @@ enum Chooser
 	CCHECKPOINT3,
 	CCHECKPOINT4,
 	CCHECKPOINT5,
-	CRETURN
+	CRETURN,
+	CEXIT
 };
 
 enum Lighting
@@ -251,6 +252,7 @@ class TrainView : public Fl_Gl_Window
 		void drawPizza();
 		void drawRain();
 		void drawStars();
+		void drawDrop(bool buttom = false);
 		void printText();
 		vec2 ndcToViewport(const vec3& ndc);
 		GLuint loadCubemap(std::vector<std::string> chapters_skybox_textures_faces);
@@ -472,4 +474,11 @@ class TrainView : public Fl_Gl_Window
 		void starAdvance();
 
 		static int verState;
+
+		Model* drop_obj = nullptr;
+		std::string drop_obj_path = "QUAD";
+		Texture2D* drop_obj_texture = nullptr;
+		std::string drop_obj_texture_path = "../GraphicsRush/Images/doc.png";
+		bool drop_term = true;
+		void dropComputerGraphics();
 };

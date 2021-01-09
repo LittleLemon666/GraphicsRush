@@ -273,6 +273,7 @@ advanceTrain(float dir)
 			if ((int)m_Track.trainU >= (int)m_Track.points.size())
 			{
 				if (trainView->chapter == 1) m_Track.first_P2 = false;
+				if (trainView->chapter == 2) trainView->drop_term = false;
 				if (trainView->chapter == 3) trainView->rain->rainEnd();
 				if (trainView->chapter == 4)
 				{

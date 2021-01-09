@@ -1127,6 +1127,9 @@ choose(int x, int y)
 	case CRETURN:
 		game_state = CLOBBY;
 		break;
+	case CEXIT:
+		dropComputerGraphics();
+		break;
 	default:
 		if (origin_game_state == CDEAD) endResetForCallBack(tw);
 		else if (origin_game_state != CSHOP) {
@@ -1141,6 +1144,7 @@ choose(int x, int y)
 			}
 			if (tw->cp1Button->value()) {
 				tw->m_Track.player.cps[CP1]--;
+				finish_computer_graphics = true;
 				tw->cp1Button->value(0);
 			}
 			if (tw->cp2Button->value()) {
@@ -1275,6 +1279,8 @@ drawChooser()
 	drawCuda(true);
 	drawCheckpoint(true);
 	drawUarrow(true);
+
+	drawDrop(true);
 }
 
 void TrainView::
@@ -1372,6 +1378,8 @@ drawWorld()
 	drawRain();
 
 	drawStars();
+
+	drawDrop();
 
 	glDisable(GL_BLEND);
 }
@@ -2622,6 +2630,39 @@ drawStars()
 }
 
 void TrainView::
+drawDrop(bool buttom)
+{
+	if (game_state != CGAME || !drop_term) return;
+
+	if (buttom)
+		this->choose_flat_shader->Use();
+	else if (drop_term)
+		this->blending_flat_shader->Use();
+	else
+		this->blending_flat_gray_shader->Use();
+
+	mat4 model_matrix = mat4();
+	model_matrix = translate(model_matrix, vec3(-0.85f, -0.75f, 0.0f));
+	model_matrix = scale(model_matrix, vec3(0.125f, 0.125f, 0.125f));
+	if (buttom)
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->choose_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		glUniform1i(glGetUniformLocation(this->choose_flat_shader->Program, "chooser"), CEXIT);
+	}
+	else
+	{
+		glUniformMatrix4fv(glGetUniformLocation(this->blending_flat_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
+		this->drop_obj_texture->bind(0);
+		glUniform1i(glGetUniformLocation(this->blending_flat_shader->Program, "u_texture"), 0);
+	}
+
+	this->drop_obj->draw();
+
+	//unbind shader(switch to fixed pipeline)
+	glUseProgram(0);
+}
+
+void TrainView::
 printText()
 {
 	if (game_state == CLOBBY)
@@ -2769,6 +2810,13 @@ printText()
 			char fcg_info[40];
 			sprintf(fcg_info, "You finished Computer Graphics!");
 			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+		}
+
+		if (drop_term)
+		{
+			char drop_info[5];
+			sprintf(drop_info, "ESC");
+			RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
 		}
 
 		if (filter_id > Filter::ORIGIN)
@@ -3087,11 +3135,14 @@ draw()
 		if (!this->pizza_obj_texture)
 			this->pizza_obj_texture = new Texture2D(pizza_obj_texture_path.c_str());
 
-		if (!door_scene_texture)
+		if (!this->door_scene_texture)
 			door_scene_texture = new Texture2D(door_scene_texture_path.c_str());
 
-		if (!door_texture)
+		if (!this->door_texture)
 			door_texture = new Texture2D(door_texture_path.c_str());
+
+		if (!this->drop_obj_texture)
+			this->drop_obj_texture = new Texture2D(drop_obj_texture_path.c_str());
 
 		if (!this->shop)
 			this->shop = new Shop;
@@ -3255,6 +3306,9 @@ draw()
 
 		if (!pizza_obj)
 			pizza_obj = new Model(pizza_obj_path, true);
+
+		if (!drop_obj)
+			drop_obj = new Model(drop_obj_path);
 
 		if (!firework)
 		{
@@ -3909,4 +3963,12 @@ starAdvance()
 			star->advanceStar();
 		}
 	}
+}
+
+void TrainView::
+dropComputerGraphics()
+{
+	tw->ver2Button->value(0);
+	tw->ver3Button->value(0);
+	endResetForCallBack(tw);
 }

@@ -1,0 +1,21 @@
+Reversi
+URL: http://mnemstudio.org/game-reversi-intro.htm
+
+Miniboss
+URL: 
+
+Galaxy
+URL: https://pixabay.com/photos/milky-way-starry-sky-night-sky-star-2695569/
+
+Skybox
+Classroom
+URL: https://hdrmaps.com/industrial-room-2/
+Roller-Coaster
+URL: http://www.andrewhazelden.com/projects/kartavr/docs/images/examples-roller-coaster-ride-latlong.jpg
+Default-Skybox
+URL: https://learnopengl.com/img/advanced/cubemaps_skybox.png
+Space
+URL: https://wwwtyro.github.io/space-3d/#animationSpeed=1&fov=35&nebulae=true&pointStars=true&resolution=1024&seed=172pw53a7uow&stars=true&sun=false
+
+Drop
+URL: https://pixabay.com/illustrations/material-icon-doc-icon-document-doc-2155438/
