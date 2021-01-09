@@ -2632,14 +2632,12 @@ drawStars()
 void TrainView::
 drawDrop(bool buttom)
 {
-	if (game_state != CGAME || !drop_term) return;
+	if (game_state != CGAME) return;
 
 	if (buttom)
 		this->choose_flat_shader->Use();
-	else if (drop_term)
-		this->blending_flat_shader->Use();
 	else
-		this->blending_flat_gray_shader->Use();
+		this->blending_flat_shader->Use();
 
 	mat4 model_matrix = mat4();
 	model_matrix = translate(model_matrix, vec3(-0.85f, -0.75f, 0.0f));
@@ -2812,12 +2810,9 @@ printText()
 			RenderText(fcg_info, w() / 2.0 - 220.0, h() - 120.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
-		if (drop_term)
-		{
-			char drop_info[5];
-			sprintf(drop_info, "ESC");
-			RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
-		}
+		char drop_info[15];
+		sprintf(drop_info, "Backspace");
+		RenderText(drop_info, 10, 10, 0.6f, vec3(0.9f, 0.9f, 0.9f));
 
 		if (filter_id > Filter::ORIGIN)
 		{
