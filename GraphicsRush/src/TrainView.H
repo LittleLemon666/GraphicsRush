@@ -420,7 +420,7 @@ class TrainView : public Fl_Gl_Window
 		Model* mini_boss_obj = nullptr;
 		std::string mini_boss_obj_path = "QUAD";
 		Texture2D* mini_boss_obj_texture = nullptr;
-		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png"; // source: https://forum.gamer.com.tw/Co.php?bsn=44201&sn=521
+		std::string mini_boss_obj_texture_path = "../GraphicsRush/Images/boss/miniboss.png";
 
 		Firework** firework = nullptr;
 		int num_firework = 10;
