@@ -2781,17 +2781,17 @@ printText()
 		if (tw->thighButton->value()) {
 			char thigh_info[20];
 			sprintf(thigh_info, "thigh: ON");
-			RenderText(thigh_info, 455.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(thigh_info, w() - 135.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 		if (tw->ver2Button->value()) {
 			char ver2_info[20];
 			sprintf(ver2_info, "ver2: ON");
-			RenderText(ver2_info, 455.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(ver2_info, w() - 135.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 		if (tw->ver3Button->value()) {
 			char ver3_info[20];
 			sprintf(ver3_info, "ver3: ON");
-			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(ver3_info, w() - 135.0f, h() - 80.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
 		if (ver2_blink)
@@ -2816,7 +2816,7 @@ printText()
 
 		char drop_info[5];
 		sprintf(drop_info, "BACK");
-		RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(drop_info, 10, 10, 0.8f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 
 		if (filter_id > Filter::ORIGIN)
