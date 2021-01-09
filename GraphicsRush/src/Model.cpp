@@ -412,8 +412,6 @@ operator=(const Model& model)
 bool Model::
 loadOBJ(const std::string fileName)
 {
-	printf("Loading OBJ file %s...\n", fileName.c_str());
-
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::vec3> temp_vertices;
 	std::vector<glm::vec2> temp_uvs;
