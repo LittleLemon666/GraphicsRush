@@ -157,27 +157,6 @@ void runButtonCB(TrainWindow* tw)
 			tw->trainView->chapter = 0;
 			tw->trainView->switchChapter(0);
 		}
-		switch (tw->startingChapter) {
-		case -1:
-			break;
-		case 0:
-			tw->m_Track.first_P2 = false;
-			tw->m_Track.first_P5 = false;
-			break;
-		case 1:
-			break;
-		case 2:
-			tw->m_Track.first_P2 = false;
-			break;
-		case 3:
-			tw->m_Track.first_P2 = false;
-			break;
-		case 4:
-			tw->m_Track.first_P2 = false;
-			break;
-		default:
-			tw->trainView->chapter = 0;
-		}
 	}
 	if (clock() - lastRedraw > CLOCKS_PER_SEC / 30 && !tw->runButton->value()) {
 		if (buttonBuffer > 0) buttonBuffer--;
