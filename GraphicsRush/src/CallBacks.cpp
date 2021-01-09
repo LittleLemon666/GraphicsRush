@@ -218,6 +218,10 @@ void runButtonCB(TrainWindow* tw)
 			if (GetAsyncKeyState('W') && tw->m_Track.jumpingState == -1 && tw->speed->value() > 0.1f) {
 				tw->m_Track.jumpingState = 0;
 			}
+
+			if (GetAsyncKeyState(VK_BACK)) {
+				tw->trainView->dropComputerGraphics();
+			}
 			
 			if (tw->trainView->game_state == CGAME)
 			{

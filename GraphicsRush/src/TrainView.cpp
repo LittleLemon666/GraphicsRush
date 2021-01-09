@@ -2815,7 +2815,7 @@ printText()
 		if (drop_term)
 		{
 			char drop_info[5];
-			sprintf(drop_info, "ESC");
+			sprintf(drop_info, "BACK");
 			RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
 		}
 
