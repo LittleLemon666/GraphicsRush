@@ -610,7 +610,6 @@ void endResetForCallBack(TrainWindow* tw) {
 		tw->startingChapter = -1;
 		deadTimer = 0;
 		tw->trainView->finish_computer_graphics = false;
-		tw->trainView->drop_term = true;
 	}
 	tw->m_Track.obstacles = {};
 	tw->m_Track.money = {};
