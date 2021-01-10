@@ -486,7 +486,7 @@ switchChapter(const int& chapter_index)
 	int old_chapter = chapter;
 	if (!tw->m_Track.first_P2 && !tw->m_Track.first_P5 && !tw->debug_mode->value()) {
 		do {
-			chapter = rand() % (NUMBER_OF_PROJECTS + 1);
+			chapter = rand() % (NUMBER_OF_PROJECTS + 1); // random chapter after chapter 5
 		} while (chapter == old_chapter);
 	}
 	else chapter = chapter_index;
@@ -738,8 +738,6 @@ initCameraMovement()
 		gmt.setG_pos(dt);
 
 		viewer_pos = gmt.calculate(dt) - viewer_forward * (20.0f - camera_angle / 10.0f);
-		//viewer_pos.y -= camera_angle / 10.0f;
-		//vec3 viewer_up = normalize(cross(viewer_forward, crossed));
 		viewer_up = vec3(up.x * cos(radians(camera_angle)) + up.z * sin(radians(camera_angle)),
 			up.y,
 			up.x * sin(radians(camera_angle)) + up.z * cos(radians(camera_angle)));
@@ -791,7 +789,7 @@ initScreenRender()
 	// * generate a new texture
 	//
 	//========================================================================
-	if (load_screen)
+	if (load_screen) // initial in different screen size
 		glad_glDeleteTextures(1, &screen_id);
 	load_screen = true;
 	glGenTextures(1, &screen_id);
@@ -837,7 +835,7 @@ renderScreenEnd()
 }
 
 void TrainView::
-renderDepthMapBegin()
+renderDepthMapBegin() // not be used
 {
 	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -856,7 +854,7 @@ renderDepthMapBegin()
 }
 
 void TrainView::
-setLightSpaceMatrix()
+setLightSpaceMatrix() // not be used
 {
 	float ortho_size = 1000.0f;
 	float near_plane = 1.0f, far_plane = ortho_size * 0.95f;
@@ -867,7 +865,7 @@ setLightSpaceMatrix()
 }
 
 void TrainView::
-renderDepthMapEnd()
+renderDepthMapEnd() // not be used
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	
@@ -936,7 +934,7 @@ renderChooseBegin()
 	glGenFramebuffers(1, &chooser_FBO->fbo);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, chooser_FBO->fbo);
 
-	glClearColor(.0f, .0f, .0f, 1.0f);
+	glClearColor(.0f, .0f, .0f, 1.0f); // black is default in our chooser
 	// clear
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
@@ -1176,7 +1174,7 @@ choose(int x, int y)
 int TrainView::
 decodeChoose(vec3 uv)
 {
-	return (int)(uv.r * 1000 + 0.5f) + (int)(uv.g * 100 + 0.5f) + (int)(uv.b * 10 + 0.5f);
+	return (int)(uv.r * 1000 + 0.5f) + (int)(uv.g * 100 + 0.5f) + (int)(uv.b * 10 + 0.5f); // + 0.5 is to avoid float deviation
 }
 
 void TrainView::
@@ -1246,7 +1244,7 @@ drawShop(bool buttom)
 	vec3 shop_cross = normalize(cross(shop_forward, shop_up));
 	shop_pos += 4.0f * shop_cross;
 	
-	mat4 model_matrix = inverse(lookAt(shop_pos, shop_pos + shop_forward, shop_up)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(shop_pos, shop_pos + shop_forward, shop_up));
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(2.5f, 2.5f, 2.5f));
 	if (buttom)
@@ -1600,7 +1598,6 @@ void TrainView::loadObjects() {
 	
 	float money_buffer = (float)((int)m_pTrack->points.size() - 2) / (float)m_pTrack->num_of_money;
 	int money_to_obstacle_ratio = m_pTrack->num_of_money / m_pTrack->num_of_obstacles, current_ratio = 0;
-	//printf("%d\n", money_to_obstacle_ratio);
 	for (float distance = 1.0f; distance < (float)((int)m_pTrack->points.size() - 1); distance += money_buffer) {
 
 		//add money
@@ -1958,7 +1955,7 @@ drawUarrow(bool buttom)
 	vec3 uarrow_cross = normalize(cross(uarrow_forward, uarrow_up));
 	uarrow_pos -= 6.0f * uarrow_cross;
 
-	mat4 model_matrix = inverse(lookAt(uarrow_pos, uarrow_pos + uarrow_forward, uarrow_up)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(uarrow_pos, uarrow_pos + uarrow_forward, uarrow_up));
 	model_matrix = rotate(model_matrix, shop_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(0.0625f, 0.0625f, 0.0625f));
 	if (buttom)
@@ -1988,13 +1985,13 @@ drawDoor()
 	if (!load_door_position) // maintain the position in front of the player (setting in the beginning)
 	{
 		load_door_position = true;
-		door_pos = player_pos - 10.0f * player_forward - 16.0f * player_up;
+		door_pos = player_pos - 10.0f * player_forward - 16.2f * player_up;
 		door_forward = player_forward + player_up;
 		door_up = player_up - player_forward;
 	}
 
 	this->door_shader->Use();
-	mat4 model_matrix = inverse(lookAt(door_pos, door_pos + door_forward, door_up)); // the player is in a 5.0f height position
+	mat4 model_matrix = inverse(lookAt(door_pos, door_pos + door_forward, door_up));
 	model_matrix = scale(model_matrix, vec3(25, 25, 25));
 	glUniformMatrix4fv(glGetUniformLocation(this->door_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
 	door_scene_texture->bind(0);
@@ -2108,7 +2105,7 @@ drawJupiter()
 
 	this->basic_shader->Use();
 	mat4 model_matrix = mat4();
-	model_matrix = translate(model_matrix, vec3(-560.0f, 25.0f, 560.0f)); //-346.611 260.85 198.76
+	model_matrix = translate(model_matrix, vec3(-560.0f, 25.0f, 560.0f));
 	model_matrix = rotate(model_matrix, jupiter_rotate, vec3(0, 1, 0));
 	model_matrix = scale(model_matrix, vec3(480, 480, 480));
 	glUniformMatrix4fv(glGetUniformLocation(this->basic_shader->Program, "u_model"), 1, GL_FALSE, &model_matrix[0][0]);
@@ -2225,7 +2222,7 @@ drawNeptune()
 void TrainView::
 drawFree(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw thigh when not in Lobby or Shop
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2268,7 +2265,7 @@ drawFree(bool buttom)
 void TrainView::
 drawVer2(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw ver2 when not in Lobby or Shop
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2311,7 +2308,7 @@ drawVer2(bool buttom)
 void TrainView::
 drawVer3(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw ver3 when not in Lobby or Shop
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2354,7 +2351,7 @@ drawVer3(bool buttom)
 void TrainView::
 drawShader(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw Shader when not in Lobby or Shop
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2397,7 +2394,7 @@ drawShader(bool buttom)
 void TrainView::
 drawCuda(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw Cuda when not in Lobby or Shop
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2439,7 +2436,7 @@ drawCuda(bool buttom)
 
 void TrainView::drawCheckpoint(bool buttom)
 {
-	if (game_state != CLOBBY && game_state != CSHOP) return;
+	if (game_state != CLOBBY && game_state != CSHOP) return; // don't draw Check points when not in Lobby or Shop
 
 	for (int checkpoint_i = 0; checkpoint_i < NUMBER_OF_PROJECTS; checkpoint_i++)
 	{
@@ -2538,7 +2535,7 @@ drawFireworks()
 void TrainView::
 drawPizza()
 {
-	if (finish_computer_graphics && shoot_firework && game_state == CGAME)
+	if (finish_computer_graphics && shoot_firework && game_state == CGAME) // draw pizza after chapter 5
 	{
 		this->basic_shader->Use();
 
@@ -2565,7 +2562,7 @@ drawPizza()
 void TrainView::
 drawRain()
 {
-	if (chapter == 3)
+	if (chapter == 3) // only draw rain in chapter 4
 	{
 		rain->setPos(player_pos);
 		this->rain_shader->Use();
@@ -2618,7 +2615,7 @@ drawStars()
 void TrainView::
 drawDrop(bool buttom)
 {
-	if (game_state != CGAME) return;
+	if (game_state != CGAME || getting_environment) return; // don't draw drop when not in Game or getting environment for multi-ball
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2649,6 +2646,8 @@ drawDrop(bool buttom)
 void TrainView::
 printText()
 {
+	if (getting_environment) return; // don't print text when getting environment for multi-ball
+
 	if (game_state == CLOBBY)
 	{
 		char title_info[20];
@@ -2763,17 +2762,17 @@ printText()
 		if (tw->thighButton->value()) {
 			char thigh_info[20];
 			sprintf(thigh_info, "thigh: ON");
-			RenderText(thigh_info, 455.0f, h() - 30.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(thigh_info, w() - 135.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 		if (tw->ver2Button->value()) {
 			char ver2_info[20];
 			sprintf(ver2_info, "ver2: ON");
-			RenderText(ver2_info, 455.0f, h() - 55.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(ver2_info, w() - 135.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 		if (tw->ver3Button->value()) {
 			char ver3_info[20];
 			sprintf(ver3_info, "ver3: ON");
-			RenderText(ver3_info, 455.0f, h() - 80.0f, 0.6f, vec3(0.9f, 0.9f, 0.9f));
+			RenderText(ver3_info, w() - 135.0f, h() - 80.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 		}
 
 		if (ver2_blink)
@@ -2798,7 +2797,7 @@ printText()
 
 		char drop_info[5];
 		sprintf(drop_info, "BACK");
-		RenderText(drop_info, 10, 10, 0.8f, vec3(0.9f, 0.9f, 0.9f));
+		RenderText(drop_info, 10, 10, 0.8f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
 
 		if (filter_id > Filter::ORIGIN)
@@ -3775,7 +3774,7 @@ setPointLightUBO() // need to behide setViewerUBO()
 void TrainView::
 switchLightMode()
 {
-	if (chapter == 4)
+	if (chapter == 4) // Sun is light source in Chapter 5
 	{
 		light_mode = Lighting::LPOINT;
 	}
