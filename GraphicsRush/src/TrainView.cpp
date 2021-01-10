@@ -1589,22 +1589,6 @@ drawPlayer(bool doShadow) {
 		glUseProgram(0);
 };
 
-void TrainView::drawIcon() {
-	glBegin(GL_QUADS);
-	glColor3f(1.0f, 0.0f, 0.0f);
-	/*
-	glVertex2f(-290.0f, 300.0f);
-	glVertex2f(-290.0f, 290.0f);
-	glVertex2f(-300.0f, 290.0f);
-	glVertex2f(-300.0f, 300.0f);
-	*/
-	glVertex2f(1000.0f, 1000.0f);
-	glVertex2f(1000.0f, -1000.0f);
-	glVertex2f(-1000.0f, -1000.0f);
-	glVertex2f(-1000.0f, 1000.0f);
-	glEnd();
-}
-
 void TrainView::loadObjects() {
 	if (!load_game_objects)
 	{
