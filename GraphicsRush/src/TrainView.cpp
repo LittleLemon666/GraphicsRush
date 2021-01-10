@@ -1135,11 +1135,9 @@ choose(int x, int y)
 			game_state = CGAME;
 			if (tw->shaderButton->value()) {
 				tw->m_Track.player.items[SHADER]--;
-				tw->shaderButton->value(0);
 			}
 			if (tw->cudaButton->value()) {
 				tw->m_Track.player.items[CUDA]--;
-				tw->cudaButton->value(0);
 			}
 			if (tw->cp1Button->value()) {
 				tw->m_Track.player.cps[CP1]--;

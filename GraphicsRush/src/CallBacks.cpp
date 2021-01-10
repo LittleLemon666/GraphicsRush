@@ -163,7 +163,7 @@ void runButtonCB(TrainWindow* tw)
 		lastRedraw = clock();
 	}
 
-	if (GetAsyncKeyState(VK_SPACE) < 0) {
+	if (GetAsyncKeyState(VK_SPACE) < 0 && tw->debug_mode->value()) {
 		if (buttonBuffer == 0) {
 			tw->runButton->value(!tw->runButton->value());
 			buttonBuffer = buffer;
@@ -571,6 +571,9 @@ void endResetForCallBack(TrainWindow* tw) {
 		if (tw->m_Track.score > tw->m_Track.player.highscore) tw->m_Track.player.highscore = tw->m_Track.score;
 		tw->m_Track.player.money_total += tw->m_Track.money_collected;
 		tw->m_Track.player.saveFile();
+
+		tw->shaderButton->value(0);
+		tw->cudaButton->value(0);
 
 		TrainView::verState = 1;
 		tw->m_Track.first_P2 = true;
