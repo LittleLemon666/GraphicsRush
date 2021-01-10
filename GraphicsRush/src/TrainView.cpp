@@ -2617,7 +2617,7 @@ drawStars()
 void TrainView::
 drawDrop(bool buttom)
 {
-	if (game_state != CGAME) return; // don't draw drop when not in Game
+	if (game_state != CGAME || getting_environment) return; // don't draw drop when not in Game or getting environment for multi-ball
 
 	if (buttom)
 		this->choose_flat_shader->Use();
@@ -2648,6 +2648,8 @@ drawDrop(bool buttom)
 void TrainView::
 printText()
 {
+	if (getting_environment) return; // don't print text when getting environment for multi-ball
+
 	if (game_state == CLOBBY)
 	{
 		char title_info[20];
