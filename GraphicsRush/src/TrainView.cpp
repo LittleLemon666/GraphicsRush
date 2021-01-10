@@ -2754,9 +2754,23 @@ printText()
 		sprintf(score_info, "Score:  %010d", m_pTrack->score);
 		RenderText(score_info, 25.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
 
+		if (tw->shaderButton->value())
+		{
+			char score_x2_info[5];
+			sprintf(score_x2_info, "x2");
+			RenderText(score_x2_info, 315.0f, h() - 30.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+		}
+
 		char money_info[20];
 		sprintf(money_info, "money: %010d", m_pTrack->money_collected);
 		RenderText(money_info, 25.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+
+		if (tw->cudaButton->value())
+		{
+			char money_x2_info[5];
+			sprintf(money_x2_info, "x2");
+			RenderText(money_x2_info, 315.0f, h() - 55.0f, 0.6f, chapter == 5 ? vec3(0.0f, 0.0f, 0.0f) : vec3(0.9f, 0.9f, 0.9f));
+		}
 
 		//power-ups
 		if (tw->thighButton->value()) {
