@@ -220,7 +220,6 @@ class TrainView : public Fl_Gl_Window
 		void drawWorld();
 		void drawPath(bool doShadow = false);
 		void drawPlayer(bool doShadow = false);
-		void drawIcon();
 		void drawObstacles(bool doShadow = false);
 		void drawMoney(bool doShadow = false);
 		void drawMiniBoss();
